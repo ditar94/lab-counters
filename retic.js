@@ -1,20 +1,34 @@
 let totalCount = localStorage.getItem('totalCount') || 0;
 let reticCount = localStorage.getItem('reticCount') || 0;
+let buttonState = localStorage.getItem('buttonState') || "Add";
 document.getElementById("total").textContent = totalCount;
 document.getElementById("retic").textContent = reticCount;
+document.getElementById("switch").textContent = buttonState;
 
-function incrementCounter() {
-    currentCount++; // Increment the counter variable by 1
-    localStorage.setItem('currentCount', currentCount); // Save the updated value to localStorage
-    document.getElementById("counter").textContent = currentCount; // Update the content of the <p> element
+// function incrementCounter() {
+//     currentCount++; // Increment the counter variable by 1
+//     localStorage.setItem('currentCount', currentCount); // Save the updated value to localStorage
+//     document.getElementById("counter").textContent = currentCount; // Update the content of the <p> element
+// }
+
+// function decreaseCounter() {
+//     currentCount--;
+//     localStorage.setItem('currentCount', currentCount); // Save the updated value to localStorage
+//     document.getElementById("counter").textContent = currentCount; // Update the content of the <p> element
+// }
+
+
+function buttonChange() {
+    if (buttonState == "Add") {
+        buttonState = "Subtract";
+        localStorage.setItem('buttonState', buttonState);
+        document.getElementById("switch").textContent = buttonState;
+    } else {
+        buttonState = "Add";
+        localStorage.setItem('buttonState', buttonState);
+        document.getElementById("switch").textContent = buttonState;
+    }
 }
-
-function decreaseCounter() {
-    currentCount--;
-    localStorage.setItem('currentCount', currentCount); // Save the updated value to localStorage
-    document.getElementById("counter").textContent = currentCount; // Update the content of the <p> element
-}
-
 function resetCounter() {
     totalCount = 0;
     reticCount = 0;
@@ -29,18 +43,37 @@ function updateCounter() {
     document.getElementById("total").textContent = totalCount;
     let reticCount = localStorage.getItem('reticCount') || 0;
     document.getElementById("retic").textContent = reticCount;
+    let buttonState = localStorage.getItem('buttonState') || "add";
+    document.getElementById("switch").textContent = buttonState;
 }
 
+
+
 function keyStroke(event) {
-    if (event.code === "ArrowLeft") {
+    if (event.code === "ArrowLeft" && buttonState == "Add" && totalCount < 1000) {
         totalCount++;
         localStorage.setItem('totalCount', totalCount);
         document.getElementById("total").textContent = totalCount;
+    } else if (event.code === "ArrowLeft" && buttonState == "Subtract" && totalCount > 0) {
+        totalCount--;
+        localStorage.setItem('totalCount', totalCount);
+        document.getElementById("total").textContent = totalCount;
     }
-
-    if (event.code === "ArrowRight") {
+    if (event.code === "ArrowRight" && buttonState == "Add" && totalCount < 1000) {
         reticCount++;
         localStorage.setItem('reticCount', reticCount);
         document.getElementById("retic").textContent = reticCount;
+        totalCount++;
+        localStorage.setItem('totalCount', totalCount);
+        document.getElementById("total").textContent = totalCount;
+    } else if (event.code === "ArrowRight" && buttonState == "Subtract" && reticCount > 0) {
+        reticCount--;
+        localStorage.setItem('reticCount', reticCount);
+        document.getElementById("retic").textContent = reticCount;
+        if (totalCount > 0) {
+        totalCount--;
+        localStorage.setItem('totalCount', totalCount);
+        document.getElementById("total").textContent = totalCount;
+        }
     }
 }

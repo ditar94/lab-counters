@@ -26,10 +26,15 @@
             <input type="text" id="retic-counter" name="retic_counter" onkeydown="keyStroke(event)">
         </div>
         <div>
-            <p id="total">0</p>
-            <p id="retic">0</p>
-            <button onclick="incrementCounter()">Update Number</button>
-            <button onclick="decreaseCounter()">Subtract</button>
+            <div>
+                <p>Retics: </p>
+                <p id="retic">0</p>
+            </div>
+            <div>
+                <p>Total Cells: </p>
+                <p id="total">0</p>
+            </div>
+            <button id="switch" onclick="buttonChange()">Add</button>
             <button onclick="resetCounter()">Reset</button>
         </div>
         <script>
