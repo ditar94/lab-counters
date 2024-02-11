@@ -8,11 +8,14 @@
 
     <body>
         <header>
+            <div id="webTitleBar">
+                <p>Lab Counter</p>
+            </div>
             <nav>
-                <li><a href="home.html">Home</a>></li>
-                <li><a href="fetal.html">Fetal Hgb Counter</a>></li>
-                <li><a href="retic.html">Retic Counter</a>></li>
-                <li><a href="parasite.html">Parasite Counter</a>></li>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="fetal.html">Fetal Hgb Counter</a></li>
+                <li><a href="retic.html">Retic Counter</a></li>
+                <li><a href="parasite.html">Parasite Counter</a></li>
             </nav>
         </header>
 
@@ -21,10 +24,6 @@
             <br>
         </div>
 
-        <div id="ret-counter">
-            <label for="retic-counter">Retic Counter</label>
-            <input type="text" id="retic-counter" name="retic_counter" onkeydown="keyStroke(event)">
-        </div>
         <div>
             <p>Retic Percentage (%): </p>
             <p id="percent">0</p>
@@ -36,9 +35,15 @@
                 <p>Total Cells: </p>
                 <p id="total">0</p>
             </div>
+            <div id="ret-counter">
+                <label for="retic-counter">Retic Counter</label>
+                <input type="text" id="retic-counter" name="retic_counter" onkeydown="keyStroke(event)">
+            </div>
             <button id="switch" onclick="buttonChange()">Add</button>
             <button onclick="resetCounter()">Reset</button>
         </div>
+
+
         <script>
             updateCounter();
             percentageCalculator();

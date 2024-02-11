@@ -1,3 +1,7 @@
+* {
+    font-family: "GDS Transport",arial,sans-serif;
+}
+
 #retic-counter:focus {
     background-color: yellow;
     color: yellow;
@@ -5,4 +9,50 @@
 
 #retic-counter {
     color: white;
+}
+
+
+a {
+    text-decoration: none;
+    color: #1d70b8;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #003078;
+}
+
+li {
+    list-style-type: none;
+}
+
+
+header {
+    display: flex;
+    flex-direction: column;
+}
+
+header p {
+    font-size: 2vw;
+    font-weight: bold;
+    color: white;
+}
+
+#webTitleBar {
+    padding: 0.1vw 3vw 0.1vw 3vw;
+    background-color: black;
+}
+
+nav {
+    display: flex;
+    justify-content: flex-start;
+    column-gap: 3vw;
+    border-top: 2vw solid #1d70b8;
+    border-bottom: 1px solid black;
+    color:black;
+    background-color: #f3f2f1;
+    padding-top: 1vw;
+    padding-bottom: 1vw;
+    padding-left: 10vw;
 }
