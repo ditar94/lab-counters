@@ -40,10 +40,14 @@ function buttonChange() {
 function resetCounter() {
     totalCount = 0;
     reticCount = 0;
+    percentage = 0;
     localStorage.setItem('reticCount', reticCount);
     localStorage.setItem('totalCount', totalCount);
+    localStorage.setItem('percentage', percentage)
     document.getElementById("total").textContent = totalCount;
     document.getElementById("retic").textContent = reticCount;
+    document.getElementById("percent").textContent = percentage;
+
 }
 
 function updateCounter() {

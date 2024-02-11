@@ -7,13 +7,22 @@ body {
 }
 
 #retic-counter:focus {
-    background-color: yellow;
-    color: yellow;
+    border: 3px solid #555;
 }
 
 #retic-counter {
     color: white;
+    border: 3px solid #ccc;
 }
+
+input::placeholder {
+    color: #555;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
 
 
 a {
@@ -55,7 +64,7 @@ nav {
     display: flex;
     justify-content: flex-start;
     column-gap: 3vw;
-    border-top: 2vw solid #1d70b8;
+    border-top: 10px solid #1d70b8;
     border-bottom: 1px solid black;
     color:black;
     background-color: #f3f2f1;
