@@ -2,6 +2,10 @@
     font-family: "GDS Transport",arial,sans-serif;
 }
 
+body {
+    margin: 0;
+}
+
 #retic-counter:focus {
     background-color: yellow;
     color: yellow;
@@ -35,12 +39,15 @@ header {
 
 header p {
     font-size: 2vw;
+    padding: 0;
+    margin: 0;
     font-weight: bold;
     color: white;
 }
 
 #webTitleBar {
-    padding: 0.1vw 3vw 0.1vw 3vw;
+    padding: 10px 0px 10px 200px;
+    margin: 0;
     background-color: black;
 }
 
@@ -54,5 +61,9 @@ nav {
     background-color: #f3f2f1;
     padding-top: 1vw;
     padding-bottom: 1vw;
-    padding-left: 10vw;
+    padding-left: 200px;
+}
+
+#main-body {
+    margin-left: 200px;
 }
