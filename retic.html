@@ -26,6 +26,8 @@
             <input type="text" id="retic-counter" name="retic_counter" onkeydown="keyStroke(event)">
         </div>
         <div>
+            <p>Retic Percentage (%): </p>
+            <p id="percent">0</p>
             <div>
                 <p>Retics: </p>
                 <p id="retic">0</p>
@@ -39,6 +41,7 @@
         </div>
         <script>
             updateCounter();
+            percentageCalculator();
         </script>
 
     </body>
