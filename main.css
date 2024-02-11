@@ -1,0 +1,8 @@
+#retic-counter:focus {
+    background-color: yellow;
+    color: yellow;
+}
+
+#retic-counter {
+    color: white;
+}

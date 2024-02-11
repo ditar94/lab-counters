@@ -3,6 +3,7 @@
         <meta charset="utf-8">
         <title>Retic - Lab Counter</title>
         <link rel="stylesheet" href="main.css" type="text/css">
+        <script src="retic.js"></script>
     </head>
 
     <body>
@@ -19,6 +20,21 @@
             <h1>Retic Counter!</h1>
             <br>
         </div>
+
+        <div id="ret-counter">
+            <label for="retic-counter">Retic Counter</label>
+            <input type="text" id="retic-counter" name="retic_counter" onkeydown="keyStroke(event)">
+        </div>
+        <div>
+            <p id="total">0</p>
+            <p id="retic">0</p>
+            <button onclick="incrementCounter()">Update Number</button>
+            <button onclick="decreaseCounter()">Subtract</button>
+            <button onclick="resetCounter()">Reset</button>
+        </div>
+        <script>
+            updateCounter();
+        </script>
 
     </body>
 </html>
