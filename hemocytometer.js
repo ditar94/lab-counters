@@ -88,14 +88,14 @@ function counterSave() {
 function calculateCount() {
     updateCounter();
     let dilution = document.getElementById("dilution").value;
-    let squares = parseInt(document.getElementById("squares").value);
+    let squares = parseFloat(document.getElementById("squares").value);
     let rbcCount;
     let rbcAvg = (parseInt(rbc_1) + parseInt(rbc_2)) / 2;
     rbcCount = 10 * dilution * rbcAvg / squares ;
     console.log(rbcCount);
-    console.log(rbc_1);
-    console.log(rbc_2);
     console.log(rbcAvg);
+    console.log(dilution);
+    console.log(squares);
     document.getElementById("rbcCount").textContent = rbcCount;
 
 }
