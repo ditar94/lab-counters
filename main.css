@@ -26,6 +26,10 @@ input::placeholder {
     text-align: center;
 }
 
+.keystroke-field:focus {
+    background-color: yellow;
+}
+
 
 
 
