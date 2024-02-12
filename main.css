@@ -28,6 +28,7 @@ input::placeholder {
 
 .keystroke-field:focus {
     background-color: yellow;
+    color:yellow;
 }
 
 

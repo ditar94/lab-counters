@@ -24,6 +24,57 @@
         <div id="main-body">
             <h1>Hemocytometer Counter!</h1>
             <br>
+            <h2>Instructions:</h2>
+            <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
+            <div class="counter-both">
+                <div class="counter-single">
+                    <p>Side 1</p>
+                    <div class="counter-single-all">
+                        <div class="counter-rbc">
+                            <p>RBC</p>
+                            <p id="rbc1">0</p>
+
+                        </div>
+                        <div class="counter-tnc">
+                            <p>TNC</p>
+                            <p id="tnc1">0</p>
+                        </div>
+                   </div>
+                   <div class="input-field">
+                        <label for="hemocytometer-counter"></label>
+                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click me to start">
+                   </div>
+                   <div>
+                    <button id="switch1" onclick="buttonChange('s1')">Add</button>
+                    <button onclick="resetCounter('c1')">Reset</button>
+                </div>
+                </div>
+
+                <div class="counter-single">
+                    <p>Side 2</p>
+                    <div class="counter-single-all">
+                        <div class="counter-rbc">
+                            <p>RBC</p>
+                            <p id="rbc2">0</p>
+                        </div>
+                        <div class="counter-tnc">
+                            <p>TNC</p>
+                            <p id="tnc2">0</p>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <label for="hemocytometer-counter"></label>
+                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click me to start">
+                    </div>
+                    <div>
+                        <button id="switch2" onclick="buttonChange('s2')">Add</button>
+                        <button onclick="resetCounter('c2')">Reset</button>
+                    </div>
+                </div>
+            </div>
         </div>
+        <script>
+            updateCounter();
+        </script>
     </body>
 </html>

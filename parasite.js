@@ -1,7 +1,7 @@
 let parasiteCount = localStorage.getItem('parasiteCount') || 0;
 let totalCountP = localStorage.getItem('totalCountP') || 0;
 let percentageP = localStorage.getItem('percentageP') || 0;
-let buttonStateP = localStorage.getItem('buttonStateP') || 0;
+let buttonStateP = localStorage.getItem('buttonStateP') || "Add";
 
 updateCounter();
 
