@@ -21,7 +21,35 @@
         <div id="main-body">
             <h1>Parasite Counter!</h1>
             <br>
+            <div>
+                <p>Parasite percentage (%):</p>
+                <p id="percent">0</p>
+            </div>
+            <div>
+                <p>Parasites: </p>
+                <p id="parasite">0</p>
+            </div>
+            <div>
+                <p>Total cells: </p>
+                <p id="total">0</p>
+            </div>
+            <div id="counter">
+                <label for="parasite-counter"></label>
+                <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click me to start" onkeydown="keyStroke(event)">
+            </div>
+
+            <div>
+                <button id="switch" onclick="buttonChange()">Add</button>
+                <button onclick="resetCounter()">Reset</button>
+            </div>
         </div>
+
+        <script>
+            updateCounter();
+            percentageCalculator();
+        </script>
+
+
 
     </body>
 </html>

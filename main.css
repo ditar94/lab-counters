@@ -6,13 +6,17 @@ body {
     margin: 0;
 }
 
-#retic-counter:focus {
+/* #retic-counter:focus {
     border: 3px solid #555;
-}
+} */
 
-#retic-counter {
+/* #retic-counter {
     color: white;
-    border: 3px solid #ccc;
+    border: 1px solid black;
+} */
+
+.keystroke-field {
+    color: white;
 }
 
 input::placeholder {
