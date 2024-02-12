@@ -90,13 +90,12 @@ function calculateCount() {
     let dilution = document.getElementById("dilution").value;
     let squares = parseInt(document.getElementById("squares").value);
     let rbcCount;
-    let rbcAvg = (rbc_1 + rbc_2) / 2;
+    let rbcAvg = (parseInt(rbc_1) + parseInt(rbc_2)) / 2;
     rbcCount = 10 * dilution * rbcAvg / squares ;
     console.log(rbcCount);
     console.log(rbc_1);
     console.log(rbc_2);
     console.log(rbcAvg);
-    console.log(rbc_1+rbc_2)
     document.getElementById("rbcCount").textContent = rbcCount;
 
 }
