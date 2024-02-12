@@ -1,17 +1,17 @@
-let rbc1 = localStorage.getItem('rbc1') || 0;
-let rbc2 = localStorage.getItem('rbc2') || 0;
-let tnc1 = localStorage.getItem('tnc1') || 0;
-let tnc2 = localStorage.getItem('tnc2') || 0;
+let rbc_1 = localStorage.getItem('rbc_1') || 0;
+let rbc_2 = localStorage.getItem('rbc_2') || 0;
+let tnc_1 = localStorage.getItem('tnc_1') || 0;
+let tnc_2 = localStorage.getItem('tnc_2') || 0;
 let buttonStateH1 = localStorage.getItem('buttonStateH1') || "Add";
 let buttonStateH2 = localStorage.getItem('buttonStateH2') || "Add";
 
 updateCounter();
 
 function updateCounter() {
-    document.getElementById("rbc1").textContent = rbc1;
-    document.getElementById("rbc2").textContent = rbc2;
-    document.getElementById("tnc1").textContent = tnc1;
-    document.getElementById("tnc2").textContent = tnc2;
+    document.getElementById("rbc1").textContent = rbc_1;
+    document.getElementById("rbc2").textContent = rbc_2;
+    document.getElementById("tnc1").textContent = tnc_1;
+    document.getElementById("tnc2").textContent = tnc_2;
     document.getElementById("switch1").textContent = buttonStateH1;
     document.getElementById("switch2").textContent = buttonStateH2;
 
@@ -40,46 +40,63 @@ function buttonChange(thisButton) {
 
 function resetCounter(thisCounter) {
     if (thisCounter == "c1") {
-        rbc1 = 0;
-        tnc1 = 0;
+        rbc_1 = 0;
+        tnc_1 = 0;
     } else if (thisCounter == "c2") {
-        rbc2 = 0;
-        tnc2 = 0;
+        rbc_2 = 0;
+        tnc_2 = 0;
     }
     counterSave();
 }
 function keyStroke(event, inputId) {
     if (inputId === "input1") {
         if (event.code === "ArrowLeft" && buttonStateH1 == "Add") {
-            rbc1++;
-        } else if (event.code === "ArrowLeft" && buttonStateH1 == "Subtract" && rbc1 > 0) {
-            rbc1--;
+            rbc_1++;
+        } else if (event.code === "ArrowLeft" && buttonStateH1 == "Subtract" && rbc_1 > 0) {
+            rbc_1--;
         } else if (event.code === "ArrowRight" && buttonStateH1 == "Add") {
-            tnc1++;
-        } else if (event.code === "ArrowRight" && buttonStateH1 == "Subtract" && tnc1 > 0) {
-            tnc1--;
+            tnc_1++;
+        } else if (event.code === "ArrowRight" && buttonStateH1 == "Subtract" && tnc_1 > 0) {
+            tnc_1--;
         }
     } else if (inputId === "input2") {
         if (event.code === "ArrowLeft" && buttonStateH2 == "Add") {
-            rbc2++;
-        } else if (event.code === "ArrowLeft" && buttonStateH2 == "Subtract" && rbc2 > 0) {
-            rbc2--;
+            rbc_2++;
+        } else if (event.code === "ArrowLeft" && buttonStateH2 == "Subtract" && rbc_2 > 0) {
+            rbc_2--;
         } else if (event.code === "ArrowRight" && buttonStateH2 == "Add") {
-            tnc2++;
-        } else if (event.code === "ArrowRight" && buttonStateH2 == "Subtract" && tnc2 > 0) {
-            tnc2--;
+            tnc_2++;
+        } else if (event.code === "ArrowRight" && buttonStateH2 == "Subtract" && tnc_2 > 0) {
+            tnc_2--;
         }
     }
     counterSave();
 }
 
 function counterSave() {
-    localStorage.setItem('rbc1', rbc1);
-    document.getElementById("rbc1").textContent = rbc1;
-    localStorage.setItem('rbc2', rbc2);
-    document.getElementById("rbc2").textContent = rbc2;
-    localStorage.setItem('tnc1', tnc1);
-    document.getElementById("tnc1").textContent = tnc1;
-    localStorage.setItem('tnc2', tnc2);
-    document.getElementById("tnc2").textContent = tnc2;
+    localStorage.setItem('rbc_1', rbc_1);
+    document.getElementById("rbc1").textContent = rbc_1;
+    localStorage.setItem('rbc_2', rbc_2);
+    document.getElementById("rbc2").textContent = rbc_2;
+    localStorage.setItem('tnc_1', tnc_1);
+    document.getElementById("tnc1").textContent = tnc_1;
+    localStorage.setItem('tnc_2', tnc_2);
+    document.getElementById("tnc2").textContent = tnc_2;
+}
+
+
+function calculateCount() {
+    updateCounter();
+    let dilution = document.getElementById("dilution").value;
+    let squares = parseInt(document.getElementById("squares").value);
+    let rbcCount;
+    let rbcAvg = (rbc_1 + rbc_2) / 2;
+    rbcCount = 10 * dilution * rbcAvg / squares ;
+    console.log(rbcCount);
+    console.log(rbc_1);
+    console.log(rbc_2);
+    console.log(rbcAvg);
+    console.log(rbc_1+rbc_2)
+    document.getElementById("rbcCount").textContent = rbcCount;
+
 }

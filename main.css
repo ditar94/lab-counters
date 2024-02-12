@@ -15,6 +15,25 @@ body {
     border: 1px solid black;
 } */
 
+.all {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.counter-both {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    column-gap: 50px;
+}
+
+.counter-single-all {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+
 .keystroke-field {
     color: white;
 }
@@ -84,4 +103,5 @@ nav {
 
 #main-body {
     margin-left: 200px;
+    margin-right: 200px;
 }
