@@ -3,18 +3,11 @@ let totalCountP = localStorage.getItem('totalCountP') || 0;
 let percentageP = localStorage.getItem('percentageP') || 0;
 let buttonStateP = localStorage.getItem('buttonStateP') || 0;
 
-document.getElementById("parasite").textContent = parasiteCount;
-document.getElementById("total").textContent = totalCountP;
-document.getElementById("percent").textContent = percentageP;
-document.getElementById("switch").textContent = buttonStateP;
+updateCounter();
 
 
 
 function updateCounter() {
-    let parasiteCount = localStorage.getItem('parasiteCount') || 0;
-    let totalCountP = localStorage.getItem('totalCountP') || 0;
-    let percentageP = localStorage.getItem('percentageP') || 0;
-    let buttonStateP = localStorage.getItem('buttonStateP') || 0;
 
     document.getElementById("parasite").textContent = parasiteCount;
     document.getElementById("total").textContent = totalCountP;
@@ -51,12 +44,25 @@ function keyStroke(event) {
         }
     } else if (event.code === "ArrowRight" && buttonStateP == "Add" && totalCountP < 1000) {
         totalCountP++
-    } else if(event.code === "ArrowLeft" && buttonStateP == "Subtract" && totalCountP > 0) {
+    } else if(event.code === "ArrowRight" && buttonStateP == "Subtract" && totalCountP > 0) {
         totalCountP--
     }
+    counterSave()
+    percentageCalculator();
+}
+
+//This function saves the counter and updates webpage
+function counterSave() {
     localStorage.setItem('totalCountP', totalCountP);
     document.getElementById("total").textContent = totalCountP;
     localStorage.setItem('parasiteCount', parasiteCount);
     document.getElementById("parasite").textContent = parasiteCount;
-    percentageCalculator();
+}
+
+function resetCounter() {
+    parasiteCount = 0;
+    totalCountP = 0;
+    percentageP = 0;
+    counterSave();
+    percentageCalculator()
 }
