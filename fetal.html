@@ -23,6 +23,106 @@
         <div id="main-body">
             <h1>Fetal Hgb Counter!</h1>
             <br>
+
+            <div id="field-counters">
+                <div class="counter-single">
+                    <p>Field 1: </p>
+                    <p>Total RBCs (Adult and Fetal)</p>
+                    <p id="field1">0</p>
+                    <label for="field1-input"></label>
+                    <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, field1)" placeholder="Click me to start">
+
+                    <div>
+                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
+                        <button onclick="resetCounter(r1)">Reset</button>
+                    </div>
+                </div>
+
+                <div class="counter-single">
+                    <p>Field 2: </p>
+                    <p>Total RBCs (Adult and Fetal)</p>
+                    <p id="field2">0</p>
+                    <label for="field2-input"></label>
+                    <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, field2)" placeholder="Click me to start">
+                    <div>
+                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
+                        <button onclick="resetCounter(r1)">Reset</button>
+                    </div>
+                </div>
+
+                <div class="counter-single">
+                    <p>Field 3: </p>
+                    <p>Total RBCs (Adult and Fetal)</p>
+                    <p id="field3">0</p>
+                    <label for="field3-input"></label>
+                    <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, field3)" placeholder="Click me to start">
+                    <div>
+                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
+                        <button onclick="resetCounter(r1)">Reset</button>
+                    </div>
+                </div>
+
+                <div class="counter-single">
+                    <p>Field 4: </p>
+                    <p>Total RBCs (Adult and Fetal)</p>
+                    <p id="field4">0</p>
+                    <label for="field4-input"></label>
+                    <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, field4)" placeholder="Click me to start">
+                    <div>
+                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
+                        <button onclick="resetCounter(r1)">Reset</button>
+                    </div>
+                </div>
+
+                <div class="counter-single">
+                    <p>Field 5: </p>
+                    <p>Total RBCs (Adult and Fetal)</p>
+                    <p id="field5">0</p>
+                    <label for="field5-input"></label>
+                    <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, field5)" placeholder="Click me to start">
+                    <div>
+                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
+                        <button onclick="resetCounter(r1)">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div>
+                    <br>
+                    <button onclick="calculateAverage()">Calculate Average</button>
+                    <p>Average RBCs per field: </p>
+                    <p id="averageRBC">0</p>
+                </div>
+
+                <div>
+                    <br>
+                    <p>RBCs in 30 fields: </p>
+                    <p id="thirtyFields">0</p>
+                </div>
+            </div>
+
+            <div class="counter-single">
+                <p>Fetal Cells in 30 Fields </p>
+                <p>Fetal Cells: </p>
+                <p id="fetalCount">0</p>
+                <p>Fields: </p>
+                <p id="fieldCount">0</p>
+                <label for="field1-input"></label>
+                <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, field1)" placeholder="Click me to start">
+
+                <div>
+                    <button id="switch1" onclick="buttonChange(s1)">Add</button>
+                    <button onclick="resetCounter(r1)">Reset</button>
+                </div>
+            </div>
+
+            <div>
+                <br>
+                <p>Percent Fetal cells: </p>
+                <p id="percentFetals">0</p>
+            </div>
+
         </div>
 
     </body>

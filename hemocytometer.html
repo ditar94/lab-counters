@@ -28,6 +28,14 @@
             <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
             <div class="all">
                 <div class="counter-both">
+
+                    <div>
+                        <p>RBC Count: </p>
+                        <p id="rbcCount">0</p>
+                        <p>TNC Count: </p>
+                        <p id="tncCount">0</p>
+                    </div>
+
                     <div class="counter-single">
                         <p>Side 1</p>
                         <div class="counter-single-all">
@@ -77,6 +85,8 @@
                         </div>
                     </div>
 
+
+
                 </div>
                 <div class="dil-and-square">
                     <div>
@@ -85,7 +95,7 @@
                             <option value="">Please choose</option>
                             <option value="0.2">0.2</option>
                             <option value="4">4</option>
-                            <option value="9">9</option>
+                            <option value="9" selected>9</option>
                         </select>
                     </div>
                     <div>
@@ -95,7 +105,7 @@
                 </div>
             </div>
             <button onclick="calculateCount()">Calculate!</button>
-            <p id="rbcCount">0</p>
+
         </div>
         <script>
             updateCounter();

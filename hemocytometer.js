@@ -91,11 +91,12 @@ function calculateCount() {
     let squares = parseFloat(document.getElementById("squares").value);
     let rbcCount;
     let rbcAvg = (parseInt(rbc_1) + parseInt(rbc_2)) / 2;
+    let tncCount;
+    let tncAverage = (parseInt(tnc_1) + parseInt(tnc_2)) / 2;
     rbcCount = 10 * dilution * rbcAvg / squares ;
-    console.log(rbcCount);
-    console.log(rbcAvg);
-    console.log(dilution);
-    console.log(squares);
-    document.getElementById("rbcCount").textContent = rbcCount;
+    tncCount = 10 * dilution * tncAverage / squares ;
+
+    document.getElementById("rbcCount").textContent = Math.round(rbcCount);
+    document.getElementById("tncCount").textContent = Math.round(tncCount);
 
 }

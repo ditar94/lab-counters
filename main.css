@@ -33,6 +33,13 @@ body {
     justify-content: space-evenly;
 }
 
+.counter-single {
+    border: 1px solid black;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 20px;
+}
+
 
 .keystroke-field {
     color: white;
@@ -50,7 +57,11 @@ input::placeholder {
     color:yellow;
 }
 
-
+#field-counters {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
 
 
 a {
