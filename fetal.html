@@ -3,6 +3,7 @@
         <meta charset="utf-8">
         <title>Fetal Hgb - Lab Counter</title>
         <link rel="stylesheet" href="main.css" type="text/css">
+
     </head>
 
     <body>
@@ -29,25 +30,25 @@
                 <div class="counter-single">
                     <p>Field 1: </p>
                     <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field1">0</p>
+                    <p id="zield1">0</p>
                     <label for="field1-input"></label>
-                    <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, field1)" placeholder="Click me to start">
+                    <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, f1)" placeholder="Click me to start">
 
                     <div>
-                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
-                        <button onclick="resetCounter(r1)">Reset</button>
+                        <button id="addSubtract1" onclick="buttonChange('s1')">Add</button>
+                        <button onclick="resetCounter('r1')">Reset</button>
                     </div>
                 </div>
 
                 <div class="counter-single">
                     <p>Field 2: </p>
                     <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field2">0</p>
+                    <p id="zield2">0</p>
                     <label for="field2-input"></label>
                     <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, field2)" placeholder="Click me to start">
                     <div>
-                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
-                        <button onclick="resetCounter(r1)">Reset</button>
+                        <button id="addSubtract2" onclick="buttonChange('s2')">Add</button>
+                        <button onclick="resetCounter('r2')">Reset</button>
                     </div>
                 </div>
 
@@ -58,8 +59,8 @@
                     <label for="field3-input"></label>
                     <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, field3)" placeholder="Click me to start">
                     <div>
-                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
-                        <button onclick="resetCounter(r1)">Reset</button>
+                        <button id="addSubtract3" onclick="buttonChange('s3')">Add</button>
+                        <button onclick="resetCounter('r3')">Reset</button>
                     </div>
                 </div>
 
@@ -70,8 +71,8 @@
                     <label for="field4-input"></label>
                     <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, field4)" placeholder="Click me to start">
                     <div>
-                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
-                        <button onclick="resetCounter(r1)">Reset</button>
+                        <button id="addSubtract4" onclick="buttonChange('s4')">Add</button>
+                        <button onclick="resetCounter('r4')">Reset</button>
                     </div>
                 </div>
 
@@ -82,8 +83,8 @@
                     <label for="field5-input"></label>
                     <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, field5)" placeholder="Click me to start">
                     <div>
-                        <button id="switch1" onclick="buttonChange(s1)">Add</button>
-                        <button onclick="resetCounter(r1)">Reset</button>
+                        <button id="addSubtract5" onclick="buttonChange('s5')">Add</button>
+                        <button onclick="resetCounter('r5')">Reset</button>
                     </div>
                 </div>
             </div>
@@ -109,12 +110,12 @@
                 <p id="fetalCount">0</p>
                 <p>Fields: </p>
                 <p id="fieldCount">0</p>
-                <label for="field1-input"></label>
-                <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, field1)" placeholder="Click me to start">
+                <label for="field6-input"></label>
+                <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, field6)" placeholder="Click me to start">
 
                 <div>
-                    <button id="switch1" onclick="buttonChange(s1)">Add</button>
-                    <button onclick="resetCounter(r1)">Reset</button>
+                    <button id="addSubtract6" onclick="buttonChange('s6')">Add</button>
+                    <button onclick="resetCounter('r6')">Reset</button>
                 </div>
             </div>
 
@@ -125,6 +126,8 @@
             </div>
 
         </div>
+
+        <script src="fetal.js"></script>
 
     </body>
 </html>

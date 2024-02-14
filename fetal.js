@@ -13,12 +13,15 @@ let add_Subtract2 = localStorage.getItem('add_Subtract2') || "Add";
 let add_Subtract3 = localStorage.getItem('add_Subtract3') || "Add";
 let add_Subtract4 = localStorage.getItem('add_Subtract4') || "Add";
 let add_Subtract5 = localStorage.getItem('add_Subtract5') || "Add";
-let add_Subtract6 = localStorage.getItem('add_Subtract6') || "Add";
+//let add_Subtract6 = localStorage.getItem('add_Subtract6') || "Add";
 let percent_Fetals = localStorage.getItem('percent_Fetals') || 0;
 
+
+updateCounter();
+
 function updateCounter() {
-    document.getElementById("field1").textContent = field_1;
-    document.getElementById("field2").textContent = field_2;
+    document.getElementById("zield1").textContent = field_1;
+    document.getElementById("zield2").textContent = field_2;
     document.getElementById("field3").textContent = field_3;
     document.getElementById("field4").textContent = field_4;
     document.getElementById("field5").textContent = field_5;
@@ -26,12 +29,79 @@ function updateCounter() {
     document.getElementById("thirtyFields").textContent = thirty_Fields;
     document.getElementById("fieldCount").textContent = field_Count;
     document.getElementById("fetalCount").textContent = fetal_Count;
-    document.getElementById("switch1").textContent = add_Subtract1;
-    document.getElementById("switch2").textContent = add_Subtract2;
-    document.getElementById("switch3").textContent = add_Subtract3;
-    document.getElementById("switch4").textContent = add_Subtract4;
-    document.getElementById("switch5").textContent = add_Subtract5;
-    document.getElementById("switch6").textContent = add_Subtract6;
+    document.getElementById("addSubtract1").textContent = add_Subtract1;
+    document.getElementById("addSubtract2").textContent = add_Subtract2;
+    document.getElementById("addSubtract3").textContent = add_Subtract3;
+    document.getElementById("addSubtract4").textContent = add_Subtract4;
+    document.getElementById("addSubtract5").textContent = add_Subtract5;
+    //document.getElementById("addSubtract6").textContent = add_Subtract6;
     document.getElementById("percentFetals").textContent = percent_Fetals;
+}
 
+function resetCounter(thisCounter) {
+    console.log("Button clicked:", thisCounter);
+    let pass;
+    if (thisCounter == "r1") {
+        field_1 = 0;
+        pass = "field_1";
+    } else if (thisCounter == "r2") {
+        field_2 = 0;
+        pass = "field_2";
+    } else if (thisCounter == "r3") {
+        field_3 = 0;
+        pass = "field_3";
+    } else if (thisCounter == "r4") {
+        field_4 = 0;
+        pass = "field_4";
+    } else if (thisCounter == "r5") {
+        field_5 = 0;
+        pass = "field_5";
+    } else if (thisCounter == "r6") {
+        field_Count = 0;
+        pass = "field_Count";
+    }
+    counterSave(pass);
+}
+
+function counterSave(pass) {
+    localStorage.setItem(pass, window[pass]);
+    document.getElementById(pass.replace("_", "")).textContent = window[pass];
+
+    console.log("When counterSave runs, pass is ", pass);
+    console.log("When counterSave runs, window[pass] is ", window[pass]);
+    console.log("When counterSave runs, pass.replace('_', '') is ", pass.replace("_", ""));
+
+}
+
+function buttonChange(thisButton) {
+    console.log(localStorage.getItem('field_5'));
+    console.log("Button clicked:", thisButton);
+    const buttonVariableMap = {
+        "s1": "add_Subtract1",
+        "s2": "add_Subtract2",
+        "s3": "add_Subtract3",
+        "s4": "add_Subtract4",
+        "s5": "add_Subtract5",
+        "s6": "add_Subtract6"
+    };
+    const currentButton = buttonVariableMap[thisButton];
+
+    if (currentButton && window[currentButton]) {
+        window[currentButton] = (window[currentButton] == "Add") ? "Subtract" : "Add";
+        localStorage.setItem(currentButton, window[currentButton]);
+        document.getElementById(currentButton.replace("_", "")).textContent = window[currentButton];
+    };
+
+    console.log("When buttonChange runs, thisButton is ", thisButton);
+    console.log(window[currentButton] == "Add");
+    console.log("When buttonChange runs, currentButton is ", currentButton);
+    console.log("When buttonChange runs, window[currentButton] is ", window[currentButton]);
+    console.log(localStorage.getItem('field_5'));
+}
+
+function calculateAverage() {
+    average_RBC = (field_1 + field_2 + field_3 + field_4 + field_5) / 5;
+    thirty_Fields = average_RBC * 30;
+    counterSave("average_RBC");
+    counterSave("thirty_Fields");
 }
