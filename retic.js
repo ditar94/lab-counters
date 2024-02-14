@@ -64,18 +64,18 @@ function updateCounter() {
 
 
 function keyStroke(event) {
-    if (event.code === "ArrowLeft" && buttonState == "Add" && totalCount < 1000) {
+    if (event.code === "ArrowRight" && buttonState == "Add" && totalCount < 1000) {
         totalCount++;
         localStorage.setItem('totalCount', totalCount);
         document.getElementById("total").textContent = totalCount;
         percentageCalculator();
-    } else if (event.code === "ArrowLeft" && buttonState == "Subtract" && totalCount > 0) {
+    } else if (event.code === "ArrowRight" && buttonState == "Subtract" && totalCount > 0) {
         totalCount--;
         localStorage.setItem('totalCount', totalCount);
         document.getElementById("total").textContent = totalCount;
         percentageCalculator();
     }
-    if (event.code === "ArrowRight" && buttonState == "Add" && totalCount < 1000) {
+    if (event.code === "ArrowLeft" && buttonState == "Add" && totalCount < 1000) {
         reticCount++;
         localStorage.setItem('reticCount', reticCount);
         document.getElementById("retic").textContent = reticCount;
@@ -83,7 +83,7 @@ function keyStroke(event) {
         localStorage.setItem('totalCount', totalCount);
         document.getElementById("total").textContent = totalCount;
         percentageCalculator();
-    } else if (event.code === "ArrowRight" && buttonState == "Subtract" && reticCount > 0) {
+    } else if (event.code === "ArrowLeft" && buttonState == "Subtract" && reticCount > 0) {
         reticCount--;
         localStorage.setItem('reticCount', reticCount);
         document.getElementById("retic").textContent = reticCount;
