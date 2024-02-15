@@ -1,21 +1,21 @@
 
-let field_1 = localStorage.getItem('field_1') || 0;
-let field_2 = localStorage.getItem('field_2') || 0;
-let field_3 = localStorage.getItem('field_3') || 0;
-let field_4 = localStorage.getItem('field_4') || 0;
-let field_5 = localStorage.getItem('field_5') || 0;
+window.field_1 = localStorage.getItem('field_1') || 0;
+window.field_2 = localStorage.getItem('field_2') || 0;
+window.field_3 = localStorage.getItem('field_3') || 0;
+window.field_4 = localStorage.getItem('field_4') || 0;
+window.field_5 = localStorage.getItem('field_5') || 0;
 console.log(localStorage.getItem('field_1'));
-let average_RBC = localStorage.getItem('average_RBC') || 0;
-let thirty_Fields = localStorage.getItem('thirty_Fields') || 0;
-let field_Count = localStorage.getItem('field_Count') || 0;
-let fetal_Count = localStorage.getItem('fetal_Count') || 0;
-let add_Subtract1 = localStorage.getItem('add_Subtract1') || "Add";
-let add_Subtract2 = localStorage.getItem('add_Subtract2') || "Add";
-let add_Subtract3 = localStorage.getItem('add_Subtract3') || "Add";
-let add_Subtract4 = localStorage.getItem('add_Subtract4') || "Add";
-let add_Subtract5 = localStorage.getItem('add_Subtract5') || "Add";
-//let add_Subtract6 = localStorage.getItem('add_Subtract6') || "Add";
-let percent_Fetals = localStorage.getItem('percent_Fetals') || 0;
+window.average_RBC = localStorage.getItem('average_RBC') || 0;
+window.thirty_Fields = localStorage.getItem('thirty_Fields') || 0;
+window.field_Count = localStorage.getItem('field_Count') || 0;
+window.fetal_Count = localStorage.getItem('fetal_Count') || 0;
+window.add_Subtract1 = localStorage.getItem('add_Subtract1') || "Add";
+window.add_Subtract2 = localStorage.getItem('add_Subtract2') || "Add";
+window.add_Subtract3 = localStorage.getItem('add_Subtract3') || "Add";
+window.add_Subtract4 = localStorage.getItem('add_Subtract4') || "Add";
+window.add_Subtract5 = localStorage.getItem('add_Subtract5') || "Add";
+//window.add_Subtract6 = localStorage.getItem('add_Subtract6') || "Add";
+window.percent_Fetals = localStorage.getItem('percent_Fetals') || 0;
 
 
 updateCounter();
@@ -39,7 +39,7 @@ function updateCounter() {
     document.getElementById("percentFetals").textContent = percent_Fetals;
 }
 
-let fields = {
+window.fields = {
     "field_1": localStorage.getItem('field_1') || 0,
     "field_2": localStorage.getItem('field_2') || 0,
     "field_3": localStorage.getItem('field_3') || 0,
@@ -54,30 +54,32 @@ function resetCounter(thisCounter) {
     if (thisCounter == "r1") {
         field_1 = 0;
         pass = "field_1";
+        counterSave(pass);
     } else if (thisCounter == "r2") {
         field_2 = 0;
         pass = 'field_2';
+        counterSave(pass);
     } else if (thisCounter == "r3") {
         field_3 = 0;
         pass = "field_3";
+        counterSave(pass);
     } else if (thisCounter == "r4") {
         field_4 = 0;
         pass = "field_4";
+        counterSave(pass);
     } else if (thisCounter == "r5") {
         field_5 = 0;
         pass = "field_5";
+        counterSave(pass);
     } else if (thisCounter == "r6") {
         field_Count = 0;
-        pass = "field_Count";
+        fetal_Count = 0;
+        counterSave("field_Count");
+        counterSave("fetal_Count");
     }
-
-    //this is a test, normally it would be counterSave(pass)
-    counterSave("field_2");
 }
 
 function counterSave(fieldValue) {
-    console.log(fieldValue);
-    console.log(window[fieldValue]);
     localStorage.setItem(fieldValue, window[fieldValue]);
     document.getElementById(fieldValue.replace("_", "")).textContent = window[fieldValue];
 }
@@ -114,3 +116,5 @@ function calculateAverage() {
     counterSave("average_RBC");
     counterSave("thirty_Fields");
 }
+
+calculateAverage();
