@@ -23,16 +23,21 @@
 
         <div id="main-body">
             <h1>Fetal Hgb Counter!</h1>
-            <h2>UNDER CONSTRUCTION</h2>
+            <h2>Instructions:</h2>
+            <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
             <br>
 
             <div id="field-counters">
+                <div>
+                    <h4>Step 1: </h4>
+                    <h5>Count the number of rbcs in 5 fields using the high dry objective (40X);</h5>
+                </div>
                 <div class="counter-single">
                     <p>Field 1: </p>
                     <p>Total RBCs (Adult and Fetal)</p>
                     <p id="field1">0</p>
                     <label for="field1-input"></label>
-                    <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, field1)" placeholder="Click me to start">
+                    <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, 1)" placeholder="Click me to start">
 
                     <div>
                         <button id="addSubtract1" onclick="buttonChange('s1')">Add</button>
@@ -45,7 +50,7 @@
                     <p>Total RBCs (Adult and Fetal)</p>
                     <p id="field2">0</p>
                     <label for="field2-input"></label>
-                    <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, field2)" placeholder="Click me to start">
+                    <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, 2)" placeholder="Click me to start">
                     <div>
                         <button id="addSubtract2" onclick="buttonChange('s2')">Add</button>
                         <button onclick="resetCounter('r2')">Reset</button>
@@ -57,7 +62,7 @@
                     <p>Total RBCs (Adult and Fetal)</p>
                     <p id="field3">0</p>
                     <label for="field3-input"></label>
-                    <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, field3)" placeholder="Click me to start">
+                    <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, 3)" placeholder="Click me to start">
                     <div>
                         <button id="addSubtract3" onclick="buttonChange('s3')">Add</button>
                         <button onclick="resetCounter('r3')">Reset</button>
@@ -69,7 +74,7 @@
                     <p>Total RBCs (Adult and Fetal)</p>
                     <p id="field4">0</p>
                     <label for="field4-input"></label>
-                    <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, field4)" placeholder="Click me to start">
+                    <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, 4)" placeholder="Click me to start">
                     <div>
                         <button id="addSubtract4" onclick="buttonChange('s4')">Add</button>
                         <button onclick="resetCounter('r4')">Reset</button>
@@ -81,7 +86,7 @@
                     <p>Total RBCs (Adult and Fetal)</p>
                     <p id="field5">0</p>
                     <label for="field5-input"></label>
-                    <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, field5)" placeholder="Click me to start">
+                    <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, 5)" placeholder="Click me to start">
                     <div>
                         <button id="addSubtract5" onclick="buttonChange('s5')">Add</button>
                         <button onclick="resetCounter('r5')">Reset</button>
@@ -92,7 +97,6 @@
             <div>
                 <div>
                     <br>
-                    <button onclick="calculateAverage()">Calculate Average</button>
                     <p>Average RBCs per field: </p>
                     <p id="averageRBC">0</p>
                 </div>
@@ -104,20 +108,31 @@
                 </div>
             </div>
 
-            <div class="counter-single">
-                <p>Fetal Cells in 30 Fields </p>
-                <p>Fetal Cells: </p>
-                <p id="fetalCount">0</p>
-                <p>Fields: </p>
-                <p id="fieldCount">0</p>
-                <label for="field6-input"></label>
-                <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, field6)" placeholder="Click me to start">
-
-                <div>
-                    <button id="addSubtract6" onclick="buttonChange('s6')">Add</button>
-                    <button onclick="resetCounter('r6')">Reset</button>
+            <div id="step2">
+                <div id="step2-instructions">
+                    <h4>Step 2: </h4>
+                    <h5>Count the number of fetal cells in 30 fields using the high dry objective (40X);</h5>
                 </div>
+
+                <div class="counter-single">
+                    <p>Fetal Cells in 30 Fields </p>
+                    <p>Fetal Cells: </p>
+                    <p id="fetalCount">0</p>
+                    <p>Fields: </p>
+                    <p id="fieldCount">0</p>
+                    <label for="field6-input"></label>
+                    <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, 6)" placeholder="Click me to start">
+
+                    <div>
+                        <button id="addSubtract6" onclick="buttonChange('s6')">Add</button>
+                        <button onclick="resetCounter('r6')">Reset</button>
+                    </div>
+                </div>
+
+
             </div>
+
+
 
             <div>
                 <br>

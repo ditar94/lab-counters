@@ -116,3 +116,14 @@ nav {
     margin-left: 200px;
     margin-right: 200px;
 }
+
+#step2 {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+
+}
+
+#step2-instructions {
+    flex: 0 0 200px;
+}
