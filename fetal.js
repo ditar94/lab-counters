@@ -1,9 +1,10 @@
+
 let field_1 = localStorage.getItem('field_1') || 0;
 let field_2 = localStorage.getItem('field_2') || 0;
 let field_3 = localStorage.getItem('field_3') || 0;
 let field_4 = localStorage.getItem('field_4') || 0;
 let field_5 = localStorage.getItem('field_5') || 0;
-
+console.log(localStorage.getItem('field_1'));
 let average_RBC = localStorage.getItem('average_RBC') || 0;
 let thirty_Fields = localStorage.getItem('thirty_Fields') || 0;
 let field_Count = localStorage.getItem('field_Count') || 0;
@@ -20,8 +21,8 @@ let percent_Fetals = localStorage.getItem('percent_Fetals') || 0;
 updateCounter();
 
 function updateCounter() {
-    document.getElementById("zield1").textContent = field_1;
-    document.getElementById("zield2").textContent = field_2;
+    document.getElementById("field1").textContent = field_1;
+    document.getElementById("field2").textContent = field_2;
     document.getElementById("field3").textContent = field_3;
     document.getElementById("field4").textContent = field_4;
     document.getElementById("field5").textContent = field_5;
@@ -38,6 +39,15 @@ function updateCounter() {
     document.getElementById("percentFetals").textContent = percent_Fetals;
 }
 
+let fields = {
+    "field_1": localStorage.getItem('field_1') || 0,
+    "field_2": localStorage.getItem('field_2') || 0,
+    "field_3": localStorage.getItem('field_3') || 0,
+    "field_4": localStorage.getItem('field_4') || 0,
+    "field_5": localStorage.getItem('field_5') || 0,
+    // Add more fields as needed
+};
+
 function resetCounter(thisCounter) {
     console.log("Button clicked:", thisCounter);
     let pass;
@@ -46,7 +56,7 @@ function resetCounter(thisCounter) {
         pass = "field_1";
     } else if (thisCounter == "r2") {
         field_2 = 0;
-        pass = "field_2";
+        pass = 'field_2';
     } else if (thisCounter == "r3") {
         field_3 = 0;
         pass = "field_3";
@@ -60,17 +70,16 @@ function resetCounter(thisCounter) {
         field_Count = 0;
         pass = "field_Count";
     }
-    counterSave(pass);
+
+    //this is a test, normally it would be counterSave(pass)
+    counterSave("field_2");
 }
 
-function counterSave(pass) {
-    localStorage.setItem(pass, window[pass]);
-    document.getElementById(pass.replace("_", "")).textContent = window[pass];
-
-    console.log("When counterSave runs, pass is ", pass);
-    console.log("When counterSave runs, window[pass] is ", window[pass]);
-    console.log("When counterSave runs, pass.replace('_', '') is ", pass.replace("_", ""));
-
+function counterSave(fieldValue) {
+    console.log(fieldValue);
+    console.log(window[fieldValue]);
+    localStorage.setItem(fieldValue, window[fieldValue]);
+    document.getElementById(fieldValue.replace("_", "")).textContent = window[fieldValue];
 }
 
 function buttonChange(thisButton) {
