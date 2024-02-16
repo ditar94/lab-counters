@@ -61,13 +61,14 @@ input::placeholder {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    flex-wrap: wrap;
 }
 
 
 a {
     text-decoration: none;
     color: #1d70b8;
-    font-size: 18px;
+    font-size: 2vw;
     font-weight: bold;
 }
 
@@ -86,7 +87,7 @@ header {
 }
 
 header p {
-    font-size: 2vw;
+    font-size: 30px;
     padding: 0;
     margin: 0;
     font-weight: bold;
@@ -94,33 +95,36 @@ header p {
 }
 
 #webTitleBar {
-    padding: 10px 0px 10px 200px;
-    margin: 0;
+    /* font-size: 50px; */
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
+    /* margin: 0; */
     background-color: black;
 }
 
 nav {
     display: flex;
     justify-content: flex-start;
-    column-gap: 3vw;
-    border-top: 10px solid #1d70b8;
-    border-bottom: 1px solid black;
+    column-gap: 1em;
+    border-top: 0.5em solid #1d70b8;
+    border-bottom: 0.1em solid black;
     color:black;
     background-color: #f3f2f1;
-    padding-top: 1vw;
+    /* padding-top: 1vw;
     padding-bottom: 1vw;
-    padding-left: 200px;
+    padding-left: 200px; */
 }
 
 #main-body {
-    margin-left: 200px;
-    margin-right: 200px;
+    margin-left: 1em;
+    margin-right: 2em;
 }
 
 #step2 {
     display: flex;
     justify-content: flex-start;
     flex-direction: row;
+    flex-wrap: wrap;
 
 }
 
