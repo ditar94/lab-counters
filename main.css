@@ -4,6 +4,29 @@
 
 }
 
+@media print {
+    * {
+        font-size: 10px;
+    }
+    nav {
+        display: none;
+    }
+    button:not(.count) {
+        display: none;
+    }
+    input[type=text] {
+        display: none;
+    }
+
+    h2, h3 {
+        display: none;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+}
+
 body {
     margin: 0;
 }
@@ -96,9 +119,10 @@ nav {
     flex-direction: column;
     border: 0.1rem solid black;
     padding: 0.25rem;
-    width: 15rem;
+    width: 13rem;
     background-color: #1d70b884;
 }
+
 
 
 
