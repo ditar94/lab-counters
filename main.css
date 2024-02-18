@@ -106,10 +106,12 @@ button.count {
     border: dotted;
     flex-grow: 1;
     flex-basis: 0;
+
 }
 
 button.count:active {
     background-color: #1d70b884;
+    touch-action: manipulation;
 }
 
 
