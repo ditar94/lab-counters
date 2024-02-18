@@ -5,7 +5,6 @@ let tnc_2 = localStorage.getItem('tnc_2') || 0;
 let buttonStateH1 = localStorage.getItem('buttonStateH1') || "Add";
 let buttonStateH2 = localStorage.getItem('buttonStateH2') || "Add";
 
-updateCounter();
 
 function updateCounter() {
     document.getElementById("rbc1").textContent = rbc_1;

@@ -17,7 +17,7 @@ window.add_Subtract6 = localStorage.getItem('add_Subtract6') || "Add";
 window.percent_Fetals = localStorage.getItem('percent_Fetals') || 0;
 
 
-updateCounter();
+
 
 function updateCounter() {
     document.getElementById("field1").textContent = field_1;
@@ -181,7 +181,3 @@ function calculatePercentage() {
     percent_Fetals = ((field_6 / thirty_Fields ) * 100).toFixed(1);
     counterSave("percent_Fetals");
 }
-
-
-calculateAverage();
-calculatePercentage();

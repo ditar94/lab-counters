@@ -2,10 +2,7 @@ let totalCount = localStorage.getItem('totalCount') || 0;
 let reticCount = localStorage.getItem('reticCount') || 0;
 let buttonState = localStorage.getItem('buttonState') || "Add";
 let percentage = localStorage.getItem('percentage') || 0;
-document.getElementById("total").textContent = totalCount;
-document.getElementById("retic").textContent = reticCount;
-document.getElementById("switch").textContent = buttonState;
-document.getElementById("percent").textContent = percentage;
+
 
 // function incrementCounter() {
 //     currentCount++; // Increment the counter variable by 1
