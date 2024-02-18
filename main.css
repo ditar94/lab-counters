@@ -1,5 +1,7 @@
 * {
     font-family: "GDS Transport",arial,sans-serif;
+    touch-action: manipulation;
+
 }
 
 body {
@@ -111,7 +113,6 @@ button.count {
 
 button.count:active {
     background-color: #1d70b884;
-    touch-action: manipulation;
 }
 
 
