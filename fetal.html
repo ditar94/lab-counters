@@ -12,9 +12,7 @@
 
     <body>
         <header>
-            <div id="webTitleBar">
-                <p>Lab Counter</p>
-            </div>
+            <p>Lab Counter</p>
             <nav>
                 <li><a href="home.html">Home</a></li>
                 <li><a href="fetal.html">Fetal Hgb Counter</a></li>
@@ -26,20 +24,37 @@
         </header>
 
         <div id="main-body">
-            <h1>Fetal Hgb Counter!</h1>
-            <h2>Instructions:</h2>
-            <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-            <br>
+            <div>
+                <h1>Fetal Hgb Counter!</h1>
+                <h2>Instructions:</h2>
+                <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
+                <br>
+            </div>
 
-            <div id="field-counters">
-                <div>
-                    <h4>Step 1: </h4>
-                    <h5>Count the number of rbcs in 5 fields using the high dry objective (40X);</h5>
+            <div>
+                <h4>Step 1: </h4>
+                <h5>Count the number of rbcs in 5 fields using the high dry objective (40X);</h5>
+            </div>
+
+            <div class="count-group">
+                <div class="count">
+                    <p>Average RBCs per field: </p>
+                    <p id="averageRBC">0</p>
                 </div>
-                <div class="counter-single">
+
+                <div class="count">
+                    <p>RBCs in 30 fields: </p>
+                    <p id="thirtyFields">0</p>
+                </div>
+            </div>
+
+           <div class="counters-group">
+                <div class="counters-single">
                     <p>Field 1: </p>
-                    <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field1">0</p>
+                    <div class="count">
+                        <p>Total RBCs (Adult and Fetal)</p>
+                        <p id="field1">0</p>
+                    </div>
                     <label for="field1-input"></label>
                     <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, 1)" placeholder="Click me to start">
 
@@ -49,10 +64,12 @@
                     </div>
                 </div>
 
-                <div class="counter-single">
+                <div class="counters-single">
                     <p>Field 2: </p>
-                    <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field2">0</p>
+                    <div class="count">
+                        <p>Total RBCs (Adult and Fetal)</p>
+                        <p id="field2">0</p>
+                    </div>
                     <label for="field2-input"></label>
                     <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, 2)" placeholder="Click me to start">
                     <div>
@@ -61,10 +78,12 @@
                     </div>
                 </div>
 
-                <div class="counter-single">
+                <div class="counters-single">
                     <p>Field 3: </p>
-                    <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field3">0</p>
+                    <div class="count">
+                        <p>Total RBCs (Adult and Fetal)</p>
+                        <p id="field3">0</p>
+                    </div>
                     <label for="field3-input"></label>
                     <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, 3)" placeholder="Click me to start">
                     <div>
@@ -73,10 +92,12 @@
                     </div>
                 </div>
 
-                <div class="counter-single">
+                <div class="counters-single">
                     <p>Field 4: </p>
-                    <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field4">0</p>
+                    <div class="count">
+                        <p>Total RBCs (Adult and Fetal)</p>
+                        <p id="field4">0</p>
+                    </div>
                     <label for="field4-input"></label>
                     <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, 4)" placeholder="Click me to start">
                     <div>
@@ -85,10 +106,12 @@
                     </div>
                 </div>
 
-                <div class="counter-single">
+                <div class="counters-single">
                     <p>Field 5: </p>
-                    <p>Total RBCs (Adult and Fetal)</p>
-                    <p id="field5">0</p>
+                    <div class="count">
+                        <p>Total RBCs (Adult and Fetal)</p>
+                        <p id="field5">0</p>
+                    </div>
                     <label for="field5-input"></label>
                     <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, 5)" placeholder="Click me to start">
                     <div>
@@ -96,57 +119,45 @@
                         <button onclick="resetCounter('r5')">Reset</button>
                     </div>
                 </div>
+
             </div>
 
-            <div>
-                <div>
-                    <br>
-                    <p>Average RBCs per field: </p>
-                    <p id="averageRBC">0</p>
-                </div>
 
-                <div>
-                    <br>
-                    <p>RBCs in 30 fields: </p>
-                    <p id="thirtyFields">0</p>
-                </div>
+
+
+
+            <div id="step2-instructions">
+                <h4>Step 2: </h4>
+                <h5>Count the number of fetal cells in 30 fields using the high dry objective (40X);</h5>
             </div>
 
-            <div id="step2">
-                <div id="step2-instructions">
-                    <h4>Step 2: </h4>
-                    <h5>Count the number of fetal cells in 30 fields using the high dry objective (40X);</h5>
-                </div>
-
-                <div class="counter-single">
-                    <p>Fetal Cells in 30 Fields </p>
-                    <p>Fetal Cells: </p>
-                    <p id="fetalCount">0</p>
-                    <p>Fields: </p>
-                    <p id="fieldCount">0</p>
-                    <label for="field6-input"></label>
-                    <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, 6)" placeholder="Click me to start">
-
-                    <div>
-                        <button id="addSubtract6" onclick="buttonChange('s6')">Add</button>
-                        <button onclick="resetCounter('r6')">Reset</button>
+            <div class="counters-single">
+                <p>Fetal Cells in 30 Fields </p>
+                <div class="count-group">
+                    <div class="count">
+                        <p>Fetal Cells: </p>
+                        <p id="fetalCount">0</p>
+                    </div>
+                    <div class="count">
+                        <p>Fields: </p>
+                        <p id="fieldCount">0</p>
                     </div>
                 </div>
+                <label for="field6-input"></label>
+                <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, 6)" placeholder="Click me to start">
 
-
+                <div>
+                    <button id="addSubtract6" onclick="buttonChange('s6')">Add</button>
+                    <button onclick="resetCounter('r6')">Reset</button>
+                </div>
             </div>
 
-
-
-            <div>
-                <br>
+            <div class="count">
                 <p>Percent Fetal cells: </p>
                 <p id="percentFetals">0</p>
             </div>
 
         </div>
-
-        <script src="fetal.js"></script>
 
     </body>
 </html>

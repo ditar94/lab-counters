@@ -30,24 +30,35 @@
             <br>
             <h2>Instructions:</h2>
             <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-            <div>
+
+            <div class="count">
                 <p>Retic Percentage (%): </p>
                 <p id="percent">0</p>
-                <div>
-                    <p>Retics: </p>
-                    <p id="retic">0</p>
-                </div>
-                <div>
-                    <p>Total Red Cells: </p>
-                    <p id="total">0</p>
-                </div>
-                <div id="ret-counter">
-                    <label for="retic-counter"></label>
-                    <input type="text" placeholder="Click me to start" id="retic-counter" class="keystroke-field" name="retic_counter" onkeydown="keyStroke(event)">
-                </div>
-                <button id="switch" onclick="buttonChange()">Add</button>
-                <button onclick="resetCounter()">Reset</button>
             </div>
+
+           <div class="counters-group">
+                <div class="counters-single">
+                    <div class="count-group">
+                        <div class="count">
+                            <p>Retics: </p>
+                            <p id="retic">0</p>
+                        </div>
+                        <div class="count">
+                            <p>Total Red Cells: </p>
+                            <p id="total">0</p>
+                        </div>
+                    </div>
+                    <div id="ret-counter">
+                        <label for="retic-counter"></label>
+                        <input type="text" placeholder="Click me to start" id="retic-counter" class="keystroke-field" name="retic_counter" onkeydown="keyStroke(event)">
+                    </div>
+                    <div>
+                        <button id="switch" onclick="buttonChange()">Add</button>
+                        <button onclick="resetCounter()">Reset</button>
+                    </div>
+                </div>
+           </div>
+
         </div>
 
 

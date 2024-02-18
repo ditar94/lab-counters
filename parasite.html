@@ -29,29 +29,33 @@
             <br>
             <h2>Instructions:</h2>
             <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-            <div>
+            <div class="count">
                 <p>Parasite percentage (%):</p>
                 <p id="percent">0</p>
             </div>
-            <div>
-                <div>
-                    <p>Parasites: </p>
-                    <p id="parasite">0</p>
-                </div>
-                <div>
-                    <p>Total Red Cells: </p>
-                    <p id="total">0</p>
-                </div>
-            </div>
-            <div id="counter">
-                <label for="parasite-counter"></label>
-                <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click me to start" onkeydown="keyStroke(event)">
-            </div>
+           <div class="counters-group">
+               <div class="counters-single">
+                    <div class="count-group">
+                        <div class="count">
+                            <p>Parasites: </p>
+                            <p id="parasite">0</p>
+                        </div>
+                        <div class="count">
+                            <p>Total Red Cells: </p>
+                            <p id="total">0</p>
+                        </div>
+                    </div>
+                    <div id="counter">
+                        <label for="parasite-counter"></label>
+                        <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click me to start" onkeydown="keyStroke(event)">
+                    </div>
 
-            <div>
-                <button id="switch" onclick="buttonChange()">Add</button>
-                <button onclick="resetCounter()">Reset</button>
-            </div>
+                    <div>
+                        <button id="switch" onclick="buttonChange()">Add</button>
+                        <button onclick="resetCounter()">Reset</button>
+                    </div>
+               </div>
+           </div>
         </div>
 
         <script>
