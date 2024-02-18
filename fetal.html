@@ -7,7 +7,7 @@
         <meta name="description" content="Fetal counter for measuring ammount of fetal hemoglobin in a maternal sample. Also known as the kleinhauer betke test">
         <title>Fetal Hgb - Lab Counter</title>
         <link rel="stylesheet" href="main.css" type="text/css">
-
+        <script src="fetal.js"></script>
     </head>
 
     <body>
@@ -51,10 +51,10 @@
            <div class="counters-group">
                 <div class="counters-single">
                     <p>Field 1: </p>
-                    <div class="count">
+                    <button class="count" onclick="buttonPress(1)">
                         <p>Total RBCs (Adult and Fetal)</p>
                         <p id="field1">0</p>
-                    </div>
+                    </button>
                     <label for="field1-input"></label>
                     <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, 1)" placeholder="Click me to start">
 
@@ -66,10 +66,10 @@
 
                 <div class="counters-single">
                     <p>Field 2: </p>
-                    <div class="count">
+                    <button class="count" onclick="buttonPress(2)">
                         <p>Total RBCs (Adult and Fetal)</p>
                         <p id="field2">0</p>
-                    </div>
+                    </button>
                     <label for="field2-input"></label>
                     <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, 2)" placeholder="Click me to start">
                     <div>
@@ -80,10 +80,10 @@
 
                 <div class="counters-single">
                     <p>Field 3: </p>
-                    <div class="count">
+                    <button class="count" onclick="buttonPress(3)">
                         <p>Total RBCs (Adult and Fetal)</p>
                         <p id="field3">0</p>
-                    </div>
+                    </button>
                     <label for="field3-input"></label>
                     <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, 3)" placeholder="Click me to start">
                     <div>
@@ -94,10 +94,10 @@
 
                 <div class="counters-single">
                     <p>Field 4: </p>
-                    <div class="count">
+                    <button class="count" onclick="buttonPress(4)">
                         <p>Total RBCs (Adult and Fetal)</p>
                         <p id="field4">0</p>
-                    </div>
+                    </button>
                     <label for="field4-input"></label>
                     <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, 4)" placeholder="Click me to start">
                     <div>
@@ -108,10 +108,10 @@
 
                 <div class="counters-single">
                     <p>Field 5: </p>
-                    <div class="count">
+                    <button class="count" onclick="buttonPress(5)">
                         <p>Total RBCs (Adult and Fetal)</p>
                         <p id="field5">0</p>
-                    </div>
+                    </button>
                     <label for="field5-input"></label>
                     <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, 5)" placeholder="Click me to start">
                     <div>
@@ -134,14 +134,14 @@
             <div class="counters-single">
                 <p>Fetal Cells in 30 Fields </p>
                 <div class="count-group">
-                    <div class="count">
+                    <button class="count" onclick="buttonPress(6)">
                         <p>Fetal Cells: </p>
-                        <p id="fetalCount">0</p>
-                    </div>
-                    <div class="count">
+                        <p id="field6">0</p>
+                    </button>
+                    <button class="count" onclick="buttonPress(7)">
                         <p>Fields: </p>
-                        <p id="fieldCount">0</p>
-                    </div>
+                        <p id="field7">0</p>
+                    </button>
                 </div>
                 <label for="field6-input"></label>
                 <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, 6)" placeholder="Click me to start">
@@ -158,6 +158,8 @@
             </div>
 
         </div>
-
+        <script>
+            updateCounter();
+        </script>
     </body>
 </html>

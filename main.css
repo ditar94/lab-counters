@@ -92,13 +92,24 @@ nav {
 .count-group {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-around;
     column-gap: 1rem;
-    width: 15rem;
+    /* width: 15rem; */
 }
 
 .count {
     text-align: center;
+}
+
+button.count {
+    /* background-color: #1d70b800 !important; */
+    border: dotted;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+button.count:active {
+    background-color: #1d70b884;
 }
 
 
