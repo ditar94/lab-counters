@@ -25,10 +25,10 @@ a:hover {
 
 li {
     margin: 0;
-    padding: 0;
     list-style-type: none;
     flex-grow: 1;
-    flex-basis: 0;
+    flex-basis: auto;
+    text-align: center;
 }
 
 header {
@@ -59,7 +59,7 @@ nav {
     border-bottom: 0.1rem solid black;
     color:black;
     background-color: #f3f2f1;
-    padding: 0 4rem 0 4rem;
+    padding: 0.25rem 4rem 0.25rem 4rem;
 }
 /* Navigation Bar end */
 
