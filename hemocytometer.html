@@ -30,6 +30,8 @@
             <br>
             <h2>Instructions:</h2>
             <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
+            <h3>OR</h3>
+            <h3>Click/Tap the corresponding buttons to count. </h3>
 
 
             <div class="count-group">
@@ -47,11 +49,11 @@
                 <div class="counters-single">
                     <p>Side 1</p>
                     <div class="count-group">
-                        <button class="count">
+                        <button class="count" onclick="buttonPress(1)">
                             <p>RBC</p>
                             <p id="rbc1">0</p>
                         </button>
-                        <button class="count">
+                        <button class="count" onclick="buttonPress(2)">
                             <p>TNC</p>
                             <p id="tnc1">0</p>
                         </button>
@@ -72,11 +74,11 @@
                 <div class="counters-single">
                     <p>Side 2</p>
                     <div class="count-group">
-                        <button class="count">
+                        <button class="count" onclick="buttonPress(3)">
                             <p>RBC</p>
                             <p id="rbc2">0</p>
                         </button>
-                        <button class="count">
+                        <button class="count" onclick="buttonPress(4)">
                             <p>TNC</p>
                             <p id="tnc2">0</p>
                         </button>
@@ -97,7 +99,7 @@
             <div class="count-group">
                 <div class="count">
                     <label for="squares">Squares Counted: </label>
-                    <select name="squares_counted" id="squares">
+                    <select name="squares_counted" id="squares" onchange="calculateCount()">
                         <option value="">Please choose</option>
                         <option value="0.2">0.2</option>
                         <option value="4">4</option>
@@ -106,15 +108,16 @@
                 </div>
                 <div class="count">
                     <label for="dilution">Dilution: </label>
-                    <input type="number" id="dilution" name="dilution" min="1" max="100" value="1">
+                    <input type="number" id="dilution" name="dilution" min="1" max="100" value="1" onchange="calculateCount()">
                 </div>
             </div>
 
-            <button onclick="calculateCount()">Calculate!</button>
+            <!-- <button onclick="calculateCount()">Calculate!</button> -->
 
         </div>
         <script>
             updateCounter();
+            calculateCount();
         </script>
     </body>
 </html>

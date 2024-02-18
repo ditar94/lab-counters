@@ -51,6 +51,33 @@ function keyStroke(event) {
     percentageCalculator();
 }
 
+function buttonPress(inputId) {
+    switch (inputId) {
+        case 1:
+            if (buttonStateP == "Add" && totalCountP < 1000) {
+                parasiteCount++;
+                totalCountP++;
+            } else if (buttonStateP == "Subtract" && parasiteCount > 0) {
+                parasiteCount--;
+                if (totalCountP > 0) {
+                    totalCountP--;
+                }
+            }
+            break;
+        case 2:
+            if (buttonStateP == "Add" && totalCountP < 1000) {
+                totalCountP++;
+            } else if (buttonStateP == "Subtract" && totalCountP > 0) {
+                totalCountP--;
+            }
+            break;
+    }
+
+    console.log
+    counterSave();
+    percentageCalculator();
+}
+
 //This function saves the counter and updates webpage
 function counterSave() {
     localStorage.setItem('totalCountP', totalCountP);

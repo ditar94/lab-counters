@@ -55,7 +55,7 @@ function updateCounter() {
     document.getElementById("total").textContent = totalCount;
     let reticCount = localStorage.getItem('reticCount') || 0;
     document.getElementById("retic").textContent = reticCount;
-    let buttonState = localStorage.getItem('buttonState') || "add";
+    let buttonState = localStorage.getItem('buttonState') || "Add";
     document.getElementById("switch").textContent = buttonState;
     let percentage = localStorage.getItem('percentage') || 0;
     document.getElementById("percent").textContent = percentage;
@@ -94,4 +94,33 @@ function keyStroke(event) {
         }
         percentageCalculator();
     }
+}
+
+function buttonPress(inputId) {
+    switch (inputId) {
+        case 1:
+            if (buttonState == "Add" && totalCount < 1000) {
+                reticCount++;
+                totalCount++;
+            } else if (buttonState == "Subtract" && reticCount > 0) {
+                reticCount--;
+                if (totalCount > 0) {
+                    totalCount--;
+                }
+            }
+            break;
+        case 2:
+            if (buttonState == "Add" && totalCount < 1000) {
+                totalCount++;
+            } else if (buttonState == "Subtract" && totalCount > 0) {
+                totalCount--;
+            }
+            break;
+    }
+
+    localStorage.setItem('reticCount', reticCount);
+    document.getElementById("retic").textContent = reticCount;
+    localStorage.setItem('totalCount', totalCount);
+    document.getElementById("total").textContent = totalCount
+    percentageCalculator();
 }

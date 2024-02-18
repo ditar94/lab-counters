@@ -14,7 +14,6 @@ function updateCounter() {
     document.getElementById("tnc2").textContent = tnc_2;
     document.getElementById("switch1").textContent = buttonStateH1;
     document.getElementById("switch2").textContent = buttonStateH2;
-
 }
 
 function buttonChange(thisButton) {
@@ -70,6 +69,42 @@ function keyStroke(event, inputId) {
             tnc_2--;
         }
     }
+    calculateCount();
+    counterSave();
+}
+
+function buttonPress(inputId) {
+    switch (inputId) {
+        case 1:
+            if (buttonStateH1 == "Add") {
+                rbc_1++;
+            } else if (buttonStateH1 == "Subtract" && rbc_1 > 0) {
+                rbc_1--;
+            }
+            break;
+        case 2:
+            if (buttonStateH1 == "Add") {
+                tnc_1++;
+            } else if (buttonStateH1 == "Subtract" && tnc_1 > 0) {
+                tnc_1--;
+            }
+            break;
+        case 3:
+            if (buttonStateH2 == "Add") {
+                rbc_2++;
+            } else if (buttonStateH2 == "Subtract" && rbc_2 > 0) {
+                rbc_2--;
+            }
+            break;
+        case 4:
+            if (buttonStateH2 == "Add") {
+                tnc_2++;
+            } else if (buttonStateH2 == "Subtract" && tnc_2 > 0) {
+                tnc_2--;
+            }
+            break;
+    }
+    calculateCount();
     counterSave();
 }
 

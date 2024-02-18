@@ -30,6 +30,8 @@
             <br>
             <h2>Instructions:</h2>
             <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
+            <h3>OR</h3>
+            <h3>Click/Tap the corresponding buttons to count. </h3>
 
             <div class="count">
                 <p>Retic Percentage (%): </p>
@@ -39,11 +41,11 @@
            <div class="counters-group">
                 <div class="counters-single">
                     <div class="count-group">
-                        <button class="count">
+                        <button class="count" onclick="buttonPress(1)">
                             <p>Retics: </p>
                             <p id="retic">0</p>
                         </button>
-                        <button class="count">
+                        <button class="count" onclick="buttonPress(2)">
                             <p>Total Red Cells: </p>
                             <p id="total">0</p>
                         </button>
