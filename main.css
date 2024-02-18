@@ -27,7 +27,13 @@
     }
 }
 
+h2, h3 {
+    font-size: 15px;
+}
 
+h1 {
+    font-size: 20px;
+}
 
 body {
     margin: 0;
