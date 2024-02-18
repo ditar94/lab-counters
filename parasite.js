@@ -6,7 +6,6 @@ let buttonStateP = localStorage.getItem('buttonStateP') || "Add";
 updateCounter();
 
 
-
 function updateCounter() {
 
     document.getElementById("parasite").textContent = parasiteCount;
