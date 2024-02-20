@@ -28,10 +28,41 @@
         <div id="main-body">
             <h1>Welcome!</h1>
             <br>
-            <p1>This is my first website.
+            <p1>
                 Please click one of the links
                 above to be directed to the appropriate counters.
             </p1>
+            <br>
+            <p1>
+                If you have any comments or suggestions, please submit them below.
+            </p1>
+
+            <form name="Suggestions" netlify>
+               <fieldset>
+                    <legend>Comments/Suggestions</legend>
+                    <div>
+                        <label>
+                            Name (optional):
+                            <input type="text" name="name" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Email (optional):
+                            <input type="email" name="email" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Comments:
+                            <textarea placeholder="Type here..."></textarea>
+                        </label>
+                    </div>
+                    <div>
+                        <button type="submit">Send</button>
+                    </div>
+               </fieldset>
+            </form>
         </div>
 
     </body>
