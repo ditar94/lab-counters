@@ -44,6 +44,7 @@ function resetCounter(thisCounter) {
         rbc_2 = 0;
         tnc_2 = 0;
     }
+    calculateCount();
     counterSave();
 }
 function keyStroke(event, inputId) {
