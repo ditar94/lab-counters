@@ -201,3 +201,7 @@ input::placeholder {
     flex-wrap: wrap;
 
 }
+
+textarea {
+    width: 100%;
+}
