@@ -25,17 +25,23 @@
         </header>
 
         <div id="main-body">
-            <h1>Fetal Hgb Counter</h1>
-            <h2>Cell counter for measuring the fetal hemoglobin percentage in a maternal sample. Also known as the Kleihauer-Betke (KB) test</h2>
-            <h3>Instructions:</h2>
-            <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-            <h3>OR</h3>
-            <h3>Click/Tap the corresponding buttons to count. </h3>
-            <br>
+            <div>
+                <h1>Fetal Hgb Counter</h1>
+                <h2>Cell counter for measuring the fetal hemoglobin percentage in a maternal sample. Also known as the Kleihauer-Betke (KB) test</h2>
+                <h3>Instructions:</h2>
+                <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
+                <h3>OR</h3>
+                <h3>Click/Tap the corresponding buttons to count. </h3>
+                <br>
+            </div>
 
             <div>
                 <h4>Step 1: </h4>
                 <h5>Count the number of rbcs in 5 fields using the high dry objective (40X);</h5>
+                <div>
+                    <label for="check">Check this box if you wish to input the average directly:</label>
+                    <input id="check" type="checkbox" onclick="inputAverage()">
+                </div>
             </div>
 
             <div class="count-group">

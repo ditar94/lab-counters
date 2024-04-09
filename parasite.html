@@ -28,17 +28,29 @@
 
         <div id="main-body">
             <h1>Parasite Counter</h1>
+            <div id="input-selector">
+                <p style="font-weight: bold;">Select input type</p>
+                <input type="radio" id="wantCounter" name="counterOrNot" checked>
+                <label for="wantCounter">Keyboard Counter</label><br>
+                <input type="radio" id="noCounter" name="counterOrNot">
+                <label for="noCounter">Direct Input</label>
+            </div>
             <br>
             <h2>Cell counter for measuring the percent parasitemia in a blood sample.  </h2>
-            <h3>Instructions:</h2>
-            <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-            <h3>OR</h3>
-            <h3>Click/Tap the corresponding buttons to count. </h3>
+            <p style="font-weight: bold;">Instructions:</p>
+            <div class="hide-counters">
+                <p>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </p>
+                <p style="text-align: center;">OR</p>
+                <p>Click/Tap the corresponding buttons to count. </p>
+            </div>
+            <div class="alt_count">
+                <p>Enter the parasite and RBC counts below using your keyboard.</p>
+            </div>
             <div class="count">
-                <p>Parasite percentage (%):</p>
+                <p style="font-weight: bold;">Parasite percentage (%):</p>
                 <p id="percent">0</p>
             </div>
-           <div class="counters-group">
+           <div class="counters-group hide-counters">
                <div class="counters-single">
                     <div class="count-group">
                         <button class="count" onclick="buttonPress(1)">
@@ -61,9 +73,17 @@
                     </div>
                </div>
            </div>
+           <div class="count alt_count">
+                <label for="para-count-input">Enter the Total number of parasites</label>
+                <input type="number" inputmode="numeric" id="para-count-input" min="0"> <br>
+                <label for="red-count-input">Enter the total number of red cells</label>
+                <input type="number" inputmode="numeric" id="red-count-input" min="0">
+                <p id="para"></p>
+            </div>
         </div>
 
         <script>
+            inputSwitcher();
             updateCounter();
             percentageCalculator();
         </script>

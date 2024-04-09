@@ -205,3 +205,12 @@ input::placeholder {
 textarea {
     width: 100%;
 }
+
+/* .hide-counters {
+    display: flex;
+} */
+
+.alt_count {
+    visibility: hidden;
+    max-height: 0;
+}
