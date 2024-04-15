@@ -4,6 +4,21 @@ let tnc_1 = localStorage.getItem('tnc_1') || 0;
 let tnc_2 = localStorage.getItem('tnc_2') || 0;
 let buttonStateH1 = localStorage.getItem('buttonStateH1') || "Add";
 let buttonStateH2 = localStorage.getItem('buttonStateH2') || "Add";
+document.addEventListener("click", inputSwitcher);
+
+function inputSwitcher() {
+    var toggleBox = document.querySelectorAll('.hide-counters');
+    if (document.getElementById('separate-counts').checked) {
+        for (i=0; i<toggleBox.length;i++) {
+            document.querySelectorAll('.hide-counters')[i].style.display = 'flex';
+        }
+    } else {
+        for (i=0; i<toggleBox.length;i++) {
+            document.querySelectorAll('.hide-counters')[i].style.display = 'none';
+        }
+    }
+    calculateCount();
+}
 
 
 function updateCounter() {
@@ -45,7 +60,6 @@ function resetCounter(thisCounter) {
         tnc_2 = 0;
     }
     calculateCount();
-    counterSave();
 }
 function keyStroke(event, inputId) {
     if (inputId === "input1") {
@@ -70,7 +84,6 @@ function keyStroke(event, inputId) {
         }
     }
     calculateCount();
-    counterSave();
 }
 
 function buttonPress(inputId) {
@@ -122,16 +135,29 @@ function counterSave() {
 
 function calculateCount() {
     updateCounter();
-    let dilution = document.getElementById("dilution").value;
-    let squares = parseFloat(document.getElementById("squares").value);
+    let dilution1;
+    let squares1;
+    let dilution2;
+    let squares2;
+    dilution1 = document.getElementById("dilution1").value;
+    squares1 = parseFloat(document.getElementById("squares1").value);
+    if (document.getElementById('separate-counts').checked) {
+        dilution2 = document.getElementById("dilution2").value;
+        squares2 = parseFloat(document.getElementById("squares2").value);
+    } else {
+        dilution2 = dilution1;
+        squares2 = squares1;
+    }
     let rbcCount;
     let rbcAvg = (parseInt(rbc_1) + parseInt(rbc_2)) / 2;
     let tncCount;
     let tncAverage = (parseInt(tnc_1) + parseInt(tnc_2)) / 2;
-    rbcCount = 10 * dilution * rbcAvg / squares ;
-    tncCount = 10 * dilution * tncAverage / squares ;
+    rbcCount = 10 * dilution1 * rbcAvg / squares1 ;
+    tncCount = 10 * dilution2 * tncAverage / squares2 ;
 
     document.getElementById("rbcCount").textContent = Math.round(rbcCount);
     document.getElementById("tncCount").textContent = Math.round(tncCount);
+    counterSave();
+
 
 }
