@@ -7,14 +7,14 @@ let buttonStateH2 = localStorage.getItem('buttonStateH2') || "Add";
 document.addEventListener("click", inputSwitcher);
 
 function inputSwitcher() {
-    var toggleBox = document.querySelectorAll('.hide-counters');
+    var toggleBox = document.querySelectorAll('.hide');
     if (document.getElementById('separate-counts').checked) {
         for (i=0; i<toggleBox.length;i++) {
-            document.querySelectorAll('.hide-counters')[i].style.display = 'flex';
+            document.querySelectorAll('.hide')[i].style.display = 'flex';
         }
     } else {
         for (i=0; i<toggleBox.length;i++) {
-            document.querySelectorAll('.hide-counters')[i].style.display = 'none';
+            document.querySelectorAll('.hide')[i].style.display = 'none';
         }
     }
     calculateCount();

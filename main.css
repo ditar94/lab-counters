@@ -216,6 +216,6 @@ textarea {
     max-height: 0;
 }
 
-.hide-counters {
+.hide {
     display: none;
 }
