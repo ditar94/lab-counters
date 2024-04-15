@@ -25,25 +25,33 @@
         </header>
 
         <div id="main-body">
-            <div>
-                <h1>Fetal Hgb Counter</h1>
-                <h2>Cell counter for measuring the fetal hemoglobin percentage in a maternal sample. Also known as the Kleihauer-Betke (KB) test</h2>
-                <h3>Instructions:</h2>
-                <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-                <h3>OR</h3>
-                <h3>Click/Tap the corresponding buttons to count. </h3>
-                <br>
-            </div>
+            <h1>Fetal Hgb Counter</h1>
+            <h2>Cell counter for measuring the fetal hemoglobin percentage in a maternal sample. Also known as the Kleihauer-Betke (KB) test</h2>
 
-            <div>
+            <div style="display:flex; flex-direction: column; align-items: center;">
                 <h4>Step 1: </h4>
-                <h5>Count the number of rbcs in 5 fields using the high dry objective (40X);</h5>
-                <div>
-                    <label for="check">Check this box if you wish to input the average directly:</label>
-                    <input id="check" type="checkbox" onclick="inputAverage()">
+                <h5>Count the number of RBCs in 5 fields using the high dry objective (40X);</h5>
+                <div id="input-selector">
+                    <p style="font-weight: bold;">Select input type</p>
+                    <input type="radio" id="wantCounter" name="counterOrNot" checked>
+                    <label for="wantCounter">Keyboard Counter</label><br>
+                    <input type="radio" id="noCounter" name="counterOrNot">
+                    <label for="noCounter">Direct Input</label>
                 </div>
-            </div>
+                <div class="hide-counters" style="display:flex; flex-direction: column; align-items: center;">
+                    <p>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </p>
+                    <p style="text-align: center;">OR</p>
+                    <p>Click/Tap the corresponding buttons to count. </p>
+                </div>
+                <div class="alt_count">
+                    <p>Enter the average RBCs per field below using your keyboard.</p>
+                </div>
 
+            </div>
+            <div class="count alt_count">
+                <label for="red-count-input">Enter the Total number of RBCs per field</label>
+                <input type="number" inputmode="numeric" id="red-count-input" min="0"> <br>
+            </div>
             <div class="count-group">
                 <div class="count">
                     <p>Average RBCs per field: </p>
@@ -72,7 +80,7 @@
                     </div>
                 </div>
 
-                <div class="counters-single">
+                <div class="counters-single hide-counters">
                     <p>Field 2: </p>
                     <button class="count" onclick="buttonPress(2)">
                         <p>Total RBCs (Adult and Fetal)</p>
@@ -86,7 +94,7 @@
                     </div>
                 </div>
 
-                <div class="counters-single">
+                <div class="counters-single hide-counters">
                     <p>Field 3: </p>
                     <button class="count" onclick="buttonPress(3)">
                         <p>Total RBCs (Adult and Fetal)</p>
@@ -100,7 +108,7 @@
                     </div>
                 </div>
 
-                <div class="counters-single">
+                <div class="counters-single hide-counters">
                     <p>Field 4: </p>
                     <button class="count" onclick="buttonPress(4)">
                         <p>Total RBCs (Adult and Fetal)</p>
@@ -114,7 +122,7 @@
                     </div>
                 </div>
 
-                <div class="counters-single">
+                <div class="counters-single hide-counters">
                     <p>Field 5: </p>
                     <button class="count" onclick="buttonPress(5)">
                         <p>Total RBCs (Adult and Fetal)</p>
@@ -167,6 +175,7 @@
 
         </div>
         <script>
+            inputSwitcher();
             updateCounter();
             calculateAverage();
             calculatePercentage();

@@ -15,9 +15,46 @@ window.add_Subtract4 = localStorage.getItem('add_Subtract4') || "Add";
 window.add_Subtract5 = localStorage.getItem('add_Subtract5') || "Add";
 window.add_Subtract6 = localStorage.getItem('add_Subtract6') || "Add";
 window.percent_Fetals = localStorage.getItem('percent_Fetals') || 0;
+document.addEventListener("input", updateValue);
+document.addEventListener("click", inputSwitcher);
+
+function inputSwitcher() {
+    var hideMe = document.querySelectorAll('.hide-counters');
+    if (document.getElementById('wantCounter').checked) {
+        for (i=0; i< hideMe.length; i++) {
+            document.querySelectorAll('.hide-counters')[i].style.display = "flex";
+        }
+        document.querySelectorAll('.alt_count')[0].style.visibility = "hidden";
+        document.querySelectorAll('.alt_count')[1].style.visibility = "hidden";
+        document.querySelectorAll('.alt_count')[0].style.maxHeight ="0";
+        document.querySelectorAll('.alt_count')[1].style.maxHeight = "0";
+
+    } else if (document.getElementById('noCounter').checked) {
+        document.getElementById('red-count-input').value = field_1;
+        for (i=0; i< hideMe.length; i++) {
+            document.querySelectorAll('.hide-counters')[i].style.display = "none";
+        }
+        document.querySelectorAll('.alt_count')[0].style.visibility = "visible";
+        document.querySelectorAll('.alt_count')[1].style.visibility = "visible";
+        document.querySelectorAll('.alt_count')[0].style.maxHeight ="none";
+        document.querySelectorAll('.alt_count')[1].style.maxHeight = "none";
 
 
+    }
+}
 
+function updateValue() {
+    field_1 = document.getElementById('red-count-input').value;
+    field_2 = document.getElementById('red-count-input').value;
+    field_3 = document.getElementById('red-count-input').value;
+    field_4 = document.getElementById('red-count-input').value;
+    field_5 = document.getElementById('red-count-input').value;
+    console.log(average_RBC);
+    console.log(document.getElementById('red-count-input'))
+    updateCounter();
+    calculateAverage();
+    calculatePercentage();
+}
 
 function updateCounter() {
     document.getElementById("field1").textContent = field_1;
@@ -74,6 +111,12 @@ function resetCounter(thisCounter) {
 function counterSave(fieldValue) {
     localStorage.setItem(fieldValue, window[fieldValue]);
     document.getElementById(fieldValue.replace("_", "")).textContent = window[fieldValue];
+    if (document.getElementById('noCounter').checked) {
+        field_2 = field_1;
+        field_3 = field_1;
+        field_4 = field_1;
+        field_5 = field_1;
+    }
 }
 
 function buttonChange(thisButton) {
