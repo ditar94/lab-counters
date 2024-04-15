@@ -7,6 +7,7 @@
         <script src="hemocytometer.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="This counter is to be used alongside a hemocytometer, to measure the RBC and White count of body fluids">
+        <meta name="author" content="Dionicy Tarantino">
         <title>Hemocytometer counter - Lab Counter</title>
     </head>
 
@@ -96,12 +97,16 @@
                     </div>
                 </div>
             </div>
-
+            <div>
+                <input id="separate-counts" type="checkbox">
+                <label for="separate-counts">Use separate dilutions and square counts for RBC and TNC</label>
+            </div>
 
             <div class="count-group">
+                <p class="hide-counters">RBC Settings: </p>
                 <div class="count">
-                    <label for="squares">Squares Counted: </label>
-                    <select name="squares_counted" id="squares" onchange="calculateCount()">
+                    <label for="squares1">Squares Counted: </label>
+                    <select name="squares_counted1" id="squares1" onchange="calculateCount()">
                         <option value="">Please choose</option>
                         <option value="0.2">0.2</option>
                         <option value="4">4</option>
@@ -109,8 +114,25 @@
                     </select>
                 </div>
                 <div class="count">
-                    <label for="dilution">Dilution: </label>
-                    <input type="number" id="dilution" name="dilution" min="1" max="100" value="1" onchange="calculateCount()">
+                    <label for="dilution1">Dilution: </label>
+                    <input type="number" id="dilution1" name="dilution_1" min="1" max="100" value="1" onchange="calculateCount()">
+                </div>
+            </div>
+
+            <div class="count-group hide-counters">
+                <p>TNC Settings: </p>
+                <div class="count">
+                    <label for="squares2">Squares Counted: </label>
+                    <select name="squares_counted2" id="squares2" onchange="calculateCount()">
+                        <option value="">Please choose</option>
+                        <option value="0.2">0.2</option>
+                        <option value="4">4</option>
+                        <option value="9" selected>9</option>
+                    </select>
+                </div>
+                <div class="count">
+                    <label for="dilution2">Dilution: </label>
+                    <input type="number" id="dilution2" name="dilution_2" min="1" max="100" value="1" onchange="calculateCount()">
                 </div>
             </div>
 
