@@ -83,17 +83,19 @@ function buttonChange() {
 }
 
 function keyStroke(event) {
-    if (event.code === "ArrowLeft" && buttonStateP == "Add" && totalCountP < 1000) {
+    if (event.key == "ArrowLeft" && buttonStateP == "Add" && totalCountP < 1000) {
+        console.log("event.code is" + event.code + ". Parasite count before is: " + parasiteCount);
         parasiteCount++;
         totalCountP++;
-    } else if (event.code === "ArrowLeft" && buttonStateP == "Subtract" && parasiteCount > 0) {
+        console.log("event.code is" + event.code + ". Parasite count after is: " + parasiteCount);
+    } else if (event.key == "ArrowLeft" && buttonStateP == "Subtract" && parasiteCount > 0) {
         parasiteCount--;
         if (totalCountP > 0) {
             totalCountP--;
         }
-    } else if (event.code === "ArrowRight" && buttonStateP == "Add" && totalCountP < 1000) {
+    } else if (event.key === "ArrowRight" && buttonStateP == "Add" && totalCountP < 1000) {
         totalCountP++
-    } else if(event.code === "ArrowRight" && buttonStateP == "Subtract" && totalCountP > 0) {
+    } else if(event.key === "ArrowRight" && buttonStateP == "Subtract" && totalCountP > 0) {
         totalCountP--
     }
     counterSave()

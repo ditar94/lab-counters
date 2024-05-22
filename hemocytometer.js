@@ -7,7 +7,10 @@ let buttonStateH2 = localStorage.getItem('buttonStateH2') || "Add";
 document.addEventListener("click", inputSwitcher);
 
 function inputSwitcher() {
+    // const buttons = document.querySelectorAll("button");
     var toggleBox = document.querySelectorAll('.hide');
+    var toggleCount = document.querySelectorAll('.final');
+    let RBCTNCMatch;
     if (document.getElementById('separate-counts').checked) {
         for (i=0; i<toggleBox.length;i++) {
             document.querySelectorAll('.hide')[i].style.display = 'flex';
@@ -17,6 +20,129 @@ function inputSwitcher() {
             document.querySelectorAll('.hide')[i].style.display = 'none';
         }
     }
+
+    if (document.getElementById('side1-done').checked && document.getElementById('side2-done').checked) {
+        for (i=0; i<toggleCount.length;i++) {
+            document.querySelectorAll('.final')[i].style.visibility= 'visible';
+            document.querySelectorAll('.final')[i].classList.remove("pseudo");
+            document.getElementById('err').style.display= 'block';
+            document.getElementsByClassName('showyourwork-group')[0].style.display= 'flex';
+        }
+        RBCTNCMatch = matchLogic();
+
+        // switch(true) {
+        //     case RBCTNCMatch[0] && RBCTNCMatch[1]:
+        //         console.log('both are true');
+        //         break;
+        //     case RBCTNCMatch[0] && !RBCTNCMatch[1]:
+        //         console.log('tnc doesnt match');
+        //         document.getElementsByTagName('button')[1].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[5].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[1].style.color="red";
+        //         document.getElementsByTagName('button')[5].style.color="red";
+        //         break;
+        //     case !RBCTNCMatch[0] && RBCTNCMatch[1]:
+        //         console.log('rbc doesnt match');
+        //         document.getElementsByTagName('button')[0].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[4].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[0].style.color="red";
+        //         document.getElementsByTagName('button')[4].style.color="red";
+        //         break;
+        //     default:
+        //         console.log('both are false');
+        //         document.getElementsByTagName('button')[0].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[1].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[4].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[5].style.border="1px solid red";
+        //         document.getElementsByTagName('button')[0].style.color="red";
+        //         document.getElementsByTagName('button')[1].style.color="red";
+        //         document.getElementsByTagName('button')[4].style.color="red";
+        //         document.getElementsByTagName('button')[5].style.color="red";
+        //         break;
+        // }
+
+        switch (true) {
+            case RBCTNCMatch[0] && RBCTNCMatch[1]:
+                console.log('both are true');
+                setButtonStyle([0, 1, 4, 5], 'green', 'green');
+                document.getElementById('err').style.display='none';
+                break;
+            case RBCTNCMatch[0] && !RBCTNCMatch[1]:
+                console.log('tnc doesnt match');
+                setButtonStyle([1, 5], 'red', 'red');
+                setButtonStyle([0, 4], 'green', 'green');
+                document.getElementById('err').textContent = RBCTNCMatch[3];
+                break;
+            case !RBCTNCMatch[0] && RBCTNCMatch[1]:
+                console.log('rbc doesnt match');
+                setButtonStyle([0, 4], 'red', 'red');
+                setButtonStyle([1, 5], 'green', 'green');
+                document.getElementById('err').textContent = RBCTNCMatch[2];
+                break;
+            default:
+                console.log('both are false');
+                setButtonStyle([0, 1, 4, 5], 'red', 'red');
+                document.getElementById('err').textContent='Counts are too far apart!';
+                break;
+        }
+
+        // buttons.forEach(button => {
+        //     button.disabled = true;
+        // });
+
+    } else {
+        for (i=0; i<toggleCount.length;i++) {
+            document.querySelectorAll('.final')[i].style.visibility= 'hidden';
+            document.querySelectorAll('.final')[i].classList.add("pseudo");
+            document.getElementById('err').style.display = 'none';
+            document.getElementsByClassName('showyourwork-group')[0].style.display= 'none';
+
+        }
+        // document.getElementsByTagName('button')[0].style.border= "1px dotted black";
+        // document.getElementsByTagName('button')[1].style.border="1px dotted black";
+        // document.getElementsByTagName('button')[4].style.border="1px dotted black";
+        // document.getElementsByTagName('button')[5].style.border="1px dotted black";
+
+        // document.getElementsByTagName('button')[0].style.color= "black";
+        // document.getElementsByTagName('button')[1].style.color="black";
+        // document.getElementsByTagName('button')[4].style.color="black";
+        // document.getElementsByTagName('button')[5].style.color="black";
+        // buttons.forEach(button => {
+        //     button.disabled = false;
+        // });
+        setButtonStyle([0, 1, 4, 5], 'black', 'black');
+
+    }
+
+    if (document.getElementById('side1-done').checked) {
+        for (i=0; i<4;i++) {
+            document.getElementsByTagName('button')[i].disabled=true;
+            document.querySelectorAll("input[type='text']")[0].disabled=true;
+            document.querySelectorAll("input[type='text']")[0].placeholder="Counter Disabled";
+
+        }
+    } else {
+        for (i=0; i<4;i++) {
+            document.getElementsByTagName('button')[i].disabled=false;
+            document.querySelectorAll("input[type='text']")[0].disabled=false;
+            document.querySelectorAll("input[type='text']")[0].placeholder="Click here to count";
+        }
+    }
+
+    if (document.getElementById('side2-done').checked) {
+        for (i=4; i<8;i++) {
+            document.getElementsByTagName('button')[i].disabled=true;
+            document.querySelectorAll("input[type='text']")[1].disabled=true;
+            document.querySelectorAll("input[type='text']")[1].placeholder="Counter Disabled";
+        }
+    } else {
+        for (i=4; i<8;i++) {
+            document.getElementsByTagName('button')[i].disabled=false;
+            document.querySelectorAll("input[type='text']")[1].disabled=false;
+            document.querySelectorAll("input[type='text']")[1].placeholder="Click here to count";
+        }
+    }
+
     calculateCount();
 }
 
@@ -63,23 +189,23 @@ function resetCounter(thisCounter) {
 }
 function keyStroke(event, inputId) {
     if (inputId === "input1") {
-        if (event.code === "ArrowLeft" && buttonStateH1 == "Add") {
+        if (event.key === "1" && buttonStateH1 == "Add") {
             rbc_1++;
-        } else if (event.code === "ArrowLeft" && buttonStateH1 == "Subtract" && rbc_1 > 0) {
+        } else if (event.key === "1" && buttonStateH1 == "Subtract" && rbc_1 > 0) {
             rbc_1--;
-        } else if (event.code === "ArrowRight" && buttonStateH1 == "Add") {
+        } else if (event.key === "3" && buttonStateH1 == "Add") {
             tnc_1++;
-        } else if (event.code === "ArrowRight" && buttonStateH1 == "Subtract" && tnc_1 > 0) {
+        } else if (event.key === "3" && buttonStateH1 == "Subtract" && tnc_1 > 0) {
             tnc_1--;
         }
     } else if (inputId === "input2") {
-        if (event.code === "ArrowLeft" && buttonStateH2 == "Add") {
+        if (event.key === "1" && buttonStateH2 == "Add") {
             rbc_2++;
-        } else if (event.code === "ArrowLeft" && buttonStateH2 == "Subtract" && rbc_2 > 0) {
+        } else if (event.key === "1" && buttonStateH2 == "Subtract" && rbc_2 > 0) {
             rbc_2--;
-        } else if (event.code === "ArrowRight" && buttonStateH2 == "Add") {
+        } else if (event.key === "3" && buttonStateH2 == "Add") {
             tnc_2++;
-        } else if (event.code === "ArrowRight" && buttonStateH2 == "Subtract" && tnc_2 > 0) {
+        } else if (event.key === "3" && buttonStateH2 == "Subtract" && tnc_2 > 0) {
             tnc_2--;
         }
     }
@@ -152,12 +278,100 @@ function calculateCount() {
     let rbcAvg = (parseInt(rbc_1) + parseInt(rbc_2)) / 2;
     let tncCount;
     let tncAverage = (parseInt(tnc_1) + parseInt(tnc_2)) / 2;
+    let prelimRBC1 = 10 * dilution1 * parseInt(rbc_1) / squares1;
+    let prelimRBC2 = 10 * dilution1 * parseInt(rbc_2) / squares1;
+    let prelimTNC1 = 10 * dilution2 * parseInt(tnc_1) / squares2;
+    let prelimTNC2 = 10 * dilution2 * parseInt(tnc_2) / squares2;
     rbcCount = 10 * dilution1 * rbcAvg / squares1 ;
     tncCount = 10 * dilution2 * tncAverage / squares2 ;
 
     document.getElementById("rbcCount").textContent = Math.round(rbcCount);
     document.getElementById("tncCount").textContent = Math.round(tncCount);
+    // document.getElementsById("avgRBC").textContent = Math.round(rbcAvg);
+
+    document.getElementById("rbcCount_1").textContent = Math.round(prelimRBC1);
+    document.getElementById("rbcCount_2").textContent = Math.round(prelimRBC2);
+    document.getElementById("tncCount_1").textContent = Math.round(prelimTNC1);
+    document.getElementById("tncCount_2").textContent = Math.round(prelimTNC2);
+    document.getElementById("calcAvRBC").textContent = rbcAvg;
+    document.getElementById("calcAvTNC").textContent = tncAverage;
+    document.getElementById("calcDilRBC").textContent = dilution1;
+    document.getElementById("calcSquaresRBC").textContent = squares1;
+    document.getElementById("calcDilTNC").textContent = dilution2;
+    document.getElementById("calcSquaresTNC").textContent = squares2;
+    document.getElementById("calcCountRBC").textContent = " " + Math.round(rbcCount);
+    document.getElementById("calcCountTNC").textContent = " " + Math.round(tncCount);
+
     counterSave();
 
 
 }
+
+
+function matchLogic() {
+    console.log("rbc_1 = " + rbc_1 + ", rbc_2 = " + rbc_2 + ", tnc_1 = " + tnc_1 + ", tnc_2 = " + tnc_2);
+    let matchRBCTNC = [false,false,'RBC counts are too far apart!','TNC counts are too far apart!'];
+    if ((parseInt(rbc_1) < 10) || (parseInt(rbc_2)< 10) ) {
+        let rbcDiff = Math.abs(parseInt(rbc_2)-parseInt(rbc_1));
+        console.log("rbcDiff = " + rbcDiff);
+        console.log("RBC is less than 10");
+        if (rbcDiff <= 5) {
+            matchRBCTNC[0] = true;
+            matchRBCTNC[2] = 'RBC counts match';
+        }
+    } else {
+        let percentDiffefenceRBC = 100 * Math.abs(parseInt(rbc_1)-parseInt(rbc_2))/((parseInt(rbc_1)+parseInt(rbc_2))/2);
+        console.log("percentDiffefenceRBC is = " + percentDiffefenceRBC);
+        if (percentDiffefenceRBC <= 20) {
+            matchRBCTNC[0] = true;
+            matchRBCTNC[2] = 'RBC counts match';
+        } else {
+            matchRBCTNC[0] = false;
+            matchRBCTNC[2] = 'RBC counts are too far apart!';
+        }
+    }
+
+    if ((parseInt(tnc_1) < 10) || (parseInt(tnc_2)< 10) ) {
+        let tncDiff = Math.abs(parseInt(tnc_2)-parseInt(tnc_1));
+        console.log("tncDiff = " + tncDiff);
+
+        // for (i=0;i<6;i++) {
+        //     if ((parseInt(tnc_1)-i == parseInt(tnc_2))||(parseInt(tnc_1)+i == parseInt(tnc_2))){
+        //         matchRBCTNC[1] = true;
+        //     }
+        // }
+        console.log("TNC is less than 10");
+        if (tncDiff <= 5) {
+            matchRBCTNC[1] = true;
+            matchRBCTNC[3] = 'TNC counts match';
+        }
+    } else {
+        let percentDiffefenceTNC = 100 * Math.abs(parseInt(tnc_1)-parseInt(tnc_2))/((parseInt(tnc_1)+parseInt(tnc_2))/2);
+        console.log("percentDifferenceTNC = " + percentDiffefenceTNC);
+
+        if (percentDiffefenceTNC <= 20) {
+            matchRBCTNC[1] = true;
+            matchRBCTNC[3] = 'TNC counts match';
+        } else {
+            matchRBCTNC[1] = false;
+            matchRBCTNC[3] = 'TNC counts are too far apart!';
+        }
+    }
+
+    console.log(matchRBCTNC);
+    return matchRBCTNC;
+}
+
+function setButtonStyle(buttonIndices, borderColor, textColor) {
+    buttonIndices.forEach(index => {
+        const button = document.getElementsByTagName('button')[index];
+        button.style.border = `1px solid ${borderColor}`;
+        button.style.color = textColor;
+    });
+}
+// // Test values
+
+// rbc_1 =200;
+// rbc_2 =220;
+// tnc_1 = 0;
+// tnc_2 = 6;

@@ -8,13 +8,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="This counter is to be used alongside a hemocytometer, to measure the RBC and White count of body fluids">
         <meta name="author" content="Dionicy Tarantino">
-        <title>Hemocytometer counter - Lab Counter</title>
+        <title>Hemocytometer counter - Cell Counter</title>
     </head>
 
     <body>
         <header>
             <div id="webTitleBar">
-                <p>Lab Counter</p>
+                <p>Cell Counter</p>
             </div>
             <nav>
                 <ul>
@@ -31,26 +31,32 @@
             <h1>Hemocytometer Counter</h1>
             <br>
             <h2>Cell counter for tallying the amount of red blood cells and white blood cells in a body fluid. </h2>
-            <h3>Instructions:</h2>
-            <h3>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </h3>
-            <h3>OR</h3>
-            <h3>Click/Tap the corresponding buttons to count. </h3>
+            <h3>Instructions:</h3>
+            <p>Click the area that says "Click here to count" and use the 1 and 3 keys to count RBCs and TNCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count.</p>
+
 
 
             <div class="count-group">
                 <div class="count">
-                    <p>RBC Count: </p>
-                    <p id="rbcCount">0</p>
+                    <p><strong>Final RBC Count: </strong></p>
+                    <p id="rbcCount" class="final pseudo">0</p>
                 </div>
                 <div class="count">
-                    <p>TNC Count: </p>
-                    <p id="tncCount">0</p>
+                    <p><strong>Final TNC Count: </strong></p>
+                    <p id="tncCount" class="final pseudo">0</p>
                 </div>
             </div>
-
+            <p id="err">Counts are too far apart!</p>
             <div class="counters-group">
                 <div class="counters-single">
-                    <p>Side 1</p>
+                    <div class="checkdone">
+                        <p>Side 1</p>
+                        <label class="container print-invisible">
+                            <input type="checkbox" id="side1-done">
+                            <span class="checkmark"></span>
+                            Done
+                        </label>
+                    </div>
                     <div class="count-group">
                         <button class="count" onclick="buttonPress(1)">
                             <p>RBC</p>
@@ -64,10 +70,10 @@
 
                     <div class="input-field">
                         <label for="hemocytometer-counter"></label>
-                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click me to start">
+                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click here to count">
                     </div>
 
-                    <div>
+                    <div class="add-reset">
                         <button id="switch1" onclick="buttonChange('s1')">Add</button>
                         <button onclick="resetCounter('c1')">Reset</button>
                     </div>
@@ -75,7 +81,14 @@
                 </div>
 
                 <div class="counters-single">
-                    <p>Side 2</p>
+                    <div class="checkdone">
+                        <p>Side 2</p>
+                        <label class="container print-invisible">
+                            <input type="checkbox" id="side2-done">
+                            <span class="checkmark"></span>
+                            Done
+                        </label>
+                    </div>
                     <div class="count-group">
                         <button class="count" onclick="buttonPress(3)">
                             <p>RBC</p>
@@ -89,14 +102,43 @@
 
                     <div class="input-field">
                         <label for="hemocytometer-counter"></label>
-                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click me to start">
+                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click here to count">
                     </div>
-                    <div>
+                    <div class="add-reset">
                         <button id="switch2" onclick="buttonChange('s2')">Add</button>
                         <button onclick="resetCounter('c2')">Reset</button>
                     </div>
                 </div>
             </div>
+            <div class="prelim-calc-group print-invisible">
+                <div class="prelim-calc">
+                    <p>Side 1 Preliminary calculation: </p>
+                    <div class="count-group">
+                        <div class="count">
+                            <p>RBC Count: </p>
+                            <p id="rbcCount_1">0</p>
+                        </div>
+                        <div class="count">
+                            <p>TNC Count: </p>
+                            <p id="tncCount_1">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="prelim-calc">
+                    <p>Side 2 Preliminary calculation: </p>
+                    <div class="count-group">
+                        <div class="count">
+                            <p>RBC Count: </p>
+                            <p id="rbcCount_2">0</p>
+                        </div>
+                        <div class="count">
+                            <p>TNC Count: </p>
+                            <p id="tncCount_2">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <input id="separate-counts" type="checkbox">
                 <label for="separate-counts">Use separate dilutions and square counts for RBC and TNC</label>
@@ -136,7 +178,44 @@
                 </div>
             </div>
 
+            <!-- <div>
+                <button onclick="calculateCount()">Calculate</button>
+            </div> -->
+
             <!-- <button onclick="calculateCount()">Calculate!</button> -->
+            <br>
+            <div class="showyourwork-group print-visible">
+                <div class="showyourwork-single">
+                    <p>RBC Count = </p>
+                    <div class="fraction">
+                        <span class="numerator">(RBC Average) x (dilution) x 10</span>
+                        <span class="denominator">(# of Squares Counted)</span>
+                    </div>
+                    <p> = </p>
+                    <div class="fraction">
+                        <span class="numerator">(<p class="no-line-breaks" id="calcAvRBC"></p>) x (<p id="calcDilRBC" class="no-line-breaks"></p>) x 10</span>
+                        <span class="denominator">(<p id="calcSquaresRBC" class="no-line-breaks"></p>)</span>
+                    </div>
+                    <p> ≈ </p>
+                    <p id="calcCountRBC"></p>
+                </div>
+                <br>
+                <div class="showyourwork-single">
+                    <p>TNC Count = </p>
+                    <div class="fraction">
+                        <span class="numerator">(TNC Average) x (dilution) x 10</span>
+                        <span class="denominator">(# of Squares Counted)</span>
+                    </div>
+                    <p> = </p>
+                    <div class="fraction">
+                        <span class="numerator">(<p class="no-line-breaks" id="calcAvTNC"></p>) x (<p id="calcDilTNC" class="no-line-breaks"></p>) x 10</span>
+                        <span class="denominator">(<p id="calcSquaresTNC" class="no-line-breaks"></p>)</span>
+                    </div>
+                    <p> ≈ </p>
+                    <p id="calcCountTNC"></p>
+                </div>
+            </div>
+
 
         </div>
         <script>

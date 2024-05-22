@@ -145,29 +145,33 @@ function calculateAverage() {
 function keyStroke(event, inputId) {
     let buttonCode = 'add_Subtract' + String(inputId);
     let element = 'field' + String(inputId);
+    console.log("The event is: " + event);
     let valueCode = element.replace('d', 'd_');
+    let testNum = -1;
         switch (inputId) {
             case 1:
             case 2:
             case 3:
             case 4:
             case 5:
-                if (event.code === "ArrowRight" &&  window[buttonCode] == "Add") {
+                console.log("The key is: " + event.key);
+                if (event.key === "ArrowRight" &&  window[buttonCode] == "Add") {
                     window[valueCode]++;
-                } else if (event.code === "ArrowRight" && window[buttonCode] == "Subtract" && window[valueCode] > 0) {
+                    testNum++;
+                } else if (event.key == "ArrowRight" && window[buttonCode] == "Subtract" && window[valueCode] > 0) {
                     window[valueCode]--;
                 }
-                //document.getElementById(element).textContent = window[valueCode];
                 counterSave(valueCode);
+                console.log("testNum is: " + testNum + ". buttonCode is: " + buttonCode + ". element is: " + element + ". valueCode is: " + valueCode + " which is equal to: " + window[valueCode]);
                 break;
             case 6:
-                if (event.code == "ArrowRight" &&  window[buttonCode] == "Add" && field_7 < 30) {
+                if (event.key == "ArrowRight" &&  window[buttonCode] == "Add" && field_7 < 30) {
                     field_7++;
-                } else if (event.code == "ArrowRight" && window[buttonCode] == "Subtract" && field_7 > 0) {
+                } else if (event.key == "ArrowRight" && window[buttonCode] == "Subtract" && field_7 > 0) {
                     field_7--;
-                } else if (event.code == "ArrowLeft" && window[buttonCode] == "Add" && field_7 < 30) {
+                } else if (event.key == "ArrowLeft" && window[buttonCode] == "Add" && field_7 < 30) {
                     field_6++;
-                } else if (event.code == "ArrowLeft" && window[buttonCode] == "Subtract" && field_6 > 0) {
+                } else if (event.key == "ArrowLeft" && window[buttonCode] == "Subtract" && field_6 > 0) {
                     field_6--;
                 }
                 counterSave("field_6");

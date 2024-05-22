@@ -4,33 +4,19 @@
 
 }
 
-@media print {
-    * {
-        font-size: 10px;
-    }
-    nav {
-        display: none;
-    }
-    button:not(.count) {
-        display: none;
-    }
-    input[type=text] {
-        display: none;
-    }
 
-    h2, h3 {
-        display: none;
-    }
-
-    h1 {
-        font-size: 20px;
-    }
-}
 
 h2, h3 {
     font-size: 15px;
 }
 
+h3 {
+    text-align: center;
+}
+
+h3 + p {
+    text-align: center;
+}
 h1 {
     font-size: 20px;
 }
@@ -148,8 +134,17 @@ a:hover {
     padding: 0.25rem;
     width: 13rem;
     background-color: #1d70b884;
+    border-radius: 10%;
 }
 
+.add-reset {
+    align-self: center;
+}
+
+.input-field {
+    border-radius: 10%;
+    align-self: center;
+}
 
 
 
@@ -167,10 +162,11 @@ a:hover {
 }
 
 button.count {
-    /* background-color: #1d70b800 !important; */
-    border: dotted;
+    background-color: #eee;
+    border: 1px dotted black;
     flex-grow: 1;
     flex-basis: 0;
+    border-radius: 10%;
 
 }
 
@@ -181,6 +177,7 @@ button.count:active {
 
 .keystroke-field {
     color: white;
+    border: none;
 }
 
 input::placeholder {
@@ -193,7 +190,11 @@ input::placeholder {
 .keystroke-field:focus {
     background-color: yellow;
     color:yellow;
+    outline: none !important;
+    border:1px solid red;
+    box-shadow: 0 0 10px #719ECE;
 }
+
 
 #step2 {
     display: flex;
@@ -218,4 +219,143 @@ textarea {
 
 .hide {
     display: none;
+}
+
+.prelim-calc {
+    display: flex;
+    flex-direction: column;
+    font-size: smaller;
+    color:gray;
+}
+
+.prelim-calc-group {
+    display: flex;
+    flex-direction: row;
+    column-gap: 3rem;
+}
+
+.checkdone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container {
+    display: block;
+    position: relative;
+    padding-right: 42px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    /* font-size: 22px; */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+  top: -10px;
+  left: 40px;
+  height: 40px;
+  width: 40px;
+  border-radius: 30%;
+  background-color: #eee;
+}
+
+.container input:checked ~ .checkmark {
+    background-color: green;
+}
+
+.counters-single:has(.container input:checked) {
+    background-color: rgba(0, 128, 0, 0.233);
+}
+
+button.count:has(.container input:checked) {
+    background-color: rgba(0, 128, 0, 0.233);
+}
+
+.final {
+    /* position: absolute; */
+    visibility: hidden;
+}
+
+
+.pseudo:before {
+    content: "Pending";
+    visibility: visible;
+}
+
+#err {
+    display: none;
+}
+.fraction {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+}
+.fraction .numerator {
+    display: block;
+    border-bottom: 1px solid #000;
+    padding: 0 5px;
+}
+.fraction .denominator {
+    display: block;
+    padding: 0 5px;
+}
+.showyourwork-group {
+    display: none;
+    flex-direction: column;
+}
+.showyourwork-single {
+    display: flex;
+}
+
+/* .print-visible {
+    visibility: visible;
+} */
+
+.no-line-breaks {
+    display: inline;
+}
+@media print {
+
+    * {
+        font-size: 10px;
+    }
+    nav {
+        display: none;
+    }
+    button:not(.count) {
+        display: none;
+    }
+    input[type=text] {
+        display: none;
+    }
+
+    h2, h3 {
+        display: none;
+    }
+    h3 + p {
+        display: none;
+    }
+    h1 {
+        font-size: 20px;
+    }
+    .print-invisible {
+        display: none;
+    }
+
+    .print-visible {
+        visibility: visible;
+    }
+
 }

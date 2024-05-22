@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Parasite - Lab Counter</title>
+        <title>Parasite - Cell Counter</title>
         <link rel="stylesheet" href="main.css" type="text/css">
         <script src="parasite.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
     <body>
         <header>
             <div id="webTitleBar">
-                <p>Lab Counter</p>
+                <p>Cell Counter</p>
             </div>
             <nav>
                 <ul>
@@ -31,7 +31,6 @@
             <h1>Parasite Counter</h1>
             <br>
             <h2>Cell counter for measuring the percent parasitemia in a blood sample.  </h2>
-            <p style="font-weight: bold;">Instructions:</p>
             <div id="input-selector">
                 <p style="font-weight: bold;">Select input type</p>
                 <input type="radio" id="wantCounter" name="counterOrNot" checked>
@@ -40,9 +39,8 @@
                 <label for="noCounter">Direct Input</label>
             </div>
             <div class="hide-counters">
-                <p>Click the area that says "Click me to start" and use the LEFT and Right arrow keys to count. </p>
-                <p style="text-align: center;">OR</p>
-                <p>Click/Tap the corresponding buttons to count. </p>
+                <h3>Instructions:</h3>
+                <p>Click the area that says "Click here to count" and use the LEFT and RIGHT arrow keys to count Parasites and RBCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count. <br> <br> N.B. Counter will automatically tally a RBC with each parasite counted.</p>
             </div>
             <div class="alt_count">
                 <p>Enter the parasite and RBC counts below using your keyboard.</p>
@@ -63,12 +61,12 @@
                             <p id="total">0</p>
                         </button>
                     </div>
-                    <div id="counter">
+                    <div class="input-field">
                         <label for="parasite-counter"></label>
-                        <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click me to start" onkeydown="keyStroke(event)">
+                        <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click here to count" onkeydown="keyStroke(event)">
                     </div>
 
-                    <div>
+                    <div class="add-reset">
                         <button id="switch" onclick="buttonChange()">Add</button>
                         <button onclick="resetCounter()">Reset</button>
                     </div>
