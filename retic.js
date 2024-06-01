@@ -1,7 +1,7 @@
-let totalCount = localStorage.getItem('totalCount') || 0;
-let reticCount = localStorage.getItem('reticCount') || 0;
-let buttonState = localStorage.getItem('buttonState') || "Add";
-let percentage = localStorage.getItem('percentage') || 0;
+let totalCount = 0;
+let reticCount = 0;
+let buttonState = "Add";
+let percentage = 0;
 
 
 // function incrementCounter() {
@@ -18,7 +18,6 @@ let percentage = localStorage.getItem('percentage') || 0;
 
 function percentageCalculator() {
     percentage = (reticCount/totalCount) * 100;
-    localStorage.setItem('percentage', percentage);
     document.getElementById("percent").textContent = percentage.toFixed(2);
     return;
 }
@@ -26,11 +25,9 @@ function percentageCalculator() {
 function buttonChange() {
     if (buttonState == "Add") {
         buttonState = "Subtract";
-        localStorage.setItem('buttonState', buttonState);
         document.getElementById("switch").textContent = buttonState;
     } else {
         buttonState = "Add";
-        localStorage.setItem('buttonState', buttonState);
         document.getElementById("switch").textContent = buttonState;
     }
 }
@@ -38,9 +35,6 @@ function resetCounter() {
     totalCount = 0;
     reticCount = 0;
     percentage = 0;
-    localStorage.setItem('reticCount', reticCount);
-    localStorage.setItem('totalCount', totalCount);
-    localStorage.setItem('percentage', percentage)
     document.getElementById("total").textContent = totalCount;
     document.getElementById("retic").textContent = reticCount;
     document.getElementById("percent").textContent = percentage;
@@ -48,49 +42,37 @@ function resetCounter() {
 }
 
 function updateCounter() {
-    let totalCount = localStorage.getItem('totalCount') || 0;
+    totalCount = 0;
     document.getElementById("total").textContent = totalCount;
-    let reticCount = localStorage.getItem('reticCount') || 0;
+    reticCount = 0;
     document.getElementById("retic").textContent = reticCount;
-    let buttonState = localStorage.getItem('buttonState') || "Add";
+    buttonState = "Add";
     document.getElementById("switch").textContent = buttonState;
-    let percentage = localStorage.getItem('percentage') || 0;
+    percentage = 0;
     document.getElementById("percent").textContent = percentage;
 }
 
 
 
 function keyStroke(event) {
-    if (event.key === "ArrowRight" && buttonState == "Add" && totalCount < 1000) {
+    if (event.key == "3" && buttonState == "Add" && totalCount < 1000) {
         totalCount++;
-        localStorage.setItem('totalCount', totalCount);
-        document.getElementById("total").textContent = totalCount;
-        percentageCalculator();
-    } else if (event.key === "ArrowRight" && buttonState == "Subtract" && totalCount > 0) {
+    } else if (event.key == "3" && buttonState == "Subtract" && totalCount > 0) {
         totalCount--;
-        localStorage.setItem('totalCount', totalCount);
-        document.getElementById("total").textContent = totalCount;
-        percentageCalculator();
     }
-    if (event.key === "ArrowLeft" && buttonState == "Add" && totalCount < 1000) {
+    if (event.key == "1" && buttonState == "Add" && totalCount < 1000) {
         reticCount++;
-        localStorage.setItem('reticCount', reticCount);
-        document.getElementById("retic").textContent = reticCount;
         totalCount++;
-        localStorage.setItem('totalCount', totalCount);
-        document.getElementById("total").textContent = totalCount;
-        percentageCalculator();
-    } else if (event.Key === "ArrowLeft" && buttonState == "Subtract" && reticCount > 0) {
+
+    } else if (event.key == "1" && buttonState == "Subtract" && reticCount > 0) {
         reticCount--;
-        localStorage.setItem('reticCount', reticCount);
-        document.getElementById("retic").textContent = reticCount;
         if (totalCount > 0) {
         totalCount--;
-        localStorage.setItem('totalCount', totalCount);
-        document.getElementById("total").textContent = totalCount;
         }
-        percentageCalculator();
     }
+    document.getElementById("retic").textContent = reticCount;
+    document.getElementById("total").textContent = totalCount;
+    percentageCalculator();
 }
 
 function buttonPress(inputId) {
@@ -115,9 +97,7 @@ function buttonPress(inputId) {
             break;
     }
 
-    localStorage.setItem('reticCount', reticCount);
     document.getElementById("retic").textContent = reticCount;
-    localStorage.setItem('totalCount', totalCount);
-    document.getElementById("total").textContent = totalCount
+    document.getElementById("total").textContent = totalCount;
     percentageCalculator();
 }

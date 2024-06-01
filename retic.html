@@ -32,7 +32,7 @@
             <br>
             <h2>Cell counter for measuring the retic percentage in a blood sample.</h2>
             <h3>Instructions:</h3>
-            <p>Click the area that says "Click here to count" and use the LEFT and RIGHT arrow keys to count Retics and RBCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count. <br> <br> N.B. Counter will automatically tally a RBC with each Reticulocyte counted.</p>
+            <p>Click the area that says "Click here to count" and use the "1" and "3" keys to count Retics and RBCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count. <br> <br> N.B. Counter will automatically tally a RBC with each Reticulocyte counted.</p>
 
             <div class="count">
                 <p>Retic Percentage (%): </p>
@@ -47,13 +47,13 @@
                             <p id="retic">0</p>
                         </button>
                         <button class="count" onclick="buttonPress(2)">
-                            <p>Total Red Cells: </p>
+                            <p>Red Cells: </p>
                             <p id="total">0</p>
                         </button>
                     </div>
                     <div class="input-field">
                         <label for="retic-counter"></label>
-                        <input type="text" placeholder="Click me to start" id="retic-counter" class="keystroke-field" name="retic_counter" onkeydown="keyStroke(event)">
+                        <input type="text" placeholder="Click me to start" id="retic-counter" class="keystroke-field" name="retic_counter" onkeydown="keyStroke(event)" readonly>
                     </div>
                     <div class="add-reset">
                         <button id="switch" onclick="buttonChange()">Add</button>

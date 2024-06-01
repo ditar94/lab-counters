@@ -76,35 +76,23 @@ function updateCounter() {
 
 
 function resetCounter(thisCounter) {
-    let pass;
     if (thisCounter == "r1") {
         field_1 = 0;
-        pass = "field_1";
-        counterSave(pass);
     } else if (thisCounter == "r2") {
         field_2 = 0;
-        pass = 'field_2';
-        counterSave(pass);
     } else if (thisCounter == "r3") {
         field_3 = 0;
-        pass = "field_3";
-        counterSave(pass);
     } else if (thisCounter == "r4") {
         field_4 = 0;
-        pass = "field_4";
-        counterSave(pass);
     } else if (thisCounter == "r5") {
         field_5 = 0;
-        pass = "field_5";
-        counterSave(pass);
     } else if (thisCounter == "r6") {
         field_7 = 0;
         field_6 = 0;
-        counterSave("field_7");
-        counterSave("field_6");
     }
     calculateAverage();
     calculatePercentage();
+    updateCounter();
 }
 
 // function counterSave(fieldValue) {
