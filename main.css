@@ -74,8 +74,9 @@ a {
     font-size: 1.8vw;
     font-weight: bold;
     margin: 0;
-    padding: 0;
+    padding-right: 0.7vw;
     white-space: nowrap;
+    border-right: 0.2vw solid #1d70b8;
 }
 
 a:hover {
@@ -159,6 +160,10 @@ a:hover {
 
 .count {
     text-align: center;
+}
+
+.count > p {
+    font-size: 16px;
 }
 
 button.count {
@@ -289,14 +294,13 @@ button.count:has(.container input:checked) {
 }
 
 
+
+
 .pseudo:before {
     content: "Pending";
     visibility: visible;
 }
 
-#err {
-    display: none;
-}
 .fraction {
     display: inline-block;
     vertical-align: middle;
@@ -358,4 +362,14 @@ button.count:has(.container input:checked) {
         visibility: visible;
     }
 
+}
+
+#err {
+    display: none;
+    color: red;
+    font-size: 25px;
+}
+
+#rbcCount, #tncCount {
+    font-size: 25px;
 }

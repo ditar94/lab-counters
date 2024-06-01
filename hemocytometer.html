@@ -32,7 +32,7 @@
             <br>
             <h2>Cell counter for tallying the amount of red blood cells and white blood cells in a body fluid. </h2>
             <h3>Instructions:</h3>
-            <p>Click the area that says "Click here to count" and use the 1 and 3 keys to count RBCs and TNCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count.</p>
+            <p>Click the area that says "Click here to count" and use the 1 and 3 keys to count RBCs and TNCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count. <br> Click "Done" on both sides to see final RBC and TNC calculations</p>
 
 
 
@@ -70,7 +70,7 @@
 
                     <div class="input-field">
                         <label for="hemocytometer-counter"></label>
-                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click here to count">
+                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click here to count" readonly>
                     </div>
 
                     <div class="add-reset">
@@ -102,7 +102,7 @@
 
                     <div class="input-field">
                         <label for="hemocytometer-counter"></label>
-                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click here to count">
+                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
                         <button id="switch2" onclick="buttonChange('s2')">Add</button>

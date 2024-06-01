@@ -1,13 +1,12 @@
-let rbc_1 = localStorage.getItem('rbc_1') || 0;
-let rbc_2 = localStorage.getItem('rbc_2') || 0;
-let tnc_1 = localStorage.getItem('tnc_1') || 0;
-let tnc_2 = localStorage.getItem('tnc_2') || 0;
-let buttonStateH1 = localStorage.getItem('buttonStateH1') || "Add";
-let buttonStateH2 = localStorage.getItem('buttonStateH2') || "Add";
+let rbc_1 = 0;
+let rbc_2 = 0;
+let tnc_1 = 0;
+let tnc_2 = 0;
+let buttonStateH1 = "Add";
+let buttonStateH2 = "Add";
 document.addEventListener("click", inputSwitcher);
 
 function inputSwitcher() {
-    // const buttons = document.querySelectorAll("button");
     var toggleBox = document.querySelectorAll('.hide');
     var toggleCount = document.querySelectorAll('.final');
     let RBCTNCMatch;
@@ -29,37 +28,6 @@ function inputSwitcher() {
             document.getElementsByClassName('showyourwork-group')[0].style.display= 'flex';
         }
         RBCTNCMatch = matchLogic();
-
-        // switch(true) {
-        //     case RBCTNCMatch[0] && RBCTNCMatch[1]:
-        //         console.log('both are true');
-        //         break;
-        //     case RBCTNCMatch[0] && !RBCTNCMatch[1]:
-        //         console.log('tnc doesnt match');
-        //         document.getElementsByTagName('button')[1].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[5].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[1].style.color="red";
-        //         document.getElementsByTagName('button')[5].style.color="red";
-        //         break;
-        //     case !RBCTNCMatch[0] && RBCTNCMatch[1]:
-        //         console.log('rbc doesnt match');
-        //         document.getElementsByTagName('button')[0].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[4].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[0].style.color="red";
-        //         document.getElementsByTagName('button')[4].style.color="red";
-        //         break;
-        //     default:
-        //         console.log('both are false');
-        //         document.getElementsByTagName('button')[0].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[1].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[4].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[5].style.border="1px solid red";
-        //         document.getElementsByTagName('button')[0].style.color="red";
-        //         document.getElementsByTagName('button')[1].style.color="red";
-        //         document.getElementsByTagName('button')[4].style.color="red";
-        //         document.getElementsByTagName('button')[5].style.color="red";
-        //         break;
-        // }
 
         switch (true) {
             case RBCTNCMatch[0] && RBCTNCMatch[1]:
@@ -86,9 +54,6 @@ function inputSwitcher() {
                 break;
         }
 
-        // buttons.forEach(button => {
-        //     button.disabled = true;
-        // });
 
     } else {
         for (i=0; i<toggleCount.length;i++) {
@@ -98,18 +63,6 @@ function inputSwitcher() {
             document.getElementsByClassName('showyourwork-group')[0].style.display= 'none';
 
         }
-        // document.getElementsByTagName('button')[0].style.border= "1px dotted black";
-        // document.getElementsByTagName('button')[1].style.border="1px dotted black";
-        // document.getElementsByTagName('button')[4].style.border="1px dotted black";
-        // document.getElementsByTagName('button')[5].style.border="1px dotted black";
-
-        // document.getElementsByTagName('button')[0].style.color= "black";
-        // document.getElementsByTagName('button')[1].style.color="black";
-        // document.getElementsByTagName('button')[4].style.color="black";
-        // document.getElementsByTagName('button')[5].style.color="black";
-        // buttons.forEach(button => {
-        //     button.disabled = false;
-        // });
         setButtonStyle([0, 1, 4, 5], 'black', 'black');
 
     }
@@ -244,19 +197,19 @@ function buttonPress(inputId) {
             break;
     }
     calculateCount();
-    counterSave();
+    // counterSave();
 }
 
-function counterSave() {
-    localStorage.setItem('rbc_1', rbc_1);
-    document.getElementById("rbc1").textContent = rbc_1;
-    localStorage.setItem('rbc_2', rbc_2);
-    document.getElementById("rbc2").textContent = rbc_2;
-    localStorage.setItem('tnc_1', tnc_1);
-    document.getElementById("tnc1").textContent = tnc_1;
-    localStorage.setItem('tnc_2', tnc_2);
-    document.getElementById("tnc2").textContent = tnc_2;
-}
+// function counterSave() {
+//     localStorage.setItem('rbc_1', rbc_1);
+//     document.getElementById("rbc1").textContent = rbc_1;
+//     localStorage.setItem('rbc_2', rbc_2);
+//     document.getElementById("rbc2").textContent = rbc_2;
+//     localStorage.setItem('tnc_1', tnc_1);
+//     document.getElementById("tnc1").textContent = tnc_1;
+//     localStorage.setItem('tnc_2', tnc_2);
+//     document.getElementById("tnc2").textContent = tnc_2;
+// }
 
 
 function calculateCount() {
@@ -302,7 +255,7 @@ function calculateCount() {
     document.getElementById("calcCountRBC").textContent = " " + Math.round(rbcCount);
     document.getElementById("calcCountTNC").textContent = " " + Math.round(tncCount);
 
-    counterSave();
+    // counterSave();
 
 
 }
