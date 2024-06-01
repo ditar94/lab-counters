@@ -28,25 +28,21 @@
         <div id="main-body">
             <h1>Fetal Hgb Counter</h1>
             <h2>Cell counter for measuring the fetal hemoglobin percentage in a maternal sample. Also known as the Kleihauer-Betke (KB) test</h2>
-
-            <div style="display:flex; flex-direction: column; align-items: center;">
-                <h4>Step 1: </h4>
-                <h5>Count the number of RBCs in 5 fields using the high dry objective (40X);</h5>
-
-                <div id="input-selector">
+            <div id="input-selector">
                     <p style="font-weight: bold;">Select input type</p>
                     <input type="radio" id="wantCounter" name="counterOrNot" checked>
                     <label for="wantCounter">Keyboard Counter</label><br>
                     <input type="radio" id="noCounter" name="counterOrNot">
                     <label for="noCounter">Direct Input</label>
-                </div>
+            </div>
+            <div style="display:flex; flex-direction: column; align-items: center;">
+                <h4>Step 1: </h4>
+                <h4>Count the number of RBCs in 5 fields using the high dry objective (40X);</h5>
                 <div class="hide-counters" style="display:flex; flex-direction: column; align-items: center;">
-                    <h3>Instructions:</h3>
-                    <p>Click the area that says "Click here to count" in each field and use the RIGHT Arrow key to count RBCs. <br> OR <br> Click/Tap the corresponding buttons to count.</p>
-
+                    <h3>Click the area that says "Click here to count" in each field and use the "3" key to count RBCs. <br> OR <br> Click/Tap the corresponding buttons to count.</h3>
                 </div>
                 <div class="alt_count">
-                    <p>Enter the average RBCs per field below using your keyboard.</p>
+                    <h3>Enter the average RBCs per field below using your keyboard.</h3>
                 </div>
 
             </div>
@@ -78,7 +74,7 @@
                         <input type="text" id="field1-input" class="keystroke-field" name="field1_input" onkeydown="keyStroke(event, 1)" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
-                        <button id="addSubtract1" onclick="buttonChange('s1')">Add</button>
+                        <button id="addSubtract1" onclick="buttonChange('add_Subtract1')">Add</button>
                         <button onclick="resetCounter('r1')">Reset</button>
                     </div>
                 </div>
@@ -94,7 +90,7 @@
                         <input type="text" id="field2-input" class="keystroke-field" name="field2_input" onkeydown="keyStroke(event, 2)" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
-                        <button id="addSubtract2" onclick="buttonChange('s2')">Add</button>
+                        <button id="addSubtract2" onclick="buttonChange('add_Subtract2')">Add</button>
                         <button onclick="resetCounter('r2')">Reset</button>
                     </div>
                 </div>
@@ -110,7 +106,7 @@
                         <input type="text" id="field3-input" class="keystroke-field" name="field3_input" onkeydown="keyStroke(event, 3)" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
-                        <button id="addSubtract3" onclick="buttonChange('s3')">Add</button>
+                        <button id="addSubtract3" onclick="buttonChange('add_Subtract3')">Add</button>
                         <button onclick="resetCounter('r3')">Reset</button>
                     </div>
                 </div>
@@ -126,7 +122,7 @@
                         <input type="text" id="field4-input" class="keystroke-field" name="field4_input" onkeydown="keyStroke(event, 4)" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
-                        <button id="addSubtract4" onclick="buttonChange('s4')">Add</button>
+                        <button id="addSubtract4" onclick="buttonChange('add_Subtract4')">Add</button>
                         <button onclick="resetCounter('r4')">Reset</button>
                     </div>
                 </div>
@@ -142,7 +138,7 @@
                         <input type="text" id="field5-input" class="keystroke-field" name="field5_input" onkeydown="keyStroke(event, 5)" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
-                        <button id="addSubtract5" onclick="buttonChange('s5')">Add</button>
+                        <button id="addSubtract5" onclick="buttonChange('add_Subtract5')">Add</button>
                         <button onclick="resetCounter('r5')">Reset</button>
                     </div>
                 </div>
@@ -155,9 +151,9 @@
 
             <div id="step2-instructions">
                 <h4>Step 2: </h4>
-                <h5>Count the number of fetal cells in 30 fields using the high dry objective (40X);</h5>
+                <h4>Count the number of fetal cells in 30 fields using the high dry objective (40X);</h4>
                 <h3>Instructions:</h3>
-                <p>Click the area that says "Click here to count" and use the LEFT and RIGHT Arrow keys to count fetal cells and tally fields, respectively. <br> OR <br> Click/Tap the corresponding buttons to count.</p>
+                <p>Click the area that says "Click here to count" and use the "1" and "3" keys to count fetal cells and tally fields, respectively. <br> OR <br> Click/Tap the corresponding buttons to count.</p>
             </div>
 
             <div class="counters-single">
@@ -177,7 +173,7 @@
                     <input type="text" id="field6-input" class="keystroke-field" name="field6_input" onkeydown="keyStroke(event, 6)" placeholder="Click here to count" readonly>
                 </div>
                 <div class="add-reset">
-                    <button id="addSubtract6" onclick="buttonChange('s6')">Add</button>
+                    <button id="addSubtract6" onclick="buttonChange('add_Subtract6')">Add</button>
                     <button onclick="resetCounter('r6')">Reset</button>
                 </div>
             </div>
