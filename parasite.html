@@ -40,7 +40,7 @@
             </div>
             <div class="hide-counters">
                 <h3>Instructions:</h3>
-                <p>Click the area that says "Click here to count" and use the LEFT and RIGHT arrow keys to count Parasites and RBCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count. <br> <br> N.B. Counter will automatically tally a RBC with each parasite counted.</p>
+                <p>Click the area that says "Click here to count" and use the 1 and 3 keys to count Parasites and RBCs, respectively. <br> OR <br> Click/Tap the corresponding buttons to count. <br> <br> N.B. Counter will automatically tally a RBC with each parasite counted.</p>
             </div>
             <div class="alt_count">
                 <p>Enter the parasite and RBC counts below using your keyboard.</p>
@@ -57,13 +57,13 @@
                             <p id="parasite">0</p>
                         </button>
                         <button class="count" onclick="buttonPress(2)">
-                            <p>Total Red Cells: </p>
+                            <p>Red Cells: </p>
                             <p id="total">0</p>
                         </button>
                     </div>
                     <div class="input-field">
                         <label for="parasite-counter"></label>
-                        <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click here to count" onkeydown="keyStroke(event)">
+                        <input type="text" id="parasite-counter" class="keystroke-field" name="parasite_counter" placeholder="Click here to count" onkeydown="keyStroke(event)" readonly>
                     </div>
 
                     <div class="add-reset">
