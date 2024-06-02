@@ -5,7 +5,7 @@ let buttonStateP = "Add";
 const input = document.querySelector("#count-input");
 const radio = document.querySelector("#wantCounter");
 const log = document.getElementById('para');
-//document.addEventListener("input", updateValue);
+document.addEventListener("input", updateValue);
 document.addEventListener("click", inputSwitcher);
 
 
@@ -37,7 +37,13 @@ function inputSwitcher() {
 }
 
 
-
+function updateValue() {
+    parasiteCount = document.getElementById('para-count-input').value;
+    totalCountP = document.getElementById('red-count-input').value;
+    console.log(parasiteCount);
+    counterSave();
+    percentageCalculator();
+}
 
 function updateCounter() {
 
