@@ -340,6 +340,10 @@ button.count:has(.container input:checked) {
     padding-right: 15px;
 
 }
+
+.prelim-calc-group {
+    display: none;
+}
 @media print {
 
     * {
@@ -353,6 +357,10 @@ button.count:has(.container input:checked) {
     }
     input[type=text] {
         display: none;
+    }
+
+    #webTitleBar p {
+        text-align: center;
     }
 
 
@@ -371,11 +379,11 @@ button.count:has(.container input:checked) {
 
     }
     .print-invisible {
-        display: none;
+        display: none !important;
     }
 
     .print-visible {
-        visibility: visible;
+        visibility: visible !important;
     }
     #input-selector {
         display: none;

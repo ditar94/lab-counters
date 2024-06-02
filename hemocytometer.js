@@ -20,6 +20,12 @@ function inputSwitcher() {
         }
     }
 
+    if (document.getElementById('toggle-prelim').checked) {
+            document.querySelectorAll('.prelim-calc-group')[0].style.display = 'flex';
+    } else {
+            document.querySelectorAll('.prelim-calc-group')[0].style.display = 'none';
+    }
+
     if (document.getElementById('side1-done').checked && document.getElementById('side2-done').checked) {
         for (i=0; i<toggleCount.length;i++) {
             document.querySelectorAll('.final')[i].style.visibility= 'visible';
