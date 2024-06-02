@@ -35,14 +35,13 @@
                     <input type="radio" id="noCounter" name="counterOrNot">
                     <label for="noCounter">Direct Input</label>
             </div>
-            <div style="display:flex; flex-direction: column; align-items: center;">
-                <h4>Step 1: </h4>
-                <h4>Count the number of RBCs in 5 fields using the high dry objective (40X);</h5>
+            <div style="display:flex; flex-direction: column; align-items: flex-start; justify-items: flex-start;">
+                <h3>Step 1: <br> Count the number of RBCs in 5 fields using the high dry objective (40X);</h3>
                 <div class="hide-counters" style="display:flex; flex-direction: column; align-items: center;">
-                    <h3>Click the area that says "Click here to count" in each field and use the "3" key to count RBCs. <br> OR <br> Click/Tap the corresponding buttons to count.</h3>
+                    <h4 class="print-invisible">Click the area that says "Click here to count" in each field and use the "3" key to count RBCs. <br> OR <br> Click/Tap the corresponding buttons to count.</h4>
                 </div>
                 <div class="alt_count">
-                    <h3>Enter the average RBCs per field below using your keyboard.</h3>
+                    <h4 class="print-invisible">Enter the average RBCs per field below using your keyboard.</h4>
                 </div>
 
             </div>
@@ -51,7 +50,12 @@
                 <input type="number" inputmode="numeric" id="red-count-input" min="0"> <br>
             </div>
             <div class="count-group">
-                <div class="count">
+                <div class="count divider">
+                    <p>Total RBCs in 5 fields: </p>
+                    <p id="fiveFields">0</p>
+                </div>
+
+                <div class="count divider">
                     <p>Average RBCs per field: </p>
                     <p id="averageRBC">0</p>
                 </div>
@@ -150,10 +154,8 @@
 
 
             <div id="step2-instructions">
-                <h4>Step 2: </h4>
-                <h4>Count the number of fetal cells in 30 fields using the high dry objective (40X);</h4>
-                <h3>Instructions:</h3>
-                <p>Click the area that says "Click here to count" and use the "1" and "3" keys to count fetal cells and tally fields, respectively. <br> OR <br> Click/Tap the corresponding buttons to count.</p>
+                <h3>Step 2: <br> Count the number of fetal cells in 30 fields using the high dry objective (40X);</h3>
+                <h4 class="print-invisible">Click the area that says "Click here to count" and use the "1" and "3" keys to count fetal cells and tally fields, respectively. <br> OR <br> Click/Tap the corresponding buttons to count.</h4>
             </div>
 
             <div class="counters-single">

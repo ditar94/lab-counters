@@ -6,6 +6,7 @@ let field_4 = 0;
 let field_5 = 0;
 let average_RBC = 0;
 let thirty_Fields = 0;
+let five_Fields = 0;
 let field_7 = 0;
 let field_6 = 0;
 let add_Subtract1 = "Add";
@@ -63,6 +64,7 @@ function updateCounter() {
     document.getElementById("field5").textContent = field_5;
     document.getElementById("averageRBC").textContent = average_RBC;
     document.getElementById("thirtyFields").textContent = thirty_Fields;
+    document.getElementById("fiveFields").textContent = five_Fields;
     document.getElementById("field7").textContent = field_7;
     document.getElementById("field6").textContent = field_6;
     document.getElementById("addSubtract1").textContent = add_Subtract1;
@@ -134,6 +136,7 @@ function buttonChange(thisButton) {
 function calculateAverage() {
     average_RBC = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5)) / 5;
     thirty_Fields = parseInt(average_RBC * 30);
+    five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));
     updateCounter()
 }
 
