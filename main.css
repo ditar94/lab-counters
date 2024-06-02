@@ -164,7 +164,6 @@ a:hover {
 
 .count {
     text-align: center;
-    padding-right: 15px;
 }
 
 .count > p {
@@ -338,6 +337,8 @@ button.count:has(.container input:checked) {
 
 .divider {
     border-right: 1px solid black;
+    padding-right: 15px;
+
 }
 @media print {
 
