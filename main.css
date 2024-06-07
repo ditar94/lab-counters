@@ -189,20 +189,7 @@ button.count:active {
     border: none;
 }
 
-input::placeholder {
-    color: #555;
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-}
 
-.keystroke-field:focus {
-    background-color: yellow;
-    color:yellow;
-    outline: none !important;
-    border:1px solid red;
-    box-shadow: 0 0 10px #719ECE;
-}
 
 
 #step2 {
@@ -247,19 +234,21 @@ textarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 5px;
 }
 
 .container {
     display: block;
     position: relative;
-    padding-right: 42px;
-    margin-bottom: 12px;
+    padding-right: 55px;
+    /* margin-bottom: 12px; */
     cursor: pointer;
     /* font-size: 22px; */
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+
 }
 
 .container input {
@@ -272,10 +261,10 @@ textarea {
 
 .checkmark {
     position: absolute;
-  top: -10px;
-  left: 40px;
-  height: 40px;
-  width: 40px;
+  top: -15px;
+  left: 43px;
+  height: 50px;
+  width: 50px;
   border-radius: 30%;
   background-color: #eee;
 }
@@ -344,6 +333,39 @@ button.count:has(.container input:checked) {
 .prelim-calc-group {
     display: none;
 }
+
+input[type=text] {
+    height: 50px;
+    width: 75px;
+    border-radius: 10%;
+    margin-top: 5% !important;
+    margin-bottom: 5% !important;
+}
+
+/* ::-webkit-input-placeholder {
+    white-space:pre-line;
+    position:relative;
+    top:-10%;
+    color: black ;
+  } */
+
+  input::placeholder {
+    white-space:pre-wrap;
+    color: #555;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    top:-15%;
+}
+
+.keystroke-field:focus {
+    background-color: yellow;
+    color:yellow;
+    outline: none !important;
+    border:1px solid red;
+    box-shadow: 0 0 10px #719ECE;
+}
 @media print {
 
     * {
@@ -400,3 +422,19 @@ button.count:has(.container input:checked) {
 #rbcCount, #tncCount {
     font-size: 25px;
 }
+/* #hemocytometer-counter1, #hemocytometer-counter2 {
+    height: 60px;
+    width: 60px;
+    border-radius: 10%;
+    margin-top: 5% !important;
+    margin-bottom: 5% !important;
+} */
+
+
+  .bold {
+    font-weight: bold;
+  }
+
+  notbold {
+    font-weight: lighter;
+  }

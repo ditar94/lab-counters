@@ -136,7 +136,7 @@ function buttonChange(thisButton) {
 function calculateAverage() {
     average_RBC = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5)) / 5;
     thirty_Fields = parseInt(average_RBC * 30);
-    five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));
+    five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));Z
     updateCounter()
 }
 

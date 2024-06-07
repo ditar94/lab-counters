@@ -32,9 +32,9 @@
             <br>
             <h2>Cell counter for tallying the amount of red blood cells and white blood cells in a body fluid. </h2>
             <h3 class="print-invisible">Instructions: <br>
-                Click the area that says "Click here to count" and use the 1 and 3 keys to count RBCs and TNCs, respectively. <br>
+                1.<notbold class="notbold"> Click the area that says <strong>"Click here to count"</strong> and use the <strong>1</strong> and <strong>3</strong> keys to count RBCs and TNCs, respectively. <br>
                 OR <br>
-                Click/Tap the corresponding buttons to count. <br> Click "Done" on both sides to see final RBC and TNC calculations</h3>
+                Click/Tap the corresponding buttons to count. <br> <strong>2.</strong> Click <strong>"Done"</strong> on both sides to see final RBC and TNC calculations</notbold></h3>
 
 
             <div class="count-group">
@@ -86,11 +86,11 @@
             <div class="counters-group">
                 <div class="counters-single">
                     <div class="checkdone">
-                        <p>Side 1</p>
+                        <p class="bold">Side 1</p>
                         <label class="container print-invisible">
                             <input type="checkbox" id="side1-done">
                             <span class="checkmark"></span>
-                            Done
+                            <strong>Done</strong>
                         </label>
                     </div>
                     <div class="count-group">
@@ -105,8 +105,8 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="hemocytometer-counter"></label>
-                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click here to count" readonly>
+                        <label for="hemocytometer-counter1"></label>
+                        <input type="text" id="hemocytometer-counter1" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input1')" placeholder="Click here to count" readonly>
                     </div>
 
                     <div class="add-reset">
@@ -118,11 +118,11 @@
 
                 <div class="counters-single">
                     <div class="checkdone">
-                        <p>Side 2</p>
+                        <p class="bold">Side 2</p>
                         <label class="container print-invisible">
                             <input type="checkbox" id="side2-done">
                             <span class="checkmark"></span>
-                            Done
+                            <strong>Done</strong>
                         </label>
                     </div>
                     <div class="count-group">
@@ -137,8 +137,8 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="hemocytometer-counter"></label>
-                        <input type="text" id="hemocytometer-counter" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click here to count" readonly>
+                        <label for="hemocytometer-counter2"></label>
+                        <input type="text" id="hemocytometer-counter2" class="keystroke-field" name="hemocytometer_counter" onkeydown="keyStroke(event, 'input2')" placeholder="Click here to count" readonly>
                     </div>
                     <div class="add-reset">
                         <button id="switch2" onclick="buttonChange('s2')">Add</button>
