@@ -39,7 +39,7 @@
                 <h3>Step 1: <br> Count the number of RBCs in 5 fields using the high dry objective (40X);</h3>
                 <div class="hide-counters" style="display:flex; flex-direction: column; align-items: center;">
                     <h4 class="print-invisible">
-                        <notbold class="notbold">Click the area that says "Click here to count" in each field and use the "3" key to count RBCs. <br>
+                            <notbold class="notbold">Click the area that says <strong>"Click here to count"</strong> in each field and use the <strong>3</strong> key to count RBCs. <br>
                         OR <br>
                         Click/Tap the corresponding buttons to count. </notbold>
                     </h4>
@@ -59,17 +59,17 @@
             </div>
             <div class="count-group">
                 <div class="count divider">
-                    <p>Total RBCs in 5 fields: </p>
+                    <p class="bold">Total RBCs in 5 fields: </p>
                     <p id="fiveFields">0</p>
                 </div>
 
                 <div class="count divider">
-                    <p>Average RBCs per field: </p>
+                    <p class="bold">Average RBCs per field: </p>
                     <p id="averageRBC">0</p>
                 </div>
 
                 <div class="count">
-                    <p>RBCs in 30 fields: </p>
+                    <p class="bold">RBCs in 30 fields: </p>
                     <p id="thirtyFields">0</p>
                 </div>
             </div>
@@ -165,15 +165,21 @@
                 <h3>Step 2: <br> Count the number of fetal cells in 30 fields using the high dry objective (40X);</h3>
                 <h4 class="print-invisible">
                     <notbold>
-                    Click the area that says "Click here to count" and use the "1" and "3" keys to count fetal cells and tally fields, respectively. <br>
+                    Click the area that says <strong>"Click here to count"</strong> and use the <strong>1</strong> and <strong>3</strong> keys to count fetal cells and tally fields, respectively. <br>
                     OR <br>
                     Click/Tap the corresponding buttons to count.
                     </notbold>
                 </h4>
             </div>
 
+            <div class="count">
+                <p class="bold">Percent Fetal cells: </p>
+                <p id="percentFetals">0</p>
+            </div>
+
+
             <div class="counters-single">
-                <p>Fetal Cells in 30 Fields </p>
+                <p>Fetal Cells in 30 Fields:</p>
                 <div class="count-group">
                     <button class="count" onclick="buttonPress(6)">
                         <p>Fetal Cells: </p>
@@ -194,10 +200,6 @@
                 </div>
             </div>
 
-            <div class="count">
-                <p>Percent Fetal cells: </p>
-                <p id="percentFetals">0</p>
-            </div>
 
         </div>
         <script>
