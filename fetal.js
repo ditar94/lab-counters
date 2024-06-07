@@ -17,6 +17,7 @@ let add_Subtract5 = "Add";
 let add_Subtract6 = "Add";
 let percent_Fetals = 0;
 let testNum = 0;
+
 document.addEventListener("click", inputSwitcher);
 document.addEventListener("input", updateValue);
 
@@ -78,8 +79,10 @@ function updateCounter() {
 
 
 function resetCounter(thisCounter) {
+    console.log("field 1 before is " + field_1)
     if (thisCounter == "r1") {
         field_1 = 0;
+        console.log("field 1 after is " + field_1)
     } else if (thisCounter == "r2") {
         field_2 = 0;
     } else if (thisCounter == "r3") {
@@ -136,7 +139,7 @@ function buttonChange(thisButton) {
 function calculateAverage() {
     average_RBC = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5)) / 5;
     thirty_Fields = parseInt(average_RBC * 30);
-    five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));Z
+    five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));
     updateCounter()
 }
 
