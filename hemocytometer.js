@@ -5,6 +5,8 @@ let tnc_2 = 0;
 let buttonStateH1 = "Add";
 let buttonStateH2 = "Add";
 document.addEventListener("click", inputSwitcher);
+document.addEventListener("input", inputSwitcher);
+
 
 function inputSwitcher() {
     var toggleBox = document.querySelectorAll('.hide');
