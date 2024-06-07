@@ -36,7 +36,8 @@
                 OR <br>
                 Click/Tap the corresponding buttons to count. <br>
                 (The "Add" button displays the current mode and can be toggled to "Subtract")<br>
-                <strong>2.</strong> Click <strong>"Done"</strong> on both sides to see final RBC and TNC calculations
+                <strong>2. </strong> Enter <strong>Squares Counted</strong> and <strong>Dilution Factor</strong> in the appropriate fields <br>
+                <strong>3.</strong> Click <strong>"Done"</strong> on both sides to see final RBC and TNC counts
             </notbold>
 
             </h3>
@@ -57,7 +58,7 @@
             <div class="count-group">
                 <p class="hide">RBC Settings: </p>
                 <div class="count">
-                    <label for="squares1">Squares Counted: </label>
+                    <label class="bold" for="squares1">Squares Counted: </label>
                     <select name="squares_counted1" id="squares1" onchange="calculateCount()">
                         <option value="">Please choose</option>
                         <option value="0.2">0.2</option>
@@ -66,7 +67,7 @@
                     </select>
                 </div>
                 <div class="count">
-                    <label for="dilution1">Dilution: </label>
+                    <label class="bold" for="dilution1">Dilution Factor: </label>
                     <input type="number" id="dilution1" name="dilution_1" min="1" max="100" value="1" onchange="calculateCount()">
                 </div>
             </div>
@@ -74,7 +75,7 @@
             <div class="count-group hide">
                 <p>TNC Settings: </p>
                 <div class="count">
-                    <label for="squares2">Squares Counted: </label>
+                    <label class="bold" for="squares2">Squares Counted: </label>
                     <select name="squares_counted2" id="squares2" onchange="calculateCount()">
                         <option value="">Please choose</option>
                         <option value="0.2">0.2</option>
@@ -83,7 +84,7 @@
                     </select>
                 </div>
                 <div class="count">
-                    <label for="dilution2">Dilution: </label>
+                    <label class="bold" for="dilution2">Dilution Factor: </label>
                     <input type="number" id="dilution2" name="dilution_2" min="1" max="100" value="1" onchange="calculateCount()">
                 </div>
             </div>
