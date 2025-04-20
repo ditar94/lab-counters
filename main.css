@@ -72,7 +72,9 @@ li {
     text-align: start;
 }
 
-a {
+
+
+nav a {
     text-decoration: none;
     color: #1d70b8;
     font-size: 1.8vw;
@@ -83,8 +85,17 @@ a {
     border-right: 0.2vw solid #1d70b8;
 }
 
-a:hover {
+
+
+nav a:hover {
     color: #003078;
+}
+
+a.external-link {
+    font-size: 0.95rem;
+    color: #0066cc;
+    text-decoration: underline;
+    font-weight: normal;
 }
 
 
@@ -92,14 +103,15 @@ a:hover {
     header p {
         font-size: 31.96px;
     }
-    a {
+
+    nav a {
         font-size: 14.382px;
     }
+
     nav {
         border-top: 5.593px solid #1d70b8;
         border-bottom: 0.799px solid black;
     }
-
 }
 
 /* Navigation Bar end */
