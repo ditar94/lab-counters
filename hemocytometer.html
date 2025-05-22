@@ -29,9 +29,6 @@
 
         <div id="main-body">
             <h1>Hemocytometer Counter</h1>
-            <div title="Created by Dionicy Tarantino" style="position: fixed; bottom: 10px; right: 10px; font-size: 0.8rem; color: #aaa; cursor: help;">
-                ℹ
-              </div>
             <br>
             <h2>Cell counter for tallying the amount of red blood cells and white blood cells in a body fluid. </h2>
             <h3 class="print-invisible">Instructions: <br>
@@ -71,7 +68,7 @@
                 </div>
                 <div class="count">
                     <label class="bold" for="dilution1">Dilution Factor: </label>
-                    <input type="number" id="dilution1" name="dilution_1" min="1" max="100" value="1" onchange="calculateCount()">
+                    <input type="number" id="dilution1" name="dilution_1" min="1" max="200" value="1" onchange="calculateCount()">
                 </div>
             </div>
 
@@ -88,7 +85,7 @@
                 </div>
                 <div class="count">
                     <label class="bold" for="dilution2">Dilution Factor: </label>
-                    <input type="number" id="dilution2" name="dilution_2" min="1" max="100" value="1" onchange="calculateCount()">
+                    <input type="number" id="dilution2" name="dilution_2" min="1" max="200" value="1" onchange="calculateCount()">
                 </div>
             </div>
 
