@@ -1,0 +1,336 @@
+.hemocytometer {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.counter-header {
+  margin-bottom: 1.5rem;
+}
+
+.counter-header h1 {
+  margin-bottom: 1rem;
+}
+
+.specimen-info {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.specimen-info .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.specimen-info input,
+.specimen-info select {
+  width: 100%;
+}
+
+.settings-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+.settings-section h3 {
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-gray-700);
+}
+
+.settings-group {
+  padding: 1rem;
+  background: var(--color-gray-50);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.settings-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.tnc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.tnc-header h3 {
+  margin-bottom: 0;
+}
+
+.show-prelim {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.settings-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.sides-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.side {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 2px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.side.done {
+  border-color: var(--color-success);
+  background-color: rgba(22, 163, 74, 0.05);
+}
+
+.side h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.config-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.config-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.config-row input,
+.config-row select {
+  width: 100%;
+}
+
+.counter-input {
+  margin-bottom: 1rem;
+}
+
+.counter-input input {
+  width: 100%;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1rem;
+  background-color: var(--color-gray-50);
+}
+
+.counter-input input:focus {
+  background-color: white;
+}
+
+.count-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.count-btn {
+  padding: 1.25rem 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--radius);
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.count-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.count-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.count-btn.error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.count-btn.rbc {
+  background-color: #fef2f2;
+}
+
+.count-btn.tnc {
+  background-color: #eff6ff;
+}
+
+.side-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.mode-btn,
+.reset-btn {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius);
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-btn:hover:not(:disabled),
+.reset-btn:hover:not(:disabled) {
+  background-color: var(--color-gray-50);
+}
+
+.mode-btn.add {
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.mode-btn.subtract {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.prelim-calcs {
+  padding: 0.75rem;
+  background: var(--color-gray-50);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.prelim-calcs p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+}
+
+.done-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-gray-100);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.results-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+.results-section h2 {
+  margin-bottom: 1rem;
+}
+
+.results-section .warning {
+  color: var(--color-error);
+  margin-bottom: 0.5rem;
+}
+
+.final-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.final-results .result {
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: var(--radius);
+  border: 2px solid;
+}
+
+.final-results .result.valid {
+  border-color: var(--color-success);
+  background-color: rgba(22, 163, 74, 0.05);
+}
+
+.final-results .result.invalid {
+  border-color: var(--color-error);
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+.final-results .label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  margin-bottom: 0.25rem;
+}
+
+.final-results .value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.formula-display {
+  padding: 1rem;
+  background: var(--color-gray-50);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.formula-display p {
+  margin: 0.25rem 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .sides-container {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions .btn {
+    width: 100%;
+  }
+}

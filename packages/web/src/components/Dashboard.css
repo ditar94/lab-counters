@@ -1,0 +1,137 @@
+.dashboard h1 {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.dashboard-card h2 {
+  font-size: 1rem;
+  color: var(--color-gray-500);
+  margin-bottom: 1rem;
+}
+
+.quick-actions .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-button {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-radius: var(--radius);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.action-button.primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+.action-button:not(.primary) {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+
+.action-button:not(.primary):hover {
+  background-color: var(--color-gray-200);
+  text-decoration: none;
+}
+
+.pending .pending-count {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-warning);
+  margin: 0;
+}
+
+.pending .view-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.recent .records-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recent .records-list li {
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.recent .records-list li:last-child {
+  border-bottom: none;
+}
+
+.recent .records-list a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.recent .records-list a:hover {
+  background-color: var(--color-gray-50);
+}
+
+.specimen-id {
+  font-weight: 500;
+  color: var(--color-gray-900);
+}
+
+.record-type {
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  text-transform: capitalize;
+}
+
+.status {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+.status-draft {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+
+.status-pending_verification {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-verified {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.no-records {
+  color: var(--color-gray-500);
+  font-size: 0.875rem;
+}

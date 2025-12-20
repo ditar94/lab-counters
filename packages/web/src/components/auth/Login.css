@@ -1,0 +1,143 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h1 {
+  font-size: 1.75rem;
+  color: var(--color-gray-900);
+  margin-bottom: 0.5rem;
+}
+
+.login-header p {
+  color: var(--color-gray-500);
+  margin: 0;
+}
+
+.login-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.login-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.login-footer p {
+  color: var(--color-gray-500);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Dev Login */
+.dev-login {
+  margin-bottom: 1.5rem;
+}
+
+.dev-label {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-warning);
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: #fef3c7;
+  border-radius: var(--radius);
+}
+
+.dev-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dev-button {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 2px solid;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dev-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dev-button.admin {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.dev-button.admin:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.dev-button.supervisor {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.dev-button.supervisor:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+.dev-button.tech {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.dev-button.tech:hover:not(:disabled) {
+  background: #dcfce7;
+}

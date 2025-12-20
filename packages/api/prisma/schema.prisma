@@ -1,0 +1,187 @@
+// Prisma schema for Lab Counters
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Organizations & Sites (Multi-tenancy)
+// ============================================
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sites        Site[]
+  users        User[]
+  countRecords CountRecord[]
+  auditLogs    AuditLog[]
+
+  @@map("organizations")
+}
+
+model Site {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  name      String
+  location  String   @default("")
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  users        User[]
+  countRecords CountRecord[]
+
+  @@map("sites")
+}
+
+// ============================================
+// Users
+// ============================================
+
+enum UserRole {
+  admin
+  supervisor
+  technologist
+  readonly
+}
+
+enum UserStatus {
+  active
+  inactive
+  pending
+}
+
+model User {
+  id        String     @id @default(uuid())
+  cognitoId String     @unique @map("cognito_id")
+  email     String
+  name      String
+  orgId     String     @map("org_id")
+  siteId    String     @map("site_id")
+  role      UserRole   @default(technologist)
+  status    UserStatus @default(pending)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  organization    Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  site            Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdRecords  CountRecord[] @relation("CreatedBy")
+  verifiedRecords CountRecord[] @relation("VerifiedBy")
+  corrections     Correction[]
+  auditLogs       AuditLog[]
+
+  @@unique([orgId, email])
+  @@map("users")
+}
+
+// ============================================
+// Count Records
+// ============================================
+
+enum CountRecordType {
+  hemocytometer
+  fetal
+  retic
+  parasite
+}
+
+enum RecordStatus {
+  draft
+  pending_verification
+  verified
+  corrected
+}
+
+model CountRecord {
+  id           String          @id @default(uuid())
+  orgId        String          @map("org_id")
+  siteId       String          @map("site_id")
+  type         CountRecordType
+  specimenId   String          @map("specimen_id")
+  specimenType String          @map("specimen_type")
+  status       RecordStatus    @default(draft)
+  data         Json
+  calculations Json
+  createdById  String          @map("created_by_id")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  verifiedById String?         @map("verified_by_id")
+  verifiedAt   DateTime?       @map("verified_at")
+  isImmutable  Boolean         @default(false) @map("is_immutable")
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  site         Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("CreatedBy", fields: [createdById], references: [id])
+  verifiedBy   User?        @relation("VerifiedBy", fields: [verifiedById], references: [id])
+  corrections  Correction[]
+
+  @@index([orgId, siteId])
+  @@index([specimenId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("count_records")
+}
+
+// ============================================
+// Corrections
+// ============================================
+
+model Correction {
+  id             String   @id @default(uuid())
+  parentRecordId String   @map("parent_record_id")
+  reason         String
+  data           Json
+  calculations   Json
+  createdById    String   @map("created_by_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  parentRecord CountRecord @relation(fields: [parentRecordId], references: [id], onDelete: Cascade)
+  createdBy    User        @relation(fields: [createdById], references: [id])
+
+  @@map("corrections")
+}
+
+// ============================================
+// Audit Log
+// ============================================
+
+enum AuditAction {
+  create
+  update
+  delete
+  verify
+  correct
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  orgId     String      @map("org_id")
+  tableName String      @map("table_name")
+  recordId  String      @map("record_id")
+  action    AuditAction
+  oldValues Json?       @map("old_values")
+  newValues Json?       @map("new_values")
+  userId    String      @map("user_id")
+  timestamp DateTime    @default(now())
+  ipAddress String?     @map("ip_address")
+  userAgent String?     @map("user_agent")
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@index([orgId, tableName, recordId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
