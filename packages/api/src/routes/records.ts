@@ -22,10 +22,19 @@ recordsRouter.use(enforceOrgScope);
 recordsRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const filters = RecordFilterSchema.parse(req.query);
-    const { page, pageSize, type, status, specimenId, startDate, endDate, createdBy } = filters;
+    const { page, pageSize, type, status, specimenId, startDate, endDate, createdBy, siteId } = filters;
+
+    // Technologists only see records from their current site
+    // Other roles can see all records in the org (optionally filtered by site)
+    const siteFilter = req.user!.role === 'technologist'
+      ? { siteId: req.user!.siteId }
+      : siteId
+        ? { siteId }
+        : {};
 
     const where = {
       orgId: req.user!.orgId,
+      ...siteFilter,
       ...(type && { type }),
       ...(status && { status }),
       ...(specimenId && { specimenId: { contains: specimenId } }),
@@ -41,6 +50,7 @@ recordsRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
+          site: { select: { id: true, name: true } },
           createdBy: { select: { id: true, name: true } },
           verifiedBy: { select: { id: true, name: true } },
         },
@@ -69,6 +79,7 @@ recordsRouter.get('/:id', async (req: Request, res: Response, next: NextFunction
         orgId: req.user!.orgId,
       },
       include: {
+        site: { select: { id: true, name: true } },
         createdBy: { select: { id: true, name: true, email: true } },
         verifiedBy: { select: { id: true, name: true, email: true } },
         corrections: {
@@ -109,6 +120,7 @@ recordsRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
         createdById: req.user!.id,
       },
       include: {
+        site: { select: { id: true, name: true } },
         createdBy: { select: { id: true, name: true } },
       },
     });

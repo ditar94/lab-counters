@@ -4,8 +4,14 @@ import { Layout } from './components/layout/Layout';
 import { Login } from './components/auth/Login';
 import { Dashboard } from './components/Dashboard';
 import { Hemocytometer } from './components/counters/Hemocytometer';
+import { Retic } from './components/counters/Retic';
+import { Parasite } from './components/counters/Parasite';
+import { Fetal } from './components/counters/Fetal';
 import { RecordsList } from './components/records/RecordsList';
 import { RecordDetail } from './components/records/RecordDetail';
+import { Organizations } from './components/superadmin/Organizations';
+import { OrganizationDetail } from './components/superadmin/OrganizationDetail';
+import { Users } from './components/admin/Users';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -44,6 +50,19 @@ export default function App() {
         <Route path="records/:id" element={<RecordDetail />} />
         <Route path="count/hemocytometer" element={<Hemocytometer />} />
         <Route path="count/hemocytometer/:id" element={<Hemocytometer />} />
+        <Route path="count/retic" element={<Retic />} />
+        <Route path="count/retic/:id" element={<Retic />} />
+        <Route path="count/parasite" element={<Parasite />} />
+        <Route path="count/parasite/:id" element={<Parasite />} />
+        <Route path="count/fetal" element={<Fetal />} />
+        <Route path="count/fetal/:id" element={<Fetal />} />
+
+        {/* Admin routes */}
+        <Route path="admin/users" element={<Users />} />
+
+        {/* Superadmin routes */}
+        <Route path="superadmin/organizations" element={<Organizations />} />
+        <Route path="superadmin/organizations/:id" element={<OrganizationDetail />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

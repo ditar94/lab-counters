@@ -2,12 +2,37 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../api/client';
-import type { CountRecord, HemocytometerRecord } from '@lab-counters/shared';
+import type {
+  RecordStatus,
+  CountRecordType,
+  HemocytometerRecord,
+  HemocytometerData,
+  HemocytometerCalculations,
+  ReticRecord,
+  ReticData,
+  ReticCalculations,
+  ParasiteRecord,
+  ParasiteData,
+  ParasiteCalculations,
+  FetalRecord,
+  FetalData,
+  FetalCalculations,
+} from '@lab-counters/shared';
 import './Records.css';
 
-interface RecordWithRelations extends CountRecord {
+interface RecordWithRelations {
+  id: string;
+  specimenId: string;
+  specimenType: string;
+  type: CountRecordType;
+  status: RecordStatus;
+  data: HemocytometerData | unknown;
+  calculations: HemocytometerCalculations | unknown;
+  createdAt: Date | string;
+  verifiedAt?: Date | string;
   createdBy: { id: string; name: string; email: string };
   verifiedBy?: { id: string; name: string; email: string };
+  site?: { id: string; name: string };
 }
 
 export function RecordDetail() {
@@ -136,6 +161,18 @@ export function RecordDetail() {
         <HemocytometerDetails record={record as unknown as HemocytometerRecord} />
       )}
 
+      {record.type === 'retic' && (
+        <ReticDetails record={record as unknown as ReticRecord} />
+      )}
+
+      {record.type === 'parasite' && (
+        <ParasiteDetails record={record as unknown as ParasiteRecord} />
+      )}
+
+      {record.type === 'fetal' && (
+        <FetalDetails record={record as unknown as FetalRecord} />
+      )}
+
       {canVerify && (
         <div className="verify-section">
           <h2>Verification</h2>
@@ -225,6 +262,114 @@ function HemocytometerDetails({ record }: { record: HemocytometerRecord }) {
           {!calculations.tncWithinTolerance && (
             <span className="warning">Counts out of tolerance</span>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReticDetails({ record }: { record: ReticRecord }) {
+  const data = record.data as ReticData;
+  const calculations = record.calculations as ReticCalculations;
+
+  return (
+    <div className="counter-details retic-details">
+      <h2>Count Data</h2>
+      <div className="simple-data-grid">
+        <div className="data-item">
+          <label>Reticulocytes</label>
+          <span className="value">{data.reticCount}</span>
+        </div>
+        <div className="data-item">
+          <label>Total RBCs</label>
+          <span className="value">{data.rbcCount}</span>
+        </div>
+      </div>
+
+      <h2>Result</h2>
+      <div className="final-results-display">
+        <div className="result valid">
+          <span className="label">Reticulocyte %</span>
+          <span className="value">{calculations.percentRetic}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ParasiteDetails({ record }: { record: ParasiteRecord }) {
+  const data = record.data as ParasiteData;
+  const calculations = record.calculations as ParasiteCalculations;
+
+  return (
+    <div className="counter-details parasite-details">
+      <h2>Count Data</h2>
+      <div className="simple-data-grid">
+        <div className="data-item">
+          <label>Parasitized RBCs</label>
+          <span className="value">{data.parasiteCount}</span>
+        </div>
+        <div className="data-item">
+          <label>Total RBCs</label>
+          <span className="value">{data.rbcCount}</span>
+        </div>
+      </div>
+
+      <h2>Result</h2>
+      <div className="final-results-display">
+        <div className="result valid">
+          <span className="label">Parasitemia %</span>
+          <span className="value">{calculations.percentParasitemia}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FetalDetails({ record }: { record: FetalRecord }) {
+  const data = record.data as FetalData;
+  const calculations = record.calculations as FetalCalculations;
+
+  return (
+    <div className="counter-details fetal-details">
+      <h2>RBC Counts (5 Fields)</h2>
+      <div className="fields-data-grid">
+        {data.fields.map((count, index) => (
+          <div key={index} className="data-item">
+            <label>Field {index + 1}</label>
+            <span className="value">{count}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="calculations-grid">
+        <div className="calc-item">
+          <label>Total in 5 Fields</label>
+          <span>{calculations.totalRbcIn5Fields}</span>
+        </div>
+        <div className="calc-item">
+          <label>Average per Field</label>
+          <span>{calculations.averageRbcPerField}</span>
+        </div>
+        <div className="calc-item">
+          <label>Est. RBCs in 30 Fields</label>
+          <span>{calculations.rbcIn30Fields}</span>
+        </div>
+      </div>
+
+      <h2>Fetal Cell Count</h2>
+      <div className="simple-data-grid">
+        <div className="data-item">
+          <label>Fetal Cells (in 30 fields)</label>
+          <span className="value">{data.fetalCellCount}</span>
+        </div>
+      </div>
+
+      <h2>Result</h2>
+      <div className="final-results-display">
+        <div className="result valid">
+          <span className="label">Fetal Cells %</span>
+          <span className="value">{calculations.percentFetal}%</span>
         </div>
       </div>
     </div>

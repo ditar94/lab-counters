@@ -2,11 +2,16 @@ import type { ApiError } from '@lab-counters/shared';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
-// Store dev user type for API requests
-let devUserType: string | null = null;
+// Store dev auth info for API requests
+let devCognitoId: string | null = null;
 
+export function setDevCognitoId(cognitoId: string | null) {
+  devCognitoId = cognitoId;
+}
+
+// Legacy support
 export function setDevUserType(type: string | null) {
-  devUserType = type;
+  devCognitoId = type ? `dev-${type}` : null;
 }
 
 class ApiClient {
@@ -25,9 +30,9 @@ class ApiClient {
       (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 
-    // Add dev user type header in development
-    if (import.meta.env.DEV && devUserType) {
-      (headers as Record<string, string>)['X-Dev-User-Type'] = devUserType;
+    // Add dev cognito ID header in development
+    if (import.meta.env.DEV && devCognitoId) {
+      (headers as Record<string, string>)['X-Dev-Cognito-Id'] = devCognitoId;
     }
 
     const response = await fetch(`${API_BASE}${path}`, {

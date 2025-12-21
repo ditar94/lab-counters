@@ -14,13 +14,21 @@ datasource db {
 // Organizations & Sites (Multi-tenancy)
 // ============================================
 
+enum OrgStatus {
+  active
+  inactive
+  archived
+}
+
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  settings  Json     @default("{}")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String    @id @default(uuid())
+  name       String
+  slug       String    @unique
+  status     OrgStatus @default(active)
+  settings   Json      @default("{}")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  archivedAt DateTime? @map("archived_at")
 
   sites        Site[]
   users        User[]
@@ -30,17 +38,26 @@ model Organization {
   @@map("organizations")
 }
 
+enum SiteStatus {
+  active
+  inactive
+  archived
+}
+
 model Site {
-  id        String   @id @default(uuid())
-  orgId     String   @map("org_id")
-  name      String
-  location  String   @default("")
-  settings  Json     @default("{}")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String     @id @default(uuid())
+  orgId      String     @map("org_id")
+  name       String
+  location   String     @default("")
+  status     SiteStatus @default(active)
+  settings   Json       @default("{}")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  archivedAt DateTime?  @map("archived_at")
 
   organization Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  users        User[]
+  users        User[]         // Users with this as their current site
+  userSites    UserSite[]     // All users assigned to this site
   countRecords CountRecord[]
 
   @@map("sites")
@@ -51,6 +68,7 @@ model Site {
 // ============================================
 
 enum UserRole {
+  superadmin
   admin
   supervisor
   technologist
@@ -61,22 +79,26 @@ enum UserStatus {
   active
   inactive
   pending
+  archived
 }
 
 model User {
-  id        String     @id @default(uuid())
-  cognitoId String     @unique @map("cognito_id")
-  email     String
-  name      String
-  orgId     String     @map("org_id")
-  siteId    String     @map("site_id")
-  role      UserRole   @default(technologist)
-  status    UserStatus @default(pending)
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id            String     @id @default(uuid())
+  cognitoId     String     @unique @map("cognito_id")
+  username      String?    @unique // Cognito username for login
+  email         String
+  name          String
+  orgId         String     @map("org_id")
+  siteId        String     @map("site_id") // Current active site
+  role          UserRole   @default(technologist)
+  status        UserStatus @default(pending)
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  archivedAt    DateTime?  @map("archived_at")
 
   organization    Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   site            Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  sites           UserSite[]    // All sites user can access
   createdRecords  CountRecord[] @relation("CreatedBy")
   verifiedRecords CountRecord[] @relation("VerifiedBy")
   corrections     Correction[]
@@ -84,6 +106,20 @@ model User {
 
   @@unique([orgId, email])
   @@map("users")
+}
+
+// Join table for many-to-many User <-> Site relationship
+model UserSite {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  siteId    String   @map("site_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, siteId])
+  @@map("user_sites")
 }
 
 // ============================================

@@ -116,14 +116,15 @@ export async function authenticate(
 
   const authHeader = req.headers.authorization;
 
-  // Development bypass - allow dev-token with user type
+  // Development bypass - allow dev-token with user type or specific cognitoId
   if (process.env.NODE_ENV === 'development') {
-    const devUserType = req.headers['x-dev-user-type'] as string;
     const token = authHeader?.substring(7);
 
     if (token === 'dev-token') {
-      // Map user type to cognito ID
-      const cognitoId = devUserType ? `dev-${devUserType}` : 'dev-admin';
+      // Prefer specific cognitoId, fall back to user type mapping
+      const devCognitoId = req.headers['x-dev-cognito-id'] as string;
+      const devUserType = req.headers['x-dev-user-type'] as string;
+      const cognitoId = devCognitoId || (devUserType ? `dev-${devUserType}` : 'dev-admin');
 
       const devUser = await prisma.user.findFirst({
         where: { cognitoId, status: 'active' },
@@ -173,15 +174,31 @@ export async function authenticate(
     }
 
     // Look up user in database
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { cognitoId: cognitoSub },
     });
 
     if (!user) {
-      recordFailedAttempt(clientIp);
-      logAuthEvent('AUTH_FAILURE', req, { reason: 'user_not_found', cognitoSub });
-      res.status(401).json({ code: 'USER_NOT_FOUND', message: 'User not found' });
+      // User exists in Cognito but not in database
+      // This can happen after a database reset or if user was created directly in Cognito
+      // Return a specific error so the frontend can handle it appropriately
+      logAuthEvent('AUTH_FAILURE', req, { reason: 'user_not_in_database', cognitoSub });
+      res.status(401).json({
+        code: 'USER_NOT_IN_DATABASE',
+        message: 'Your account exists but is not set up in this system. Please contact an administrator.',
+        cognitoSub
+      });
       return;
+    }
+
+    // Auto-activate pending users on first successful authentication
+    // (they've completed their Cognito password setup if they have a valid token)
+    if (user.status === 'pending') {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { status: 'active' },
+      });
+      user.status = 'active';
     }
 
     if (user.status !== 'active') {
@@ -249,7 +266,52 @@ export function enforceOrgScope(
     return;
   }
 
+  // Superadmins bypass org scoping - they can access all orgs
+  if (req.user.role === 'superadmin') {
+    next();
+    return;
+  }
+
   // Add org filter to request for use in queries
   req.query.orgId = req.user.orgId;
   next();
+}
+
+/**
+ * Check if a user is a superadmin
+ */
+export function isSuperadmin(user: User | undefined): boolean {
+  return user?.role === 'superadmin';
+}
+
+/**
+ * Middleware to restrict access to superadmins only
+ */
+export function superadminOnly(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!req.user) {
+    res.status(401).json({ code: 'UNAUTHORIZED', message: 'Not authenticated' });
+    return;
+  }
+
+  if (req.user.role !== 'superadmin') {
+    res.status(403).json({ code: 'FORBIDDEN', message: 'Superadmin access required' });
+    return;
+  }
+
+  next();
+}
+
+/**
+ * Helper to get org filter based on user role
+ * Superadmins get no filter, others get their orgId
+ */
+export function getOrgFilter(user: User): { orgId?: string } {
+  if (user.role === 'superadmin') {
+    return {};
+  }
+  return { orgId: user.orgId };
 }

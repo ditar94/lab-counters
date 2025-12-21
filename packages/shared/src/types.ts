@@ -2,8 +2,10 @@
 // Core Entity Types
 // ============================================
 
-export type UserRole = 'admin' | 'supervisor' | 'technologist' | 'readonly';
-export type UserStatus = 'active' | 'inactive' | 'pending';
+export type UserRole = 'superadmin' | 'admin' | 'supervisor' | 'technologist' | 'readonly';
+export type UserStatus = 'active' | 'inactive' | 'pending' | 'archived';
+export type OrgStatus = 'active' | 'inactive' | 'archived';
+export type SiteStatus = 'active' | 'inactive' | 'archived';
 
 export type CountRecordType = 'hemocytometer' | 'fetal' | 'retic' | 'parasite';
 export type RecordStatus = 'draft' | 'pending_verification' | 'verified' | 'corrected';
@@ -24,9 +26,11 @@ export interface Organization {
   id: string;
   name: string;
   slug: string;
+  status: OrgStatus;
   settings: OrganizationSettings;
   createdAt: Date;
   updatedAt: Date;
+  archivedAt?: Date;
 }
 
 export interface OrganizationSettings {
@@ -41,9 +45,11 @@ export interface Site {
   orgId: string;
   name: string;
   location: string;
+  status: SiteStatus;
   settings: SiteSettings;
   createdAt: Date;
   updatedAt: Date;
+  archivedAt?: Date;
 }
 
 export interface SiteSettings {
@@ -60,16 +66,25 @@ export interface User {
   email: string;
   name: string;
   orgId: string;
-  siteId: string;
+  siteId: string; // Current active site
   role: UserRole;
   status: UserStatus;
   createdAt: Date;
   updatedAt: Date;
+  archivedAt?: Date;
+}
+
+export interface UserSite {
+  id: string;
+  userId: string;
+  siteId: string;
+  site: Site;
 }
 
 export interface UserWithOrg extends User {
   organization: Organization;
-  site: Site;
+  site: Site; // Current active site details
+  sites?: UserSite[]; // All sites user can access
 }
 
 // ============================================

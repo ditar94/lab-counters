@@ -5,11 +5,20 @@ import { api } from '../api/client';
 import type { CountRecord, PaginatedResponse } from '@lab-counters/shared';
 import './Dashboard.css';
 
+interface OrgSummary {
+  id: string;
+  name: string;
+  _count: { users: number; sites: number };
+}
+
 export function Dashboard() {
   const { user, getToken } = useAuth();
   const [recentRecords, setRecentRecords] = useState<CountRecord[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [organizations, setOrganizations] = useState<OrgSummary[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const isSuperadmin = user?.role === 'superadmin';
 
   useEffect(() => {
     async function fetchData() {
@@ -17,13 +26,20 @@ export function Dashboard() {
         const token = await getToken();
         if (!token) return;
 
-        const [records, pending] = await Promise.all([
-          api.get<PaginatedResponse<CountRecord>>('/api/records?pageSize=5', token),
-          api.get<PaginatedResponse<CountRecord>>('/api/records?status=pending_verification&pageSize=1', token),
-        ]);
+        if (isSuperadmin) {
+          // Superadmin sees organizations
+          const orgs = await api.get<OrgSummary[]>('/api/superadmin/organizations', token);
+          setOrganizations(orgs);
+        } else {
+          // Regular users see records
+          const [records, pending] = await Promise.all([
+            api.get<PaginatedResponse<CountRecord>>('/api/records?pageSize=5', token),
+            api.get<PaginatedResponse<CountRecord>>('/api/records?status=pending_verification&pageSize=1', token),
+          ]);
 
-        setRecentRecords(records.data);
-        setPendingCount(pending.total);
+          setRecentRecords(records.data);
+          setPendingCount(pending.total);
+        }
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
       } finally {
@@ -32,24 +48,79 @@ export function Dashboard() {
     }
 
     fetchData();
-  }, [getToken]);
+  }, [getToken, isSuperadmin]);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
+  // Superadmin Dashboard
+  if (isSuperadmin) {
+    return (
+      <div className="dashboard">
+        <h1>Welcome, {user?.name}</h1>
+        <p className="dashboard-subtitle">Site Administration</p>
+
+        <div className="dashboard-grid">
+          <div className="dashboard-card quick-actions">
+            <h2>Quick Actions</h2>
+            <div className="action-buttons">
+              <Link to="/superadmin/organizations" className="action-button primary">
+                Manage Organizations
+              </Link>
+            </div>
+          </div>
+
+          <div className="dashboard-card stats">
+            <h2>Overview</h2>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <span className="stat-value">{organizations.length}</span>
+                <span className="stat-label">Organizations</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">
+                  {organizations.reduce((sum, org) => sum + org._count.sites, 0)}
+                </span>
+                <span className="stat-label">Sites</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">
+                  {organizations.reduce((sum, org) => sum + org._count.users, 0)}
+                </span>
+                <span className="stat-label">Users</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Regular User Dashboard
   return (
     <div className="dashboard">
       <h1>Welcome, {user?.name}</h1>
 
       <div className="dashboard-grid">
         <div className="dashboard-card quick-actions">
-          <h2>Quick Actions</h2>
-          <div className="action-buttons">
+          <h2>Start New Count</h2>
+          <div className="action-buttons counter-grid">
             <Link to="/count/hemocytometer" className="action-button primary">
-              New Hemocytometer Count
+              Hemocytometer
             </Link>
-            <Link to="/records" className="action-button">
+            <Link to="/count/retic" className="action-button">
+              Reticulocyte
+            </Link>
+            <Link to="/count/parasite" className="action-button">
+              Parasite
+            </Link>
+            <Link to="/count/fetal" className="action-button">
+              Fetal (KB)
+            </Link>
+          </div>
+          <div className="action-buttons" style={{ marginTop: '1rem' }}>
+            <Link to="/records" className="action-button secondary">
               View All Records
             </Link>
           </div>

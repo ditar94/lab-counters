@@ -1,6 +1,29 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { type Options } from 'express-rate-limit';
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * Get client IP address, handling proxies
+ * Uses X-Forwarded-For if behind a load balancer
+ */
+function getClientIp(req: Request): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0]?.trim() || 'unknown';
+  }
+  return req.ip || 'unknown';
+}
+
+/**
+ * Create a rate limiter with proper IPv6 handling
+ */
+function createRateLimiter(options: Partial<Options>) {
+  return rateLimit({
+    ...options,
+    // Disable the validation that complains about IPv6
+    validate: { xForwardedForHeader: false },
+  });
+}
 
 // Extend Express Request type to include correlationId
 declare global {
@@ -27,7 +50,7 @@ export function correlationId(req: Request, res: Response, next: NextFunction): 
  * General API rate limiter
  * 100 requests per minute per IP
  */
-export const generalRateLimiter = rateLimit({
+export const generalRateLimiter = createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // 100 requests per minute
   standardHeaders: true, // Return rate limit info in headers
@@ -36,19 +59,14 @@ export const generalRateLimiter = rateLimit({
     code: 'RATE_LIMIT_EXCEEDED',
     message: 'Too many requests, please try again later',
   },
-  keyGenerator: (req) => {
-    // Use X-Forwarded-For in production (behind load balancer)
-    return (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
-      || req.ip
-      || 'unknown';
-  },
+  keyGenerator: (req) => getClientIp(req),
 });
 
 /**
  * Strict rate limiter for authentication endpoints
  * 10 requests per minute per IP (prevents brute force)
  */
-export const authRateLimiter = rateLimit({
+export const authRateLimiter = createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
   max: 10, // 10 requests per minute
   standardHeaders: true,
@@ -57,20 +75,16 @@ export const authRateLimiter = rateLimit({
     code: 'AUTH_RATE_LIMIT_EXCEEDED',
     message: 'Too many authentication attempts, please try again later',
   },
-  keyGenerator: (req) => {
-    return (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
-      || req.ip
-      || 'unknown';
-  },
+  keyGenerator: (req) => getClientIp(req),
   // Skip rate limiting for successful requests in development
-  skip: (req) => process.env.NODE_ENV === 'development',
+  skip: () => process.env.NODE_ENV === 'development',
 });
 
 /**
  * Very strict rate limiter for sensitive operations
  * 5 requests per minute per user
  */
-export const sensitiveRateLimiter = rateLimit({
+export const sensitiveRateLimiter = createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
   max: 5, // 5 requests per minute
   standardHeaders: true,
@@ -81,10 +95,7 @@ export const sensitiveRateLimiter = rateLimit({
   },
   keyGenerator: (req) => {
     // Rate limit by user ID if authenticated, otherwise by IP
-    return req.user?.id
-      || (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
-      || req.ip
-      || 'unknown';
+    return req.user?.id || getClientIp(req);
   },
 });
 
@@ -125,7 +136,7 @@ export function securityLogger(req: Request, res: Response, next: NextFunction):
       path: req.path,
       statusCode: res.statusCode,
       duration: `${duration}ms`,
-      ip: (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip,
+      ip: getClientIp(req),
       userAgent: req.headers['user-agent'],
       userId: req.user?.id,
       orgId: req.user?.orgId,

@@ -20,6 +20,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.956.0",
     "@lab-counters/shared": "*",
     "@prisma/client": "^6.1.0",
     "cors": "^2.8.5",

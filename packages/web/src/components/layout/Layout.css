@@ -62,7 +62,78 @@
 
 .user-info {
   font-size: 0.875rem;
+  color: var(--color-gray-700);
+  font-weight: 500;
+}
+
+.org-info {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+}
+
+.site-name {
   color: var(--color-gray-600);
+}
+
+.site-switcher-container {
+  position: relative;
+  display: inline-block;
+}
+
+.site-switcher-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.site-switcher-button:hover {
+  text-decoration: underline;
+}
+
+.site-switcher-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.site-option {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.site-option:hover:not(:disabled) {
+  background-color: var(--color-gray-50);
+}
+
+.site-option.current {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.site-option:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .logout-button {

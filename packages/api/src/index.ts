@@ -13,6 +13,7 @@ import { authRouter } from './routes/auth';
 import { recordsRouter } from './routes/records';
 import { usersRouter } from './routes/users';
 import { healthRouter } from './routes/health';
+import { superadminRouter } from './routes/superadmin';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -51,7 +52,7 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Dev-User-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Dev-User-Type', 'X-Dev-Cognito-Id'],
 }));
 
 // Rate limiting (apply to all routes)
@@ -70,6 +71,7 @@ app.use('/health', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/records', recordsRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/superadmin', superadminRouter);
 
 // Error handling
 app.use(errorHandler);

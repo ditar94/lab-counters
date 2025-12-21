@@ -4,8 +4,11 @@ import { z } from 'zod';
 // Enums as Zod schemas
 // ============================================
 
-export const UserRoleSchema = z.enum(['admin', 'supervisor', 'technologist', 'readonly']);
-export const UserStatusSchema = z.enum(['active', 'inactive', 'pending']);
+export const UserRoleSchema = z.enum(['superadmin', 'admin', 'supervisor', 'technologist', 'readonly']);
+export const OrgUserRoleSchema = z.enum(['admin', 'supervisor', 'technologist', 'readonly']); // Roles that org admins can assign
+export const UserStatusSchema = z.enum(['active', 'inactive', 'pending', 'archived']);
+export const OrgStatusSchema = z.enum(['active', 'inactive', 'archived']);
+export const SiteStatusSchema = z.enum(['active', 'inactive', 'archived']);
 export const CountRecordTypeSchema = z.enum(['hemocytometer', 'fetal', 'retic', 'parasite']);
 export const RecordStatusSchema = z.enum(['draft', 'pending_verification', 'verified', 'corrected']);
 export const SpecimenTypeSchema = z.enum(['csf', 'synovial', 'pleural', 'peritoneal', 'pericardial', 'other']);
@@ -115,6 +118,7 @@ export const RecordFilterSchema = PaginationQuerySchema.extend({
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   createdBy: z.string().uuid().optional(),
+  siteId: z.string().uuid().optional(),
 });
 
 // ============================================
@@ -122,15 +126,73 @@ export const RecordFilterSchema = PaginationQuerySchema.extend({
 // ============================================
 
 export const CreateUserRequestSchema = z.object({
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, 'Username must be alphanumeric with underscores or hyphens'),
   email: z.string().email(),
   name: z.string().min(1).max(100),
-  role: UserRoleSchema,
-  siteId: z.string().uuid(),
+  role: OrgUserRoleSchema,
+  siteId: z.string().uuid(), // Primary/current site
+  siteIds: z.array(z.string().uuid()).min(1).optional(), // All assigned sites (if not provided, uses siteId)
+  temporaryPassword: z.string().min(8).max(50).optional(),
 });
 
 export const UpdateUserRequestSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  role: UserRoleSchema.optional(),
-  siteId: z.string().uuid().optional(),
+  role: OrgUserRoleSchema.optional(),
+  siteId: z.string().uuid().optional(), // Change current site
+  siteIds: z.array(z.string().uuid()).min(1).optional(), // Update assigned sites
   status: UserStatusSchema.optional(),
+});
+
+// ============================================
+// Organization Schemas (Superadmin)
+// ============================================
+
+export const OrganizationSettingsSchema = z.object({
+  timezone: z.string().default('America/New_York'),
+  defaultDilution: z.number().min(1).max(200).default(10),
+  requireVerification: z.boolean().default(true),
+  allowSelfVerification: z.boolean().default(false),
+});
+
+export const CreateOrganizationSchema = z.object({
+  name: z.string().min(1).max(100),
+  slug: z.string().min(1).max(50).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  settings: OrganizationSettingsSchema.partial().optional(),
+});
+
+export const UpdateOrganizationSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  settings: OrganizationSettingsSchema.partial().optional(),
+});
+
+// ============================================
+// Site Schemas (Superadmin)
+// ============================================
+
+export const SiteSettingsSchema = z.object({
+  timezone: z.string().optional(),
+});
+
+export const CreateSiteSchema = z.object({
+  name: z.string().min(1).max(100),
+  location: z.string().max(255).optional(),
+  settings: SiteSettingsSchema.optional(),
+});
+
+export const UpdateSiteSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  location: z.string().max(255).optional(),
+  settings: SiteSettingsSchema.optional(),
+});
+
+// ============================================
+// Org Admin User Creation Schema
+// ============================================
+
+export const CreateOrgAdminSchema = z.object({
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, 'Username must be alphanumeric with underscores or hyphens'),
+  email: z.string().email(),
+  name: z.string().min(1).max(100),
+  siteId: z.string().uuid(),
+  temporaryPassword: z.string().min(8).max(50).optional(),
 });

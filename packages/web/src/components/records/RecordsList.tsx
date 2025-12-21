@@ -2,19 +2,34 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../api/client';
-import type { CountRecord, PaginatedResponse, RecordStatus, CountRecordType } from '@lab-counters/shared';
+import type { PaginatedResponse, RecordStatus, CountRecordType } from '@lab-counters/shared';
 import './Records.css';
+
+interface RecordWithSite {
+  id: string;
+  specimenId: string;
+  type: CountRecordType;
+  status: RecordStatus;
+  createdAt: Date | string;
+  site?: { id: string; name: string };
+  createdBy?: { id: string; name: string };
+}
 
 export function RecordsList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { getToken, user } = useAuth();
-  const [records, setRecords] = useState<CountRecord[]>([]);
+  const [records, setRecords] = useState<RecordWithSite[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
   const statusFilter = searchParams.get('status') as RecordStatus | null;
   const typeFilter = searchParams.get('type') as CountRecordType | null;
+  const siteFilter = searchParams.get('siteId');
+
+  // Non-technologists can filter by site
+  const canFilterBySite = user?.role !== 'technologist';
+  const userSites = user?.sites || [];
 
   useEffect(() => {
     async function fetchRecords() {
@@ -28,8 +43,9 @@ export function RecordsList() {
         params.set('pageSize', '20');
         if (statusFilter) params.set('status', statusFilter);
         if (typeFilter) params.set('type', typeFilter);
+        if (siteFilter && canFilterBySite) params.set('siteId', siteFilter);
 
-        const response = await api.get<PaginatedResponse<CountRecord>>(
+        const response = await api.get<PaginatedResponse<RecordWithSite>>(
           `/api/records?${params}`,
           token
         );
@@ -44,7 +60,7 @@ export function RecordsList() {
     }
 
     fetchRecords();
-  }, [getToken, page, statusFilter, typeFilter]);
+  }, [getToken, page, statusFilter, typeFilter, siteFilter, canFilterBySite]);
 
   const handleFilterChange = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams);
@@ -115,6 +131,23 @@ export function RecordsList() {
             <option value="parasite">Parasite</option>
           </select>
         </div>
+
+        {canFilterBySite && userSites.length > 1 && (
+          <div className="filter-group">
+            <label>Site</label>
+            <select
+              value={siteFilter || ''}
+              onChange={(e) => handleFilterChange('siteId', e.target.value || null)}
+            >
+              <option value="">All Sites</option>
+              {userSites.map((userSite) => (
+                <option key={userSite.siteId} value={userSite.siteId}>
+                  {userSite.site.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -131,6 +164,7 @@ export function RecordsList() {
               <tr>
                 <th>Specimen ID</th>
                 <th>Type</th>
+                <th>Site</th>
                 <th>Status</th>
                 <th>Created</th>
                 <th>Created By</th>
@@ -144,13 +178,14 @@ export function RecordsList() {
                     <Link to={`/records/${record.id}`}>{record.specimenId}</Link>
                   </td>
                   <td className="capitalize">{record.type}</td>
+                  <td>{record.site?.name || '-'}</td>
                   <td>
                     <span className={`status-badge ${getStatusClass(record.status)}`}>
                       {record.status.replace('_', ' ')}
                     </span>
                   </td>
                   <td>{formatDate(record.createdAt)}</td>
-                  <td>{(record as unknown as { createdBy: { name: string } }).createdBy?.name || '-'}</td>
+                  <td>{record.createdBy?.name || '-'}</td>
                   <td className="actions">
                     <Link to={`/records/${record.id}`} className="btn-link">
                       View
