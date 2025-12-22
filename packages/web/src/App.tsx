@@ -9,6 +9,7 @@ import { Parasite } from './components/counters/Parasite';
 import { Fetal } from './components/counters/Fetal';
 import { RecordsList } from './components/records/RecordsList';
 import { RecordDetail } from './components/records/RecordDetail';
+import { MonthlyReview } from './components/reviews/MonthlyReview';
 import { Organizations } from './components/superadmin/Organizations';
 import { OrganizationDetail } from './components/superadmin/OrganizationDetail';
 import { Users } from './components/admin/Users';
@@ -59,6 +60,7 @@ export default function App() {
 
         {/* Admin routes */}
         <Route path="admin/users" element={<Users />} />
+        <Route path="reviews" element={<MonthlyReview />} />
 
         {/* Superadmin routes */}
         <Route path="superadmin/organizations" element={<Organizations />} />

@@ -2,8 +2,10 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../middleware/error-handler';
 import { auditLog } from '../../services/audit';
-import { createCognitoUser, CognitoError } from '../../services/cognito';
-import { CreateOrgAdminSchema } from '@lab-counters/shared';
+import { createCognitoUser, CognitoError, deleteCognitoUser, disableCognitoUser, enableCognitoUser, resetCognitoUserPassword } from '../../services/cognito';
+import { CreateOrgAdminSchema, ResetPasswordRequestSchema } from '@lab-counters/shared';
+import { generateTemporaryPassword } from '../../lib/passwords';
+import { buildUsernameBase, buildUsernameCandidate } from '../../lib/usernames';
 
 export const usersRouter = Router({ mergeParams: true }); // To access :orgId from parent
 
@@ -58,13 +60,23 @@ usersRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
       throw new AppError(403, 'FORBIDDEN', 'Cannot add users to system organization');
     }
 
-    // Verify site belongs to org
-    const site = await prisma.site.findFirst({
-      where: { id: body.siteId, orgId },
+    const siteIdsToAssign = body.siteIds ?? [body.siteId];
+
+    if (!siteIdsToAssign.includes(body.siteId)) {
+      throw new AppError(400, 'INVALID_SITE', 'Primary site must be in assigned sites');
+    }
+
+    // Verify all sites belong to org
+    const sites = await prisma.site.findMany({
+      where: {
+        id: { in: siteIdsToAssign },
+        orgId,
+      },
+      select: { id: true },
     });
 
-    if (!site) {
-      throw new AppError(400, 'INVALID_SITE', 'Site not found in this organization');
+    if (sites.length !== siteIdsToAssign.length) {
+      throw new AppError(400, 'INVALID_SITE', 'One or more sites not found in this organization');
     }
 
     // Check if email already exists in org
@@ -76,43 +88,91 @@ usersRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
       throw new AppError(400, 'EMAIL_EXISTS', 'A user with this email already exists in this organization');
     }
 
-    // Check if username already exists
-    const existingUsername = await prisma.user.findFirst({
-      where: { username: body.username },
-    });
+    const baseUsername = buildUsernameBase(body.name);
+    let candidateUsername = body.username;
 
-    if (existingUsername) {
-      throw new AppError(400, 'USERNAME_EXISTS', 'A user with this username already exists');
+    if (!candidateUsername) {
+      let suffix = 0;
+      while (true) {
+        const possible = buildUsernameCandidate(baseUsername, suffix);
+        const existingUsername = await prisma.user.findFirst({
+          where: { username: possible },
+          select: { id: true },
+        });
+        if (!existingUsername) {
+          candidateUsername = possible;
+          break;
+        }
+        suffix += 1;
+      }
+    } else {
+      const existingUsername = await prisma.user.findFirst({
+        where: { username: candidateUsername },
+      });
+      if (existingUsername) {
+        throw new AppError(400, 'USERNAME_EXISTS', 'A user with this username already exists');
+      }
     }
+
+    const tempPassword = body.temporaryPassword || (body.generateTemporaryPassword ? generateTemporaryPassword() : undefined);
+    const suppressEmail = !!tempPassword;
 
     // Create user in Cognito first
     let cognitoResult;
-    try {
-      cognitoResult = await createCognitoUser({
-        username: body.username,
-        email: body.email,
-        name: body.name,
-        temporaryPassword: body.temporaryPassword,
-        suppressEmail: !!body.temporaryPassword,
-      });
-    } catch (error) {
-      if (error instanceof CognitoError) {
-        throw new AppError(400, error.code, error.message);
+    if (!candidateUsername) {
+      throw new AppError(400, 'INVALID_USERNAME', 'Unable to generate username');
+    }
+
+    let suffix = 0;
+    while (true) {
+      if (!body.username) {
+        const existingUsername = await prisma.user.findFirst({
+          where: { username: candidateUsername },
+          select: { id: true },
+        });
+        if (existingUsername) {
+          suffix += 1;
+          candidateUsername = buildUsernameCandidate(baseUsername, suffix);
+          continue;
+        }
       }
-      throw error;
+
+      try {
+        cognitoResult = await createCognitoUser({
+          username: candidateUsername,
+          email: body.email,
+          name: body.name,
+          temporaryPassword: tempPassword,
+          suppressEmail,
+        });
+        break;
+      } catch (error) {
+        if (!body.username && error instanceof CognitoError && error.code === 'USERNAME_EXISTS') {
+          suffix += 1;
+          candidateUsername = buildUsernameCandidate(baseUsername, suffix);
+          continue;
+        }
+        if (error instanceof CognitoError) {
+          throw new AppError(400, error.code, error.message);
+        }
+        throw error;
+      }
     }
 
     // Create user in database with Cognito ID
     const user = await prisma.user.create({
       data: {
         cognitoId: cognitoResult.cognitoId,
-        username: body.username,
+        username: candidateUsername,
         email: body.email,
         name: body.name,
         orgId,
         siteId: body.siteId,
         role: 'admin', // Superadmin creates org admins
         status: 'pending', // Will be activated when user sets password
+        sites: {
+          create: siteIdsToAssign.map((siteId) => ({ siteId })),
+        },
       },
       include: {
         site: { select: { id: true, name: true } },
@@ -122,15 +182,18 @@ usersRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
 
     await auditLog({
       orgId,
-      tableName: 'users',
-      recordId: user.id,
+      actorUserId: req.user!.id,
       action: 'create',
-      newValues: user,
-      userId: req.user!.id,
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { record: user },
       req,
     });
 
-    res.status(201).json(user);
+    res.status(201).json({
+      ...user,
+      ...(tempPassword ? { temporaryPassword: tempPassword } : {}),
+    });
   } catch (error) {
     next(error);
   }
@@ -148,7 +211,7 @@ usersRouter.get('/:userId', async (req: Request, res: Response, next: NextFuncti
         sites: {
           include: { site: { select: { id: true, name: true } } },
         },
-        _count: { select: { createdRecords: true, verifiedRecords: true } },
+        _count: { select: { performedRecords: true, verifiedRecords: true } },
       },
     });
 
@@ -197,14 +260,25 @@ usersRouter.patch('/:userId/status', async (req: Request, res: Response, next: N
       },
     });
 
+    if (existing.username && process.env.NODE_ENV !== 'development') {
+      try {
+        if (status === 'inactive') {
+          await disableCognitoUser(existing.username);
+        } else if (status === 'active') {
+          await enableCognitoUser(existing.username);
+        }
+      } catch (err) {
+        console.warn('Failed to update Cognito user status:', err);
+      }
+    }
+
     await auditLog({
       orgId,
-      tableName: 'users',
-      recordId: user.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: user.status },
-      userId: req.user!.id,
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { statusBefore: existing.status, statusAfter: user.status },
       req,
     });
 
@@ -246,14 +320,21 @@ usersRouter.post('/:userId/archive', async (req: Request, res: Response, next: N
       },
     });
 
+    if (existing.username && process.env.NODE_ENV !== 'development') {
+      try {
+        await disableCognitoUser(existing.username);
+      } catch (err) {
+        console.warn('Failed to disable Cognito user:', err);
+      }
+    }
+
     await auditLog({
       orgId,
-      tableName: 'users',
-      recordId: user.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: 'archived', archivedAt: user.archivedAt },
-      userId: req.user!.id,
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { statusBefore: existing.status, statusAfter: 'archived', archivedAt: user.archivedAt },
       req,
     });
 
@@ -294,16 +375,58 @@ usersRouter.post('/:userId/restore', async (req: Request, res: Response, next: N
 
     await auditLog({
       orgId,
-      tableName: 'users',
-      recordId: user.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: { status: existing.status, archivedAt: existing.archivedAt },
-      newValues: { status: 'inactive', archivedAt: null },
-      userId: req.user!.id,
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { statusBefore: existing.status, statusAfter: 'inactive', archivedAt: null },
       req,
     });
 
     res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Reset user password
+usersRouter.post('/:userId/reset-password', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { orgId, userId } = req.params;
+    const body = ResetPasswordRequestSchema.parse(req.body ?? {});
+
+    const existing = await prisma.user.findFirst({
+      where: { id: userId, orgId },
+    });
+
+    if (!existing) {
+      throw new AppError(404, 'NOT_FOUND', 'User not found');
+    }
+
+    if (existing.status === 'archived') {
+      throw new AppError(400, 'ARCHIVED', 'Cannot reset password for archived user');
+    }
+
+    const tempPassword = body.temporaryPassword || (body.generateTemporaryPassword ? generateTemporaryPassword() : undefined);
+
+    if (existing.username && process.env.NODE_ENV !== 'development') {
+      await resetCognitoUserPassword(existing.username, tempPassword);
+    }
+
+    await auditLog({
+      orgId,
+      actorUserId: req.user!.id,
+      action: 'reset_password',
+      entityType: 'user',
+      entityId: existing.id,
+      metadata: { targetUserId: existing.id },
+      req,
+    });
+
+    res.json({
+      status: 'ok',
+      ...(tempPassword ? { temporaryPassword: tempPassword } : {}),
+    });
   } catch (error) {
     next(error);
   }
@@ -318,7 +441,7 @@ usersRouter.delete('/:userId', async (req: Request, res: Response, next: NextFun
     const existing = await prisma.user.findFirst({
       where: { id: userId, orgId },
       include: {
-        _count: { select: { createdRecords: true, verifiedRecords: true } },
+        _count: { select: { performedRecords: true, verifiedRecords: true } },
       },
     });
 
@@ -335,11 +458,11 @@ usersRouter.delete('/:userId', async (req: Request, res: Response, next: NextFun
       throw new AppError(400, 'CANNOT_DELETE_SELF', 'Cannot delete your own account');
     }
 
-    // Warn about records
-    const totalRecords = existing._count.createdRecords + existing._count.verifiedRecords;
-    if (totalRecords > 0 && confirm !== 'true') {
+    // Prevent deletion if user has records
+    const totalRecords = existing._count.performedRecords + existing._count.verifiedRecords;
+    if (totalRecords > 0) {
       throw new AppError(400, 'USER_HAS_RECORDS',
-        `User has ${existing._count.createdRecords} created and ${existing._count.verifiedRecords} verified records. Add ?confirm=true to permanently delete.`);
+        `User has ${existing._count.performedRecords} performed and ${existing._count.verifiedRecords} verified records and cannot be deleted.`);
     }
 
     // Warn if not archived first
@@ -350,13 +473,21 @@ usersRouter.delete('/:userId', async (req: Request, res: Response, next: NextFun
 
     await auditLog({
       orgId,
-      tableName: 'users',
-      recordId: userId,
+      actorUserId: req.user!.id,
       action: 'delete',
-      oldValues: { ...existing, _count: existing._count },
-      userId: req.user!.id,
+      entityType: 'user',
+      entityId: userId,
+      metadata: { record: existing, counts: existing._count },
       req,
     });
+
+    if (existing.username && process.env.NODE_ENV !== 'development') {
+      try {
+        await deleteCognitoUser(existing.username);
+      } catch (err) {
+        console.warn('Failed to delete Cognito user:', err);
+      }
+    }
 
     await prisma.user.delete({
       where: { id: userId },

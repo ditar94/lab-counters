@@ -1,0 +1,206 @@
+.reviews-page {
+  padding: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.reviews-page .page-header {
+  margin-bottom: 1.5rem;
+}
+
+.reviews-page .page-subtitle {
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.review-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.review-controls .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.review-controls .filter-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.review-controls .filter-group select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 150px;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.review-summary {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.review-summary h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-card.success {
+  background: #d4edda;
+}
+
+.stat-card.warning {
+  background: #fff3cd;
+}
+
+.stat-card.info {
+  background: #d1ecf1;
+}
+
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.review-completed {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.review-badge {
+  display: inline-block;
+  background: #28a745;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.review-notes {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #c3e6cb;
+  font-style: italic;
+}
+
+.sign-off-section {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1.5rem;
+}
+
+.sign-off-section .form-group {
+  margin-bottom: 1rem;
+}
+
+.sign-off-section textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.sign-off-confirmation {
+  margin-bottom: 1rem;
+}
+
+.sign-off-confirmation .checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.sign-off-confirmation input[type="checkbox"] {
+  margin-top: 0.25rem;
+}
+
+.cannot-sign-off {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.warning-badge {
+  display: inline-block;
+  background: #ffc107;
+  color: #333;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.history-section {
+  margin-top: 1rem;
+}
+
+.history-section h3 {
+  margin: 0 0 1rem 0;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.history-table th {
+  background: #f8f9fa;
+  font-weight: 500;
+}
+
+.empty-history {
+  color: #666;
+  font-style: italic;
+}

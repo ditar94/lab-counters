@@ -22,7 +22,7 @@ recordsRouter.use(enforceOrgScope);
 recordsRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const filters = RecordFilterSchema.parse(req.query);
-    const { page, pageSize, type, status, specimenId, startDate, endDate, createdBy, siteId } = filters;
+    const { page, pageSize, type, status, specimenId, startDate, endDate, performedBy, siteId, month, year } = filters;
 
     // Technologists only see records from their current site
     // Other roles can see all records in the org (optionally filtered by site)
@@ -32,30 +32,49 @@ recordsRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
         ? { siteId }
         : {};
 
+    // Build date filter for month/year
+    let dateFilter = {};
+    if (month && year) {
+      const monthStart = new Date(year, month - 1, 1);
+      const monthEnd = new Date(year, month, 0, 23, 59, 59, 999);
+      dateFilter = { createdAt: { gte: monthStart, lte: monthEnd } };
+    } else if (year) {
+      const yearStart = new Date(year, 0, 1);
+      const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
+      dateFilter = { createdAt: { gte: yearStart, lte: yearEnd } };
+    } else if (month) {
+      // Month without year - use current year
+      const currentYear = new Date().getFullYear();
+      const monthStart = new Date(currentYear, month - 1, 1);
+      const monthEnd = new Date(currentYear, month, 0, 23, 59, 59, 999);
+      dateFilter = { createdAt: { gte: monthStart, lte: monthEnd } };
+    }
+
     const where = {
       orgId: req.user!.orgId,
       ...siteFilter,
       ...(type && { type }),
       ...(status && { status }),
       ...(specimenId && { specimenId: { contains: specimenId } }),
-      ...(startDate && { createdAt: { gte: startDate } }),
-      ...(endDate && { createdAt: { lte: endDate } }),
-      ...(createdBy && { createdById: createdBy }),
+      ...(startDate && !month && !year && { createdAt: { gte: startDate } }),
+      ...(endDate && !month && !year && { createdAt: { lte: endDate } }),
+      ...dateFilter,
+      ...(performedBy && { performedById: performedBy }),
     };
 
     const [records, total] = await Promise.all([
-      prisma.countRecord.findMany({
+      prisma.manualCountRecord.findMany({
         where,
         skip: (page - 1) * pageSize,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
           site: { select: { id: true, name: true } },
-          createdBy: { select: { id: true, name: true } },
+          performedBy: { select: { id: true, name: true } },
           verifiedBy: { select: { id: true, name: true } },
         },
       }),
-      prisma.countRecord.count({ where }),
+      prisma.manualCountRecord.count({ where }),
     ]);
 
     res.json({
@@ -70,24 +89,56 @@ recordsRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
   }
 });
 
+// Get overdue pending records (pending for more than 24 hours, non-QC only)
+// For supervisors/admins to see records needing attention
+recordsRouter.get('/alerts/overdue', authorize('supervisor', 'admin'), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    // Get sites user has access to
+    const userSiteIds = req.user!.sites?.map((s: { siteId: string }) => s.siteId) || [];
+
+    const overdueRecords = await prisma.manualCountRecord.findMany({
+      where: {
+        orgId: req.user!.orgId,
+        siteId: { in: userSiteIds },
+        status: 'pending_verification',
+        isQC: false,
+        performedAt: { lt: twentyFourHoursAgo },
+      },
+      select: {
+        id: true,
+        specimenId: true,
+        type: true,
+        performedAt: true,
+        site: { select: { id: true, name: true } },
+        performedBy: { select: { id: true, name: true } },
+      },
+      orderBy: { performedAt: 'asc' },
+      take: 50, // Limit to prevent huge responses
+    });
+
+    res.json({
+      count: overdueRecords.length,
+      records: overdueRecords,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get single record
 recordsRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const record = await prisma.countRecord.findFirst({
+    const record = await prisma.manualCountRecord.findFirst({
       where: {
         id: req.params.id,
         orgId: req.user!.orgId,
       },
       include: {
         site: { select: { id: true, name: true } },
-        createdBy: { select: { id: true, name: true, email: true } },
+        performedBy: { select: { id: true, name: true, email: true } },
         verifiedBy: { select: { id: true, name: true, email: true } },
-        corrections: {
-          orderBy: { createdAt: 'desc' },
-          include: {
-            createdBy: { select: { id: true, name: true } },
-          },
-        },
       },
     });
 
@@ -105,33 +156,36 @@ recordsRouter.get('/:id', async (req: Request, res: Response, next: NextFunction
 recordsRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const body = CreateRecordRequestSchema.parse(req.body);
-    const calculations = calculateResults(body.type, body.data);
+    const calculations = calculateResults(body.type, body.rawTallies);
 
-    const record = await prisma.countRecord.create({
+    const record = await prisma.manualCountRecord.create({
       data: {
         orgId: req.user!.orgId,
-        siteId: req.user!.siteId,
+        siteId: req.user!.siteId!,
         type: body.type,
         specimenId: body.specimenId,
-        specimenType: body.specimenType,
+        fluidType: body.fluidType,
+        dilution: body.dilution,
+        squaresCounted: body.squaresCounted,
+        isQC: body.isQC ?? false,
         status: 'draft',
-        data: body.data as object,
+        rawTallies: body.rawTallies as object,
         calculations: calculations as object,
-        createdById: req.user!.id,
+        performedById: req.user!.id,
       },
       include: {
         site: { select: { id: true, name: true } },
-        createdBy: { select: { id: true, name: true } },
+        performedBy: { select: { id: true, name: true } },
       },
     });
 
     await auditLog({
       orgId: req.user!.orgId,
-      tableName: 'count_records',
-      recordId: record.id,
+      entityType: 'manual_count_record',
+      entityId: record.id,
       action: 'create',
-      newValues: record,
-      userId: req.user!.id,
+      metadata: { record },
+      actorUserId: req.user!.id,
       req,
     });
 
@@ -146,7 +200,7 @@ recordsRouter.patch('/:id', async (req: Request, res: Response, next: NextFuncti
   try {
     const body = UpdateRecordRequestSchema.parse(req.body);
 
-    const existing = await prisma.countRecord.findFirst({
+    const existing = await prisma.manualCountRecord.findFirst({
       where: {
         id: req.params.id,
         orgId: req.user!.orgId,
@@ -157,39 +211,34 @@ recordsRouter.patch('/:id', async (req: Request, res: Response, next: NextFuncti
       throw new AppError(404, 'NOT_FOUND', 'Record not found');
     }
 
-    if (existing.isImmutable) {
-      throw new AppError(400, 'IMMUTABLE', 'Verified records cannot be modified');
-    }
-
     if (existing.status !== 'draft') {
       throw new AppError(400, 'INVALID_STATUS', 'Only draft records can be updated');
     }
 
     const updateData: Record<string, unknown> = {};
-    if (body.data) {
-      updateData.data = body.data;
-      updateData.calculations = calculateResults(existing.type, body.data);
+    if (body.rawTallies) {
+      updateData.rawTallies = body.rawTallies;
+      updateData.calculations = calculateResults(existing.type, body.rawTallies);
     }
     if (body.status) {
       updateData.status = body.status;
     }
 
-    const record = await prisma.countRecord.update({
+    const record = await prisma.manualCountRecord.update({
       where: { id: req.params.id },
       data: updateData,
       include: {
-        createdBy: { select: { id: true, name: true } },
+        performedBy: { select: { id: true, name: true } },
       },
     });
 
     await auditLog({
       orgId: req.user!.orgId,
-      tableName: 'count_records',
-      recordId: record.id,
+      entityType: 'manual_count_record',
+      entityId: record.id,
       action: 'update',
-      oldValues: existing,
-      newValues: record,
-      userId: req.user!.id,
+      metadata: { before: existing, after: record },
+      actorUserId: req.user!.id,
       req,
     });
 
@@ -199,10 +248,10 @@ recordsRouter.patch('/:id', async (req: Request, res: Response, next: NextFuncti
   }
 });
 
-// Submit for verification
+// Submit for verification (QC records auto-verify)
 recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const existing = await prisma.countRecord.findFirst({
+    const existing = await prisma.manualCountRecord.findFirst({
       where: {
         id: req.params.id,
         orgId: req.user!.orgId,
@@ -217,19 +266,28 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
       throw new AppError(400, 'INVALID_STATUS', 'Only draft records can be submitted');
     }
 
-    const record = await prisma.countRecord.update({
+    // QC records auto-verify (no peer review needed)
+    const isQC = existing.isQC;
+    const newStatus = isQC ? 'verified' : 'pending_verification';
+
+    const record = await prisma.manualCountRecord.update({
       where: { id: req.params.id },
-      data: { status: 'pending_verification' },
+      data: {
+        status: newStatus,
+        ...(isQC && {
+          verifiedById: req.user!.id,
+          verifiedAt: new Date(),
+        }),
+      },
     });
 
     await auditLog({
       orgId: req.user!.orgId,
-      tableName: 'count_records',
-      recordId: record.id,
-      action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: record.status },
-      userId: req.user!.id,
+      entityType: 'manual_count_record',
+      entityId: record.id,
+      action: isQC ? 'submit_qc_auto_verified' : 'submit_pending',
+      metadata: { statusBefore: existing.status, statusAfter: record.status, isQC },
+      actorUserId: req.user!.id,
       req,
     });
 
@@ -239,17 +297,17 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
   }
 });
 
-// Verify record (supervisors and admins only)
+// Verify record (technologists, supervisors, and admins can verify others' records)
 // Apply strict rate limiting to prevent abuse
 recordsRouter.post(
   '/:id/verify',
   sensitiveRateLimiter,
-  authorize('supervisor', 'admin'),
+  authorize('technologist', 'supervisor', 'admin'),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       VerifyRecordRequestSchema.parse(req.body);
 
-      const existing = await prisma.countRecord.findFirst({
+      const existing = await prisma.manualCountRecord.findFirst({
         where: {
           id: req.params.id,
           orgId: req.user!.orgId,
@@ -264,42 +322,31 @@ recordsRouter.post(
         throw new AppError(400, 'INVALID_STATUS', 'Only pending records can be verified');
       }
 
-      // Check if self-verification is allowed
-      if (existing.createdById === req.user!.id) {
-        // Get org settings to check if self-verification is allowed
-        const org = await prisma.organization.findUnique({
-          where: { id: req.user!.orgId },
-          select: { settings: true },
-        });
-        const settings = org?.settings as { allowSelfVerification?: boolean } | null;
-
-        if (!settings?.allowSelfVerification) {
-          throw new AppError(403, 'SELF_VERIFICATION_NOT_ALLOWED', 'You cannot verify your own records');
-        }
+      // Self-verification is never allowed - a different user must verify
+      if (existing.performedById === req.user!.id) {
+        throw new AppError(403, 'SELF_VERIFICATION_NOT_ALLOWED', 'You cannot verify your own records');
       }
 
-      const record = await prisma.countRecord.update({
+      const record = await prisma.manualCountRecord.update({
         where: { id: req.params.id },
         data: {
           status: 'verified',
           verifiedById: req.user!.id,
           verifiedAt: new Date(),
-          isImmutable: true,
         },
         include: {
-          createdBy: { select: { id: true, name: true } },
+          performedBy: { select: { id: true, name: true } },
           verifiedBy: { select: { id: true, name: true } },
         },
       });
 
       await auditLog({
         orgId: req.user!.orgId,
-        tableName: 'count_records',
-        recordId: record.id,
+        entityType: 'manual_count_record',
+        entityId: record.id,
         action: 'verify',
-        oldValues: { status: existing.status },
-        newValues: { status: record.status, verifiedById: record.verifiedById },
-        userId: req.user!.id,
+        metadata: { statusBefore: existing.status, statusAfter: record.status, verifiedById: record.verifiedById },
+        actorUserId: req.user!.id,
         req,
       });
 
@@ -316,7 +363,7 @@ recordsRouter.delete(
   authorize('admin'),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const existing = await prisma.countRecord.findFirst({
+      const existing = await prisma.manualCountRecord.findFirst({
         where: {
           id: req.params.id,
           orgId: req.user!.orgId,
@@ -331,17 +378,17 @@ recordsRouter.delete(
         throw new AppError(400, 'INVALID_STATUS', 'Only draft records can be deleted');
       }
 
-      await prisma.countRecord.delete({
+      await prisma.manualCountRecord.delete({
         where: { id: req.params.id },
       });
 
       await auditLog({
         orgId: req.user!.orgId,
-        tableName: 'count_records',
-        recordId: req.params.id,
+        entityType: 'manual_count_record',
+        entityId: req.params.id,
         action: 'delete',
-        oldValues: existing,
-        userId: req.user!.id,
+        metadata: { record: existing },
+        actorUserId: req.user!.id,
         req,
       });
 

@@ -14,6 +14,7 @@ export function Retic() {
 
   // Specimen info
   const [specimenId, setSpecimenId] = useState('');
+  const [isQC, setIsQC] = useState(false);
 
   // Counter state
   const [reticCount, setReticCount] = useState(0);
@@ -34,8 +35,8 @@ export function Retic() {
 
         const record = await api.get<ReticRecord>(`/api/records/${id}`, token);
         setSpecimenId(record.specimenId);
-        setReticCount(record.data.reticCount);
-        setRbcCount(record.data.rbcCount);
+        setReticCount(record.rawTallies.reticCount);
+        setRbcCount(record.rawTallies.rbcCount);
       } catch (err) {
         console.error('Failed to load record:', err);
         setError('Failed to load record');
@@ -123,7 +124,7 @@ export function Retic() {
       const token = await getToken();
       if (!token) throw new Error('Not authenticated');
 
-      const data: ReticData = {
+      const rawTallies: ReticData = {
         reticCount,
         rbcCount,
       };
@@ -131,15 +132,18 @@ export function Retic() {
       let recordId = id;
 
       if (id) {
-        await api.patch(`/api/records/${id}`, { data }, token);
+        await api.patch(`/api/records/${id}`, { rawTallies }, token);
       } else {
         const record = await api.post<ReticRecord>(
           '/api/records',
           {
             type: 'retic',
             specimenId: specimenId.trim(),
-            specimenType: 'other',
-            data,
+            fluidType: 'other',
+            dilution: 1,
+            squaresCounted: 1,
+            isQC,
+            rawTallies,
           },
           token
         );
@@ -179,6 +183,16 @@ export function Retic() {
               onChange={(e) => setSpecimenId(e.target.value)}
               placeholder="Enter specimen ID"
             />
+          </div>
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={isQC}
+                onChange={(e) => setIsQC(e.target.checked)}
+              />
+              QC Sample (no verification required)
+            </label>
           </div>
         </div>
       </header>
@@ -264,7 +278,7 @@ export function Retic() {
           disabled={saving || !canSubmit}
           title={!canSubmit ? 'Count some cells to submit' : ''}
         >
-          Submit for Verification
+          {isQC ? 'Submit' : 'Submit for Verification'}
         </button>
       </div>
     </div>

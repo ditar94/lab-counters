@@ -1,15 +1,12 @@
 import { Request } from 'express';
 import { prisma } from '../lib/prisma';
-import type { AuditAction } from '@lab-counters/shared';
-
 interface AuditLogParams {
   orgId: string;
-  tableName: string;
-  recordId: string;
-  action: AuditAction;
-  oldValues?: unknown;
-  newValues?: unknown;
-  userId: string;
+  actorUserId: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  metadata?: Record<string, unknown>;
   req?: Request;
 }
 
@@ -40,7 +37,7 @@ function getClientIp(req: Request): string | undefined {
  * Every data modification is logged with full context
  */
 export async function auditLog(params: AuditLogParams): Promise<void> {
-  const { orgId, tableName, recordId, action, oldValues, newValues, userId, req } = params;
+  const { orgId, actorUserId, action, entityType, entityId, metadata, req } = params;
 
   const correlationId = req?.correlationId;
   const ipAddress = req ? getClientIp(req) : undefined;
@@ -50,26 +47,28 @@ export async function auditLog(params: AuditLogParams): Promise<void> {
   console.info('[AUDIT]', JSON.stringify({
     correlationId,
     action,
-    tableName,
-    recordId,
-    userId,
+    entityType,
+    entityId,
+    actorUserId,
     orgId,
     ipAddress,
     timestamp: new Date().toISOString(),
   }));
 
   try {
-    await prisma.auditLog.create({
+    await prisma.auditEvent.create({
       data: {
         orgId,
-        tableName,
-        recordId,
+        actorUserId,
         action,
-        oldValues: oldValues ? JSON.parse(JSON.stringify(oldValues)) : null,
-        newValues: newValues ? JSON.parse(JSON.stringify(newValues)) : null,
-        userId,
-        ipAddress,
-        userAgent: userAgent ? userAgent.substring(0, 500) : null, // Truncate long user agents
+        entityType,
+        entityId,
+        metadata: {
+          ...(metadata ?? {}),
+          correlationId,
+          ipAddress,
+          userAgent: userAgent ? userAgent.substring(0, 500) : undefined,
+        },
       },
     });
   } catch (error) {
@@ -78,26 +77,26 @@ export async function auditLog(params: AuditLogParams): Promise<void> {
       correlationId,
       error: error instanceof Error ? error.message : 'Unknown error',
       action,
-      tableName,
-      recordId,
+      entityType,
+      entityId,
     });
   }
 }
 
 export async function getAuditHistory(
   orgId: string,
-  tableName: string,
-  recordId: string
+  entityType: string,
+  entityId: string
 ) {
-  return prisma.auditLog.findMany({
+  return prisma.auditEvent.findMany({
     where: {
       orgId,
-      tableName,
-      recordId,
+      entityType,
+      entityId,
     },
     include: {
-      user: { select: { id: true, name: true } },
+      actor: { select: { id: true, name: true } },
     },
-    orderBy: { timestamp: 'desc' },
+    orderBy: { createdAt: 'desc' },
   });
 }

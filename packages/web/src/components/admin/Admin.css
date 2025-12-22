@@ -213,6 +213,30 @@
   padding: 1.5rem;
 }
 
+.admin-page .modal-body {
+  padding: 1.5rem;
+}
+
+.admin-page .password-notice {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--color-gray-300);
+  border-radius: var(--radius);
+  background: var(--color-gray-50);
+}
+
+.admin-page .password-notice label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.admin-page .password-notice .password-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
 .admin-page .modal-actions {
   display: flex;
   justify-content: flex-end;

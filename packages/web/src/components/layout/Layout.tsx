@@ -11,6 +11,8 @@ export function Layout() {
 
   const isSuperadmin = user?.role === 'superadmin';
   const isAdmin = user?.role === 'admin';
+  const isSupervisor = user?.role === 'supervisor';
+  const canReview = isAdmin || isSupervisor;
   const hasMultipleSites = (user?.sites?.length ?? 0) > 1;
 
   // Build nav items based on role
@@ -21,6 +23,7 @@ export function Layout() {
       : [
           { path: '/records', label: 'Records' },
           { path: '/count/hemocytometer', label: 'Hemocytometer' },
+          ...(canReview ? [{ path: '/reviews', label: 'Monthly Review' }] : []),
           ...(isAdmin ? [{ path: '/admin/users', label: 'Users' }] : []),
         ]),
   ];
@@ -77,7 +80,7 @@ export function Layout() {
                       className="site-switcher-button"
                       onClick={() => setShowSiteSwitcher(!showSiteSwitcher)}
                     >
-                      {user?.site.name} ▾
+                      {user?.site?.name ?? 'Select site'} ▾
                     </button>
                     {showSiteSwitcher && (
                       <div className="site-switcher-dropdown">
@@ -97,7 +100,7 @@ export function Layout() {
                     )}
                   </span>
                 ) : (
-                  <span className="site-name">{user?.site.name}</span>
+                  <span className="site-name">{user?.site?.name ?? 'No site assigned'}</span>
                 )}
               </>
             )}

@@ -97,11 +97,11 @@ sitesRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
 
     await auditLog({
       orgId,
-      tableName: 'sites',
-      recordId: site.id,
+      actorUserId: req.user!.id,
       action: 'create',
-      newValues: site,
-      userId: req.user!.id,
+      entityType: 'site',
+      entityId: site.id,
+      metadata: { record: site },
       req,
     });
 
@@ -139,12 +139,11 @@ sitesRouter.patch('/:siteId', async (req: Request, res: Response, next: NextFunc
 
     await auditLog({
       orgId,
-      tableName: 'sites',
-      recordId: site.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: existing,
-      newValues: site,
-      userId: req.user!.id,
+      entityType: 'site',
+      entityId: site.id,
+      metadata: { before: existing, after: site },
       req,
     });
 
@@ -183,12 +182,11 @@ sitesRouter.patch('/:siteId/status', async (req: Request, res: Response, next: N
 
     await auditLog({
       orgId,
-      tableName: 'sites',
-      recordId: site.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: site.status },
-      userId: req.user!.id,
+      entityType: 'site',
+      entityId: site.id,
+      metadata: { statusBefore: existing.status, statusAfter: site.status },
       req,
     });
 
@@ -225,12 +223,11 @@ sitesRouter.post('/:siteId/archive', async (req: Request, res: Response, next: N
 
     await auditLog({
       orgId,
-      tableName: 'sites',
-      recordId: site.id,
-      action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: 'archived', archivedAt: site.archivedAt },
-      userId: req.user!.id,
+      actorUserId: req.user!.id,
+      action: 'archive',
+      entityType: 'site',
+      entityId: site.id,
+      metadata: { statusBefore: existing.status, statusAfter: 'archived', archivedAt: site.archivedAt },
       req,
     });
 
@@ -267,12 +264,11 @@ sitesRouter.post('/:siteId/restore', async (req: Request, res: Response, next: N
 
     await auditLog({
       orgId,
-      tableName: 'sites',
-      recordId: site.id,
-      action: 'update',
-      oldValues: { status: existing.status, archivedAt: existing.archivedAt },
-      newValues: { status: 'active', archivedAt: null },
-      userId: req.user!.id,
+      actorUserId: req.user!.id,
+      action: 'restore',
+      entityType: 'site',
+      entityId: site.id,
+      metadata: { statusBefore: existing.status, statusAfter: 'active', archivedAt: null },
       req,
     });
 
@@ -319,11 +315,11 @@ sitesRouter.delete('/:siteId', async (req: Request, res: Response, next: NextFun
 
     await auditLog({
       orgId,
-      tableName: 'sites',
-      recordId: siteId,
+      actorUserId: req.user!.id,
       action: 'delete',
-      oldValues: { ...existing, _count: existing._count },
-      userId: req.user!.id,
+      entityType: 'site',
+      entityId: siteId,
+      metadata: { record: existing, counts: existing._count },
       req,
     });
 

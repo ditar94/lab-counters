@@ -8,16 +8,17 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint src",
+    "typecheck": "tsc -b --noEmit",
     "test": "vitest",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.7.0",
     "@lab-counters/shared": "*",
+    "aws-amplify": "^6.11.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.1.0",
-    "aws-amplify": "^6.11.0",
-    "@aws-amplify/ui-react": "^6.7.0"
+    "react-router-dom": "^7.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.17",
@@ -25,6 +26,6 @@
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.16"
   }
 }

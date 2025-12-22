@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../middleware/error-handler';
 import { auditLog } from '../../services/audit';
+import { disableCognitoUser } from '../../services/cognito';
 import { CreateOrganizationSchema, UpdateOrganizationSchema } from '@lab-counters/shared';
 
 export const organizationsRouter = Router();
@@ -108,11 +109,11 @@ organizationsRouter.post('/', async (req: Request, res: Response, next: NextFunc
 
     await auditLog({
       orgId: org.id,
-      tableName: 'organizations',
-      recordId: org.id,
+      actorUserId: req.user!.id,
       action: 'create',
-      newValues: org,
-      userId: req.user!.id,
+      entityType: 'organization',
+      entityId: org.id,
+      metadata: { record: org },
       req,
     });
 
@@ -152,12 +153,11 @@ organizationsRouter.patch('/:id', async (req: Request, res: Response, next: Next
 
     await auditLog({
       orgId: org.id,
-      tableName: 'organizations',
-      recordId: org.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: existing,
-      newValues: org,
-      userId: req.user!.id,
+      entityType: 'organization',
+      entityId: org.id,
+      metadata: { before: existing, after: org },
       req,
     });
 
@@ -203,16 +203,29 @@ organizationsRouter.patch('/:id/status', async (req: Request, res: Response, nex
         where: { orgId: req.params.id, status: 'active' },
         data: { status: 'inactive' },
       });
+
+      if (process.env.NODE_ENV !== 'development') {
+        const usersToDisable = await prisma.user.findMany({
+          where: { orgId: req.params.id, username: { not: null } },
+          select: { username: true },
+        });
+        for (const user of usersToDisable) {
+          try {
+            await disableCognitoUser(user.username!);
+          } catch (err) {
+            console.warn('Failed to disable Cognito user:', err);
+          }
+        }
+      }
     }
 
     await auditLog({
       orgId: org.id,
-      tableName: 'organizations',
-      recordId: org.id,
+      actorUserId: req.user!.id,
       action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: org.status },
-      userId: req.user!.id,
+      entityType: 'organization',
+      entityId: org.id,
+      metadata: { statusBefore: existing.status, statusAfter: org.status },
       req,
     });
 
@@ -259,6 +272,20 @@ organizationsRouter.post('/:id/archive', async (req: Request, res: Response, nex
       },
     });
 
+    if (process.env.NODE_ENV !== 'development') {
+      const usersToDisable = await prisma.user.findMany({
+        where: { orgId: req.params.id, username: { not: null } },
+        select: { username: true },
+      });
+      for (const user of usersToDisable) {
+        try {
+          await disableCognitoUser(user.username!);
+        } catch (err) {
+          console.warn('Failed to disable Cognito user:', err);
+        }
+      }
+    }
+
     // Archive all sites in the org
     await prisma.site.updateMany({
       where: { orgId: req.params.id },
@@ -270,12 +297,11 @@ organizationsRouter.post('/:id/archive', async (req: Request, res: Response, nex
 
     await auditLog({
       orgId: org.id,
-      tableName: 'organizations',
-      recordId: org.id,
-      action: 'update',
-      oldValues: { status: existing.status },
-      newValues: { status: 'archived', archivedAt: org.archivedAt },
-      userId: req.user!.id,
+      actorUserId: req.user!.id,
+      action: 'archive',
+      entityType: 'organization',
+      entityId: org.id,
+      metadata: { statusBefore: existing.status, statusAfter: 'archived', archivedAt: org.archivedAt },
       req,
     });
 
@@ -329,12 +355,11 @@ organizationsRouter.post('/:id/restore', async (req: Request, res: Response, nex
 
     await auditLog({
       orgId: org.id,
-      tableName: 'organizations',
-      recordId: org.id,
-      action: 'update',
-      oldValues: { status: existing.status, archivedAt: existing.archivedAt },
-      newValues: { status: 'active', archivedAt: null },
-      userId: req.user!.id,
+      actorUserId: req.user!.id,
+      action: 'restore',
+      entityType: 'organization',
+      entityId: org.id,
+      metadata: { statusBefore: existing.status, statusAfter: 'active', archivedAt: null },
       req,
     });
 
@@ -380,11 +405,11 @@ organizationsRouter.delete('/:id', async (req: Request, res: Response, next: Nex
     // Log before deletion
     await auditLog({
       orgId: existing.id,
-      tableName: 'organizations',
-      recordId: existing.id,
+      actorUserId: req.user!.id,
       action: 'delete',
-      oldValues: { ...existing, _count: existing._count },
-      userId: req.user!.id,
+      entityType: 'organization',
+      entityId: existing.id,
+      metadata: { record: existing, counts: existing._count },
       req,
     });
 

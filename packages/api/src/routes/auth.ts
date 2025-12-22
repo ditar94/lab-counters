@@ -73,6 +73,11 @@ authRouter.post('/switch-site', authenticate, async (req: Request, res: Response
       return;
     }
 
+    if (userSite.site.status !== 'active') {
+      res.status(403).json({ code: 'SITE_INACTIVE', message: 'Site access is not active' });
+      return;
+    }
+
     // Update user's current site
     const user = await prisma.user.update({
       where: { id: req.user!.id },
@@ -89,12 +94,11 @@ authRouter.post('/switch-site', authenticate, async (req: Request, res: Response
 
     await auditLog({
       orgId: req.user!.orgId,
-      tableName: 'users',
-      recordId: user.id,
-      action: 'update',
-      oldValues: { siteId: req.user!.siteId },
-      newValues: { siteId },
-      userId: req.user!.id,
+      actorUserId: req.user!.id,
+      action: 'switch_site',
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { previousSiteId: req.user!.siteId, newSiteId: siteId },
       req,
     });
 

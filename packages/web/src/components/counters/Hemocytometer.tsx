@@ -6,7 +6,7 @@ import type {
   HemocytometerData,
   HemocytometerCalculations,
   HemocytometerRecord,
-  SpecimenType,
+  FluidType,
 } from '@lab-counters/shared';
 import './Hemocytometer.css';
 
@@ -24,7 +24,7 @@ interface CountSettings {
   dilutionFactor: number;
 }
 
-const SPECIMEN_TYPES: { value: SpecimenType; label: string }[] = [
+const FLUID_TYPES: { value: FluidType; label: string }[] = [
   { value: 'csf', label: 'CSF' },
   { value: 'synovial', label: 'Synovial' },
   { value: 'pleural', label: 'Pleural' },
@@ -48,7 +48,8 @@ export function Hemocytometer() {
 
   // Specimen info
   const [specimenId, setSpecimenId] = useState('');
-  const [specimenType, setSpecimenType] = useState<SpecimenType>('csf');
+  const [fluidType, setFluidType] = useState<FluidType>('csf');
+  const [isQC, setIsQC] = useState(false);
 
   // Counter state for each side
   const [side1, setSide1] = useState<SideState>({
@@ -109,9 +110,9 @@ export function Hemocytometer() {
 
         const record = await api.get<HemocytometerRecord>(`/api/records/${id}`, token);
         setSpecimenId(record.specimenId);
-        setSpecimenType(record.specimenType as SpecimenType);
+        setFluidType(record.fluidType as FluidType);
 
-        const data = record.data;
+        const data = record.rawTallies;
         setSide1({
           rbcCount: data.side1.rbcCount,
           tncCount: data.side1.tncCount,
@@ -301,7 +302,7 @@ export function Hemocytometer() {
         }),
       };
 
-      const data: HemocytometerData = {
+      const rawTallies: HemocytometerData = {
         side1: {
           rbcCount: side1.rbcCount,
           tncCount: side1.tncCount,
@@ -320,7 +321,7 @@ export function Hemocytometer() {
 
       if (id) {
         // Update existing
-        await api.patch(`/api/records/${id}`, { data }, token);
+        await api.patch(`/api/records/${id}`, { rawTallies }, token);
       } else {
         // Create new
         const record = await api.post<HemocytometerRecord>(
@@ -328,8 +329,11 @@ export function Hemocytometer() {
           {
             type: 'hemocytometer',
             specimenId: specimenId.trim(),
-            specimenType,
-            data,
+            fluidType,
+            dilution: sharedSettings.dilutionFactor,
+            squaresCounted: sharedSettings.squaresCounted,
+            isQC,
+            rawTallies,
           },
           token
         );
@@ -373,18 +377,28 @@ export function Hemocytometer() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="specimen-type">Specimen Type</label>
+            <label htmlFor="specimen-type">Fluid Type</label>
             <select
               id="specimen-type"
-              value={specimenType}
-              onChange={(e) => setSpecimenType(e.target.value as SpecimenType)}
+              value={fluidType}
+              onChange={(e) => setFluidType(e.target.value as FluidType)}
             >
-              {SPECIMEN_TYPES.map((type) => (
+              {FLUID_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
                   {type.label}
                 </option>
               ))}
             </select>
+          </div>
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={isQC}
+                onChange={(e) => setIsQC(e.target.checked)}
+              />
+              QC Sample (no verification required)
+            </label>
           </div>
         </div>
       </header>
@@ -754,7 +768,7 @@ export function Hemocytometer() {
           disabled={saving || !canSubmit}
           title={!canSubmit ? 'Complete both sides with matching counts to submit' : ''}
         >
-          Submit for Verification
+          {isQC ? 'Submit' : 'Submit for Verification'}
         </button>
       </div>
     </div>

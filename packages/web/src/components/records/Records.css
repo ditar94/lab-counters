@@ -231,6 +231,68 @@
   margin: 0;
 }
 
+/* Settings Display */
+.settings-display {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--color-gray-50);
+  border-radius: var(--radius);
+}
+
+.shared-settings dl {
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+}
+
+.shared-settings dt {
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+}
+
+.shared-settings dd {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 1.5rem 0 0.5rem;
+}
+
+.separate-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.setting-group {
+  padding: 0.75rem;
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-gray-200);
+}
+
+.setting-group h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+}
+
+.setting-group dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+}
+
+.setting-group dt {
+  font-size: 0.8rem;
+  color: var(--color-gray-500);
+}
+
+.setting-group dd {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0;
+}
+
 .calculations-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

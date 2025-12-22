@@ -23,14 +23,14 @@ import './Records.css';
 interface RecordWithRelations {
   id: string;
   specimenId: string;
-  specimenType: string;
+  fluidType: string;
   type: CountRecordType;
   status: RecordStatus;
-  data: HemocytometerData | unknown;
+  rawTallies: HemocytometerData | unknown;
   calculations: HemocytometerCalculations | unknown;
-  createdAt: Date | string;
+  performedAt: Date | string;
   verifiedAt?: Date | string;
-  createdBy: { id: string; name: string; email: string };
+  performedBy: { id: string; name: string; email: string };
   verifiedBy?: { id: string; name: string; email: string };
   site?: { id: string; name: string };
 }
@@ -99,7 +99,8 @@ export function RecordDetail() {
 
   const canVerify =
     record.status === 'pending_verification' &&
-    (user?.role === 'supervisor' || user?.role === 'admin');
+    record.performedById !== user?.id &&
+    (user?.role === 'technologist' || user?.role === 'supervisor' || user?.role === 'admin');
 
   const canEdit = record.status === 'draft';
 
@@ -109,7 +110,7 @@ export function RecordDetail() {
         <div>
           <h1>Record: {record.specimenId}</h1>
           <p className="subtitle">
-            {record.type} - {record.specimenType}
+            {record.type} - {record.fluidType}
           </p>
         </div>
         <div className="header-actions">
@@ -135,12 +136,12 @@ export function RecordDetail() {
             </span>
           </div>
           <div className="info-item">
-            <label>Created</label>
-            <span>{formatDate(record.createdAt)}</span>
+            <label>Performed</label>
+            <span>{formatDate(record.performedAt)}</span>
           </div>
           <div className="info-item">
-            <label>Created By</label>
-            <span>{record.createdBy.name}</span>
+            <label>Performed By</label>
+            <span>{record.performedBy.name}</span>
           </div>
           {record.verifiedBy && (
             <>
@@ -191,10 +192,47 @@ export function RecordDetail() {
 }
 
 function HemocytometerDetails({ record }: { record: HemocytometerRecord }) {
-  const { data, calculations } = record;
+  const { rawTallies, calculations } = record;
+  const hasSeparateSettings = rawTallies.side1.separateSettings;
 
   return (
     <div className="hemocytometer-details">
+      <h2>Count Settings</h2>
+
+      <div className="settings-display">
+        {hasSeparateSettings ? (
+          <div className="separate-settings">
+            <div className="setting-group">
+              <h4>RBC Settings</h4>
+              <dl>
+                <dt>Squares Counted</dt>
+                <dd>{rawTallies.side1.rbcSquaresCounted}</dd>
+                <dt>Dilution Factor</dt>
+                <dd>{rawTallies.side1.rbcDilution}</dd>
+              </dl>
+            </div>
+            <div className="setting-group">
+              <h4>TNC Settings</h4>
+              <dl>
+                <dt>Squares Counted</dt>
+                <dd>{rawTallies.side1.tncSquaresCounted}</dd>
+                <dt>Dilution Factor</dt>
+                <dd>{rawTallies.side1.tncDilution}</dd>
+              </dl>
+            </div>
+          </div>
+        ) : (
+          <div className="shared-settings">
+            <dl>
+              <dt>Squares Counted</dt>
+              <dd>{rawTallies.side1.squaresCounted}</dd>
+              <dt>Dilution Factor</dt>
+              <dd>{rawTallies.side1.dilutionFactor}</dd>
+            </dl>
+          </div>
+        )}
+      </div>
+
       <h2>Count Data</h2>
 
       <div className="sides-grid">
@@ -202,13 +240,9 @@ function HemocytometerDetails({ record }: { record: HemocytometerRecord }) {
           <h3>Side 1</h3>
           <dl>
             <dt>RBC Count</dt>
-            <dd>{data.side1.rbcCount}</dd>
+            <dd>{rawTallies.side1.rbcCount}</dd>
             <dt>TNC Count</dt>
-            <dd>{data.side1.tncCount}</dd>
-            <dt>Squares</dt>
-            <dd>{data.side1.squaresCounted}</dd>
-            <dt>Dilution</dt>
-            <dd>{data.side1.dilutionFactor}</dd>
+            <dd>{rawTallies.side1.tncCount}</dd>
           </dl>
         </div>
 
@@ -216,13 +250,9 @@ function HemocytometerDetails({ record }: { record: HemocytometerRecord }) {
           <h3>Side 2</h3>
           <dl>
             <dt>RBC Count</dt>
-            <dd>{data.side2.rbcCount}</dd>
+            <dd>{rawTallies.side2.rbcCount}</dd>
             <dt>TNC Count</dt>
-            <dd>{data.side2.tncCount}</dd>
-            <dt>Squares</dt>
-            <dd>{data.side2.squaresCounted}</dd>
-            <dt>Dilution</dt>
-            <dd>{data.side2.dilutionFactor}</dd>
+            <dd>{rawTallies.side2.tncCount}</dd>
           </dl>
         </div>
       </div>
@@ -269,7 +299,7 @@ function HemocytometerDetails({ record }: { record: HemocytometerRecord }) {
 }
 
 function ReticDetails({ record }: { record: ReticRecord }) {
-  const data = record.data as ReticData;
+  const data = record.rawTallies as ReticData;
   const calculations = record.calculations as ReticCalculations;
 
   return (
@@ -298,7 +328,7 @@ function ReticDetails({ record }: { record: ReticRecord }) {
 }
 
 function ParasiteDetails({ record }: { record: ParasiteRecord }) {
-  const data = record.data as ParasiteData;
+  const data = record.rawTallies as ParasiteData;
   const calculations = record.calculations as ParasiteCalculations;
 
   return (
@@ -327,7 +357,7 @@ function ParasiteDetails({ record }: { record: ParasiteRecord }) {
 }
 
 function FetalDetails({ record }: { record: FetalRecord }) {
-  const data = record.data as FetalData;
+  const data = record.rawTallies as FetalData;
   const calculations = record.calculations as FetalCalculations;
 
   return (

@@ -10,9 +10,9 @@ interface RecordWithSite {
   specimenId: string;
   type: CountRecordType;
   status: RecordStatus;
-  createdAt: Date | string;
+  performedAt: Date | string;
   site?: { id: string; name: string };
-  createdBy?: { id: string; name: string };
+  performedBy?: { id: string; name: string };
 }
 
 export function RecordsList() {
@@ -26,10 +26,19 @@ export function RecordsList() {
   const statusFilter = searchParams.get('status') as RecordStatus | null;
   const typeFilter = searchParams.get('type') as CountRecordType | null;
   const siteFilter = searchParams.get('siteId');
+  const monthFilter = searchParams.get('month');
+  const yearFilter = searchParams.get('year');
 
   // Non-technologists can filter by site
   const canFilterBySite = user?.role !== 'technologist';
   const userSites = user?.sites || [];
+
+  // For technologists, include siteId in dependencies so list refreshes on site switch
+  const currentSiteId = user?.siteId;
+
+  // Generate year options (current year and 2 years back)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [currentYear, currentYear - 1, currentYear - 2];
 
   useEffect(() => {
     async function fetchRecords() {
@@ -44,6 +53,8 @@ export function RecordsList() {
         if (statusFilter) params.set('status', statusFilter);
         if (typeFilter) params.set('type', typeFilter);
         if (siteFilter && canFilterBySite) params.set('siteId', siteFilter);
+        if (monthFilter) params.set('month', monthFilter);
+        if (yearFilter) params.set('year', yearFilter);
 
         const response = await api.get<PaginatedResponse<RecordWithSite>>(
           `/api/records?${params}`,
@@ -60,7 +71,7 @@ export function RecordsList() {
     }
 
     fetchRecords();
-  }, [getToken, page, statusFilter, typeFilter, siteFilter, canFilterBySite]);
+  }, [getToken, page, statusFilter, typeFilter, siteFilter, canFilterBySite, currentSiteId, monthFilter, yearFilter]);
 
   const handleFilterChange = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams);
@@ -92,7 +103,7 @@ export function RecordsList() {
     }
   };
 
-  const canVerify = user?.role === 'supervisor' || user?.role === 'admin';
+  const canVerify = user?.role === 'technologist' || user?.role === 'supervisor' || user?.role === 'admin';
 
   return (
     <div className="records-page">
@@ -148,6 +159,43 @@ export function RecordsList() {
             </select>
           </div>
         )}
+
+        <div className="filter-group">
+          <label>Month</label>
+          <select
+            value={monthFilter || ''}
+            onChange={(e) => handleFilterChange('month', e.target.value || null)}
+          >
+            <option value="">All Months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Year</label>
+          <select
+            value={yearFilter || ''}
+            onChange={(e) => handleFilterChange('year', e.target.value || null)}
+          >
+            <option value="">All Years</option>
+            {yearOptions.map((year) => (
+              <option key={year} value={year.toString()}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading ? (
@@ -166,8 +214,8 @@ export function RecordsList() {
                 <th>Type</th>
                 <th>Site</th>
                 <th>Status</th>
-                <th>Created</th>
-                <th>Created By</th>
+                <th>Performed</th>
+                <th>Performed By</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -184,8 +232,8 @@ export function RecordsList() {
                       {record.status.replace('_', ' ')}
                     </span>
                   </td>
-                  <td>{formatDate(record.createdAt)}</td>
-                  <td>{record.createdBy?.name || '-'}</td>
+                  <td>{formatDate(record.performedAt)}</td>
+                  <td>{record.performedBy?.name || '-'}</td>
                   <td className="actions">
                     <Link to={`/records/${record.id}`} className="btn-link">
                       View
@@ -195,7 +243,7 @@ export function RecordsList() {
                         Edit
                       </Link>
                     )}
-                    {record.status === 'pending_verification' && canVerify && (
+                    {record.status === 'pending_verification' && canVerify && record.performedBy?.id !== user?.id && (
                       <Link to={`/records/${record.id}`} className="btn-link verify">
                         Verify
                       </Link>

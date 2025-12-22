@@ -4,6 +4,8 @@ import {
   AdminDisableUserCommand,
   AdminEnableUserCommand,
   AdminDeleteUserCommand,
+  AdminResetUserPasswordCommand,
+  AdminSetUserPasswordCommand,
   AdminGetUserCommand,
   ListUsersCommand,
   UsernameExistsException,
@@ -152,6 +154,33 @@ export async function deleteCognitoUser(username: string): Promise<void> {
     Username: username,
   });
 
+  await client.send(command);
+}
+
+/**
+ * Reset a user's password.
+ * - If temporaryPassword is provided, set it as a temporary password (forces change on login).
+ * - Otherwise, Cognito sends the standard reset email.
+ */
+export async function resetCognitoUserPassword(
+  username: string,
+  temporaryPassword?: string
+): Promise<void> {
+  if (temporaryPassword) {
+    const command = new AdminSetUserPasswordCommand({
+      UserPoolId: USER_POOL_ID,
+      Username: username,
+      Password: temporaryPassword,
+      Permanent: false,
+    });
+    await client.send(command);
+    return;
+  }
+
+  const command = new AdminResetUserPasswordCommand({
+    UserPoolId: USER_POOL_ID,
+    Username: username,
+  });
   await client.send(command);
 }
 

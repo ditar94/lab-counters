@@ -310,6 +310,30 @@
   padding: 1.5rem;
 }
 
+.modal-body {
+  padding: 1.5rem;
+}
+
+.password-notice {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--color-gray-300);
+  border-radius: var(--radius);
+  background: var(--color-gray-50);
+}
+
+.password-notice label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.password-notice .password-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -317,6 +341,36 @@
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-gray-100);
+}
+
+/* Site Checkboxes */
+.site-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-gray-50);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-gray-200);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-label .site-location {
+  color: var(--color-gray-500);
+  font-size: 0.8125rem;
 }
 
 /* Inline Form */

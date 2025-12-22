@@ -11,11 +11,12 @@ interface UserSiteAssignment {
 
 interface User {
   id: string;
+  username?: string;
   email: string;
   name: string;
   role: UserRole;
   status: UserStatus;
-  site: { id: string; name: string };
+  site?: { id: string; name: string };
   sites?: UserSiteAssignment[];
 }
 
@@ -35,6 +36,11 @@ export function Users() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [passwordNotice, setPasswordNotice] = useState<{
+    name: string;
+    username?: string;
+    temporaryPassword: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -89,6 +95,33 @@ export function Users() {
     }
   }
 
+  async function handleResetPassword(user: User) {
+    if (!confirm(`Reset password for ${user.name}?`)) return;
+
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const result = await api.post<{ temporaryPassword?: string }>(
+        `/api/users/${user.id}/reset-password`,
+        { generateTemporaryPassword: true },
+        token
+      );
+      if (result.temporaryPassword) {
+        setPasswordNotice({
+          name: user.name,
+          username: user.username,
+          temporaryPassword: result.temporaryPassword,
+        });
+      } else {
+        window.alert('Password reset initiated.');
+      }
+    } catch (err) {
+      console.error('Failed to reset password:', err);
+      setError('Failed to reset password');
+    }
+  }
+
   if (currentUser?.role !== 'admin') {
     return (
       <div className="admin-page">
@@ -127,9 +160,16 @@ export function Users() {
         <UserForm
           sites={sites}
           onClose={() => setShowCreateForm(false)}
-          onSaved={() => {
+          onSaved={(tempPassword, createdUser) => {
             setShowCreateForm(false);
             fetchData();
+            if (tempPassword) {
+              setPasswordNotice({
+                name: createdUser?.name || 'User',
+                username: createdUser?.username,
+                temporaryPassword: tempPassword,
+              });
+            }
           }}
         />
       )}
@@ -146,7 +186,6 @@ export function Users() {
         />
       )}
 
-      {/* Active Users */}
       <section className="detail-section">
         <div className="section-header">
           <h2>Active Users ({activeUsers.length})</h2>
@@ -156,6 +195,7 @@ export function Users() {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
                 <th>Sites</th>
@@ -166,6 +206,7 @@ export function Users() {
               {activeUsers.map((user) => (
                 <tr key={user.id}>
                   <td>{user.name}</td>
+                  <td>{user.username || '-'}</td>
                   <td>{user.email}</td>
                   <td>
                     <span className={`role-badge role-${user.role}`}>{user.role}</span>
@@ -173,9 +214,9 @@ export function Users() {
                   <td>
                     {user.sites && user.sites.length > 0
                       ? user.sites.map((s) => s.site.name).join(', ')
-                      : user.site.name}
+                      : user.site?.name || '-'}
                     {user.sites && user.sites.length > 1 && (
-                      <span className="current-site-indicator"> (current: {user.site.name})</span>
+                      <span className="current-site-indicator"> (current: {user.site?.name || '-'})</span>
                     )}
                   </td>
                   <td>
@@ -186,6 +227,12 @@ export function Users() {
                           onClick={() => setEditingUser(user)}
                         >
                           Edit
+                        </button>
+                        <button
+                          className="btn small secondary"
+                          onClick={() => handleResetPassword(user)}
+                        >
+                          Reset Password
                         </button>
                         <button
                           className="btn small danger"
@@ -210,7 +257,6 @@ export function Users() {
         )}
       </section>
 
-      {/* Pending Users */}
       {pendingUsers.length > 0 && (
         <section className="detail-section">
           <div className="section-header">
@@ -220,6 +266,7 @@ export function Users() {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
                 <th>Site</th>
@@ -230,11 +277,12 @@ export function Users() {
               {pendingUsers.map((user) => (
                 <tr key={user.id}>
                   <td>{user.name}</td>
+                  <td>{user.username || '-'}</td>
                   <td>{user.email}</td>
                   <td>
                     <span className={`role-badge role-${user.role}`}>{user.role}</span>
                   </td>
-                  <td>{user.site.name}</td>
+                  <td>{user.site?.name || '-'}</td>
                   <td>
                     <div className="action-buttons">
                       <button
@@ -242,6 +290,12 @@ export function Users() {
                         onClick={() => setEditingUser(user)}
                       >
                         Edit
+                      </button>
+                      <button
+                        className="btn small secondary"
+                        onClick={() => handleResetPassword(user)}
+                      >
+                        Reset Password
                       </button>
                     </div>
                   </td>
@@ -252,7 +306,6 @@ export function Users() {
         </section>
       )}
 
-      {/* Inactive Users */}
       {inactiveUsers.length > 0 && (
         <section className="detail-section">
           <div className="section-header">
@@ -262,6 +315,7 @@ export function Users() {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
                 <th>Site</th>
@@ -272,11 +326,12 @@ export function Users() {
               {inactiveUsers.map((user) => (
                 <tr key={user.id}>
                   <td className="inactive-text">{user.name}</td>
+                  <td className="inactive-text">{user.username || '-'}</td>
                   <td className="inactive-text">{user.email}</td>
                   <td>
                     <span className={`role-badge role-${user.role}`}>{user.role}</span>
                   </td>
-                  <td className="inactive-text">{user.site.name}</td>
+                  <td className="inactive-text">{user.site?.name || '-'}</td>
                   <td>
                     <button
                       className="btn small secondary"
@@ -291,6 +346,15 @@ export function Users() {
           </table>
         </section>
       )}
+
+      {passwordNotice && (
+        <PasswordNoticeModal
+          name={passwordNotice.name}
+          username={passwordNotice.username}
+          temporaryPassword={passwordNotice.temporaryPassword}
+          onClose={() => setPasswordNotice(null)}
+        />
+      )}
     </div>
   );
 }
@@ -304,21 +368,19 @@ function UserForm({
   sites: Site[];
   user?: User;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (temporaryPassword?: string, createdUser?: User) => void;
 }) {
   const { getToken } = useAuth();
-  const [username, setUsername] = useState('');
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [role, setRole] = useState<OrgUserRole>(
     (user?.role as OrgUserRole) || 'technologist'
   );
-  // For multi-site selection
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>(
-    user?.sites?.map((s) => s.siteId) || (user?.site.id ? [user.site.id] : (sites[0]?.id ? [sites[0].id] : []))
+    user?.sites?.map((s) => s.siteId) || (user?.site?.id ? [user.site.id] : (sites[0]?.id ? [sites[0].id] : []))
   );
-  const [primarySiteId, setPrimarySiteId] = useState(user?.site.id || sites[0]?.id || '');
-  const [temporaryPassword, setTemporaryPassword] = useState('');
+  const [primarySiteId, setPrimarySiteId] = useState(user?.site?.id || sites[0]?.id || '');
+  const [generateTempPassword, setGenerateTempPassword] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -327,17 +389,14 @@ function UserForm({
   const handleSiteToggle = (siteId: string) => {
     setSelectedSiteIds((prev) => {
       if (prev.includes(siteId)) {
-        // Don't allow removing the last site
         if (prev.length === 1) return prev;
-        // If removing the primary site, update primary to another selected site
         if (siteId === primarySiteId) {
           const remaining = prev.filter((id) => id !== siteId);
           setPrimarySiteId(remaining[0]);
         }
         return prev.filter((id) => id !== siteId);
-      } else {
-        return [...prev, siteId];
       }
+      return [...prev, siteId];
     });
   };
 
@@ -350,28 +409,39 @@ function UserForm({
       const token = await getToken();
       if (!token) return;
 
+      if (!primarySiteId) {
+        setError('Please select a primary site');
+        return;
+      }
+
+      if (!selectedSiteIds.length) {
+        setError('Please select at least one site');
+        return;
+      }
+
       if (isEditing) {
         await api.patch(
           `/api/users/${user.id}`,
           { name, role, siteId: primarySiteId, siteIds: selectedSiteIds },
           token
         );
-      } else {
-        await api.post(
-          '/api/users',
-          {
-            username,
-            name,
-            email,
-            role,
-            siteId: primarySiteId,
-            siteIds: selectedSiteIds,
-            ...(temporaryPassword ? { temporaryPassword } : {}),
-          },
-          token
-        );
+        onSaved();
+        return;
       }
-      onSaved();
+
+      const result = await api.post<User & { temporaryPassword?: string }>(
+        '/api/users',
+        {
+          name,
+          email,
+          role,
+          siteId: primarySiteId,
+          ...(selectedSiteIds.length ? { siteIds: selectedSiteIds } : {}),
+          ...(generateTempPassword ? { generateTemporaryPassword: true } : {}),
+        },
+        token
+      );
+      onSaved(result.temporaryPassword, result);
     } catch (err: unknown) {
       console.error('Failed to save user:', err);
       const message = err instanceof Error ? err.message : 'Failed to save user';
@@ -393,19 +463,10 @@ function UserForm({
         <form onSubmit={handleSubmit}>
           {!isEditing && (
             <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g., jsmith"
-                pattern="^[a-zA-Z0-9_-]+$"
-                minLength={3}
-                maxLength={50}
-                required
-              />
-              <p className="form-hint">Used for login. Letters, numbers, underscores, and hyphens only.</p>
+              <label>Username</label>
+              <p className="form-hint">
+                Username is automatically generated from the user's name (first initial + last name).
+              </p>
             </div>
           )}
 
@@ -435,19 +496,18 @@ function UserForm({
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="tempPassword">Temporary Password (optional)</label>
-                <input
-                  id="tempPassword"
-                  type="text"
-                  value={temporaryPassword}
-                  onChange={(e) => setTemporaryPassword(e.target.value)}
-                  placeholder="Leave blank to send email"
-                  minLength={8}
-                />
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={generateTempPassword}
+                    onChange={(e) => setGenerateTempPassword(e.target.checked)}
+                  />
+                  Generate a temporary password for this user
+                </label>
                 <p className="form-hint">
-                  {temporaryPassword
-                    ? 'Share this password with the user. They must change it on first login.'
-                    : 'User will receive login instructions via email'}
+                  {generateTempPassword
+                    ? 'A temporary password will be shown after creation. The user must change it on first login.'
+                    : 'User will receive login instructions via email.'}
                 </p>
               </div>
             </>
@@ -524,6 +584,50 @@ function UserForm({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function PasswordNoticeModal({
+  name,
+  username,
+  temporaryPassword,
+  onClose,
+}: {
+  name: string;
+  username?: string;
+  temporaryPassword: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Temporary Password Issued</h2>
+          <button className="modal-close" onClick={onClose}>
+            &times;
+          </button>
+        </div>
+        <div className="modal-body">
+          <p>
+            A temporary password has been generated for <strong>{name}</strong>
+            {username ? ` (${username})` : ''}. Provide this password to the user and
+            instruct them to change it at first login.
+          </p>
+          <div className="password-notice">
+            <label>Temporary Password</label>
+            <div className="password-value">{temporaryPassword}</div>
+          </div>
+          <p className="form-hint">
+            For compliance, record this password securely and avoid sending it over email.
+          </p>
+        </div>
+        <div className="modal-actions">
+          <button type="button" className="btn primary" onClick={onClose}>
+            I have recorded it
+          </button>
+        </div>
       </div>
     </div>
   );

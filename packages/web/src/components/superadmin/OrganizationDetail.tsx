@@ -15,6 +15,7 @@ interface Site {
 interface OrgUser {
   id: string;
   name: string;
+  username?: string;
   email: string;
   role: string;
   status: 'active' | 'inactive' | 'pending' | 'archived';
@@ -46,6 +47,11 @@ export function OrganizationDetail() {
   const [showSiteForm, setShowSiteForm] = useState(false);
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [passwordNotice, setPasswordNotice] = useState<{
+    name: string;
+    username?: string;
+    temporaryPassword: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchOrganization();
@@ -358,6 +364,14 @@ export function OrganizationDetail() {
       </header>
 
       {error && <div className="error-banner">{error} <button onClick={() => setError(null)}>Dismiss</button></div>}
+      {passwordNotice && (
+        <PasswordNoticeModal
+          name={passwordNotice.name}
+          username={passwordNotice.username}
+          temporaryPassword={passwordNotice.temporaryPassword}
+          onClose={() => setPasswordNotice(null)}
+        />
+      )}
 
       {/* Sites Section */}
       <section className="detail-section">
@@ -473,9 +487,16 @@ export function OrganizationDetail() {
             orgId={org.id}
             sites={org.sites}
             onClose={() => setShowAdminForm(false)}
-            onCreated={() => {
+            onCreated={(tempPassword, createdUser) => {
               setShowAdminForm(false);
               fetchOrganization();
+              if (tempPassword) {
+                setPasswordNotice({
+                  name: createdUser?.name || 'User',
+                  username: createdUser?.username,
+                  temporaryPassword: tempPassword,
+                });
+              }
             }}
           />
         )}
@@ -685,16 +706,32 @@ function CreateAdminForm({
   orgId: string;
   sites: Site[];
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (temporaryPassword?: string, createdUser?: OrgUser) => void;
 }) {
   const { getToken } = useAuth();
-  const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [siteId, setSiteId] = useState(sites[0]?.id || '');
-  const [temporaryPassword, setTemporaryPassword] = useState('');
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>(
+    sites[0]?.id ? [sites[0].id] : []
+  );
+  const [primarySiteId, setPrimarySiteId] = useState(sites[0]?.id || '');
+  const [generateTempPassword, setGenerateTempPassword] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleSiteToggle = (siteId: string) => {
+    setSelectedSiteIds((prev) => {
+      if (prev.includes(siteId)) {
+        if (prev.length === 1) return prev;
+        if (siteId === primarySiteId) {
+          const remaining = prev.filter((id) => id !== siteId);
+          setPrimarySiteId(remaining[0]);
+        }
+        return prev.filter((id) => id !== siteId);
+      }
+      return [...prev, siteId];
+    });
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -705,18 +742,28 @@ function CreateAdminForm({
       const token = await getToken();
       if (!token) return;
 
-      await api.post(
+      if (!primarySiteId) {
+        setError('Please select a primary site');
+        return;
+      }
+
+      if (!selectedSiteIds.length) {
+        setError('Please select at least one site');
+        return;
+      }
+
+      const result = await api.post<OrgUser & { temporaryPassword?: string }>(
         `/api/superadmin/organizations/${orgId}/users`,
         {
-          username,
           name,
           email,
-          siteId,
-          ...(temporaryPassword ? { temporaryPassword } : {}),
+          siteId: primarySiteId,
+          ...(selectedSiteIds.length ? { siteIds: selectedSiteIds } : {}),
+          ...(generateTempPassword ? { generateTemporaryPassword: true } : {}),
         },
         token
       );
-      onCreated();
+      onCreated(result.temporaryPassword, result);
     } catch (err: unknown) {
       console.error('Failed to create admin:', err);
       const message = err instanceof Error ? err.message : 'Failed to create admin';
@@ -727,22 +774,20 @@ function CreateAdminForm({
   }
 
   return (
-    <div className="inline-form">
-      <form onSubmit={handleSubmit}>
-        <div className="form-row">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Add Admin</h2>
+          <button className="modal-close" onClick={onClose}>
+            &times;
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="admin-username">Username</label>
-            <input
-              id="admin-username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="e.g., jsmith"
-              pattern="^[a-zA-Z0-9_-]+$"
-              minLength={3}
-              maxLength={50}
-              required
-            />
+            <label>Username</label>
+            <p className="form-hint">
+              Username is automatically generated from the user's name (first initial + last name).
+            </p>
           </div>
           <div className="form-group">
             <label htmlFor="admin-name">Full Name</label>
@@ -767,47 +812,112 @@ function CreateAdminForm({
             />
           </div>
           <div className="form-group">
-            <label htmlFor="admin-site">Primary Site</label>
-            <select
-              id="admin-site"
-              value={siteId}
-              onChange={(e) => setSiteId(e.target.value)}
-              required
-            >
+            <label>Assigned Sites</label>
+            <div className="site-checkboxes">
               {sites.map((site) => (
-                <option key={site.id} value={site.id}>
+                <label key={site.id} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedSiteIds.includes(site.id)}
+                    onChange={() => handleSiteToggle(site.id)}
+                  />
                   {site.name}
-                </option>
+                  {site.location && <span className="site-location"> ({site.location})</span>}
+                </label>
               ))}
-            </select>
+            </div>
+            <p className="form-hint">Select all sites this admin can manage</p>
           </div>
+          {selectedSiteIds.length > 1 && (
+            <div className="form-group">
+              <label htmlFor="admin-primary-site">Current Site</label>
+              <select
+                id="admin-primary-site"
+                value={primarySiteId}
+                onChange={(e) => setPrimarySiteId(e.target.value)}
+                required
+              >
+                {sites
+                  .filter((site) => selectedSiteIds.includes(site.id))
+                  .map((site) => (
+                    <option key={site.id} value={site.id}>
+                      {site.name}
+                    </option>
+                  ))}
+              </select>
+              <p className="form-hint">The site they'll be working at initially</p>
+            </div>
+          )}
           <div className="form-group">
-            <label htmlFor="admin-password">Temporary Password (optional)</label>
-            <input
-              id="admin-password"
-              type="text"
-              value={temporaryPassword}
-              onChange={(e) => setTemporaryPassword(e.target.value)}
-              placeholder="Leave blank to send email"
-              minLength={8}
-            />
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={generateTempPassword}
+                onChange={(e) => setGenerateTempPassword(e.target.checked)}
+              />
+              Generate a temporary password for this admin
+            </label>
+            <p className="form-hint">
+              {generateTempPassword
+                ? 'A temporary password will be shown after creation. The admin must change it on first login.'
+                : 'Admin will receive an email with login instructions.'}
+            </p>
           </div>
-          <div className="form-actions">
-            <button type="button" className="btn secondary small" onClick={onClose}>
+          {error && <div className="error-message">{error}</div>}
+          <div className="modal-actions">
+            <button type="button" className="btn secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn primary small" disabled={submitting}>
+            <button type="submit" className="btn primary" disabled={submitting}>
               {submitting ? 'Adding...' : 'Add Admin'}
             </button>
           </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function PasswordNoticeModal({
+  name,
+  username,
+  temporaryPassword,
+  onClose,
+}: {
+  name: string;
+  username?: string;
+  temporaryPassword: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Temporary Password Issued</h2>
+          <button className="modal-close" onClick={onClose}>
+            &times;
+          </button>
         </div>
-        <p className="form-hint">
-          {temporaryPassword
-            ? 'Share the temporary password with the user. They must change it on first login.'
-            : 'Admin will receive an email with login instructions.'}
-        </p>
-        {error && <div className="error-message">{error}</div>}
-      </form>
+        <div className="modal-body">
+          <p>
+            A temporary password has been generated for <strong>{name}</strong>
+            {username ? ` (${username})` : ''}. Provide this password to the user and
+            instruct them to change it at first login.
+          </p>
+          <div className="password-notice">
+            <label>Temporary Password</label>
+            <div className="password-value">{temporaryPassword}</div>
+          </div>
+          <p className="form-hint">
+            For compliance, record this password securely and avoid sending it over email.
+          </p>
+        </div>
+        <div className="modal-actions">
+          <button type="button" className="btn primary" onClick={onClose}>
+            I have recorded it
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

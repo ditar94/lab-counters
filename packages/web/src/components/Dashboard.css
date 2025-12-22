@@ -193,3 +193,66 @@
   text-transform: uppercase;
   margin-top: 0.25rem;
 }
+
+/* Overdue Alert Banner */
+.overdue-alert {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.overdue-alert .alert-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f59e0b;
+  color: white;
+  font-weight: bold;
+  font-size: 1.25rem;
+  border-radius: 50%;
+}
+
+.overdue-alert .alert-content {
+  flex: 1;
+}
+
+.overdue-alert .alert-content strong {
+  display: block;
+  color: #92400e;
+  margin-bottom: 0.25rem;
+}
+
+.overdue-alert .alert-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #78350f;
+}
+
+.overdue-alert .alert-content a {
+  color: #78350f;
+  font-weight: 500;
+}
+
+.overdue-alert .alert-action {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  background: #f59e0b;
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: background 0.15s ease;
+}
+
+.overdue-alert .alert-action:hover {
+  background: #d97706;
+  text-decoration: none;
+}

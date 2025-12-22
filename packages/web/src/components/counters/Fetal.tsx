@@ -12,6 +12,7 @@ export function Fetal() {
 
   // Specimen info
   const [specimenId, setSpecimenId] = useState('');
+  const [isQC, setIsQC] = useState(false);
 
   // 5 fields for RBC counts
   const [fields, setFields] = useState<number[]>([0, 0, 0, 0, 0]);
@@ -40,8 +41,8 @@ export function Fetal() {
 
         const record = await api.get<FetalRecord>(`/api/records/${id}`, token);
         setSpecimenId(record.specimenId);
-        setFields(record.data.fields);
-        setFetalCellCount(record.data.fetalCellCount);
+        setFields(record.rawTallies.fields);
+        setFetalCellCount(record.rawTallies.fetalCellCount);
       } catch (err) {
         console.error('Failed to load record:', err);
         setError('Failed to load record');
@@ -160,7 +161,7 @@ export function Fetal() {
       const token = await getToken();
       if (!token) throw new Error('Not authenticated');
 
-      const data: FetalData = {
+      const rawTallies: FetalData = {
         fields,
         fetalCellCount,
       };
@@ -168,15 +169,18 @@ export function Fetal() {
       let recordId = id;
 
       if (id) {
-        await api.patch(`/api/records/${id}`, { data }, token);
+        await api.patch(`/api/records/${id}`, { rawTallies }, token);
       } else {
         const record = await api.post<FetalRecord>(
           '/api/records',
           {
             type: 'fetal',
             specimenId: specimenId.trim(),
-            specimenType: 'other',
-            data,
+            fluidType: 'other',
+            dilution: 1,
+            squaresCounted: 1,
+            isQC,
+            rawTallies,
           },
           token
         );
@@ -216,6 +220,16 @@ export function Fetal() {
               onChange={(e) => setSpecimenId(e.target.value)}
               placeholder="Enter specimen ID"
             />
+          </div>
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={isQC}
+                onChange={(e) => setIsQC(e.target.checked)}
+              />
+              QC Sample (no verification required)
+            </label>
           </div>
         </div>
       </header>
@@ -402,7 +416,7 @@ export function Fetal() {
           disabled={saving || !canSubmit}
           title={!canSubmit ? 'Count RBCs in at least one field to submit' : ''}
         >
-          Submit for Verification
+          {isQC ? 'Submit' : 'Submit for Verification'}
         </button>
       </div>
     </div>

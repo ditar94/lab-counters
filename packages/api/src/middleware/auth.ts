@@ -97,6 +97,34 @@ function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
   });
 }
 
+function checkOrgSiteAccess(
+  user: User & { organization?: { status?: string } | null; site?: { status?: string } | null },
+  req: Request
+): { ok: boolean; code?: string; message?: string } {
+  if (user.role === 'superadmin') {
+    return { ok: true };
+  }
+
+  const isAuthRoute = req.baseUrl === '/api/auth';
+  const allowInactiveSite = isAuthRoute && (req.path === '/me' || req.path === '/switch-site');
+
+  const orgStatus = user.organization?.status;
+  if (orgStatus && orgStatus !== 'active') {
+    return { ok: false, code: 'ORG_INACTIVE', message: 'Organization access is not active' };
+  }
+
+  if (!user.siteId) {
+    return { ok: false, code: 'NO_SITE', message: 'No site assigned for this user' };
+  }
+
+  const siteStatus = user.site?.status;
+  if (siteStatus && siteStatus !== 'active' && !allowInactiveSite) {
+    return { ok: false, code: 'SITE_INACTIVE', message: 'Site access is not active' };
+  }
+
+  return { ok: true };
+}
+
 export async function authenticate(
   req: Request,
   res: Response,
@@ -128,9 +156,17 @@ export async function authenticate(
 
       const devUser = await prisma.user.findFirst({
         where: { cognitoId, status: 'active' },
-        include: { organization: true, site: true },
+        include: {
+          organization: { select: { status: true } },
+          site: { select: { status: true } },
+        },
       });
       if (devUser) {
+        const access = checkOrgSiteAccess(devUser as unknown as User & { organization?: { status?: string }; site?: { status?: string } }, req);
+        if (!access.ok) {
+          res.status(403).json({ code: access.code, message: access.message });
+          return;
+        }
         req.user = devUser as unknown as User;
         req.cognitoSub = devUser.cognitoId;
         logAuthEvent('AUTH_SUCCESS', req, { userId: devUser.id, email: devUser.email, dev: true });
@@ -176,6 +212,10 @@ export async function authenticate(
     // Look up user in database
     let user = await prisma.user.findUnique({
       where: { cognitoId: cognitoSub },
+      include: {
+        organization: { select: { status: true } },
+        site: { select: { status: true } },
+      },
     });
 
     if (!user) {
@@ -204,6 +244,12 @@ export async function authenticate(
     if (user.status !== 'active') {
       logAuthEvent('USER_INACTIVE', req, { userId: user.id, status: user.status });
       res.status(403).json({ code: 'USER_INACTIVE', message: 'User account is not active' });
+      return;
+    }
+
+    const access = checkOrgSiteAccess(user as unknown as User & { organization?: { status?: string }; site?: { status?: string } }, req);
+    if (!access.ok) {
+      res.status(403).json({ code: access.code, message: access.message });
       return;
     }
 
@@ -269,6 +315,11 @@ export function enforceOrgScope(
   // Superadmins bypass org scoping - they can access all orgs
   if (req.user.role === 'superadmin') {
     next();
+    return;
+  }
+
+  if (!req.user.siteId) {
+    res.status(403).json({ code: 'NO_SITE', message: 'No site assigned for this user' });
     return;
   }
 

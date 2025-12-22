@@ -10,13 +10,16 @@ export type SiteStatus = 'active' | 'inactive' | 'archived';
 export type CountRecordType = 'hemocytometer' | 'fetal' | 'retic' | 'parasite';
 export type RecordStatus = 'draft' | 'pending_verification' | 'verified' | 'corrected';
 
-export type SpecimenType =
+export type FluidType =
   | 'csf'
   | 'synovial'
   | 'pleural'
   | 'peritoneal'
   | 'pericardial'
   | 'other';
+
+// Back-compat alias (will be removed once all callers migrate).
+export type SpecimenType = FluidType;
 
 // ============================================
 // Organization & Site
@@ -66,7 +69,7 @@ export interface User {
   email: string;
   name: string;
   orgId: string;
-  siteId: string; // Current active site
+  siteId?: string; // Current active site
   role: UserRole;
   status: UserStatus;
   createdAt: Date;
@@ -83,7 +86,7 @@ export interface UserSite {
 
 export interface UserWithOrg extends User {
   organization: Organization;
-  site: Site; // Current active site details
+  site?: Site; // Current active site details
   sites?: UserSite[]; // All sites user can access
 }
 
@@ -91,20 +94,28 @@ export interface UserWithOrg extends User {
 // Count Records
 // ============================================
 
-export interface CountRecordBase {
+export interface ManualCountRecordBase {
   id: string;
   orgId: string;
   siteId: string;
   type: CountRecordType;
   specimenId: string;
-  specimenType: SpecimenType;
+  fluidType: FluidType;
+  dilution: number;
+  squaresCounted: number;
+  isQC: boolean;
   status: RecordStatus;
-  createdBy: string;
+  rawTallies: Record<string, unknown>;
+  calculations: Record<string, unknown>;
+  performedById: string;
+  performedAt: Date;
+  verifiedById?: string;
+  verifiedAt?: Date;
+  version: number;
+  parentRecordId?: string;
+  correctionReason?: string;
   createdAt: Date;
   updatedAt: Date;
-  verifiedBy?: string;
-  verifiedAt?: Date;
-  isImmutable: boolean;
 }
 
 // ============================================
@@ -144,9 +155,9 @@ export interface HemocytometerCalculations {
   tncWithinTolerance: boolean;
 }
 
-export interface HemocytometerRecord extends CountRecordBase {
+export interface HemocytometerRecord extends Omit<ManualCountRecordBase, 'rawTallies' | 'calculations' | 'type'> {
   type: 'hemocytometer';
-  data: HemocytometerData;
+  rawTallies: HemocytometerData;
   calculations: HemocytometerCalculations;
 }
 
@@ -166,9 +177,9 @@ export interface FetalCalculations {
   percentFetal: number;
 }
 
-export interface FetalRecord extends CountRecordBase {
+export interface FetalRecord extends Omit<ManualCountRecordBase, 'rawTallies' | 'calculations' | 'type'> {
   type: 'fetal';
-  data: FetalData;
+  rawTallies: FetalData;
   calculations: FetalCalculations;
 }
 
@@ -185,9 +196,9 @@ export interface ReticCalculations {
   percentRetic: number;
 }
 
-export interface ReticRecord extends CountRecordBase {
+export interface ReticRecord extends Omit<ManualCountRecordBase, 'rawTallies' | 'calculations' | 'type'> {
   type: 'retic';
-  data: ReticData;
+  rawTallies: ReticData;
   calculations: ReticCalculations;
 }
 
@@ -204,9 +215,9 @@ export interface ParasiteCalculations {
   percentParasitemia: number;
 }
 
-export interface ParasiteRecord extends CountRecordBase {
+export interface ParasiteRecord extends Omit<ManualCountRecordBase, 'rawTallies' | 'calculations' | 'type'> {
   type: 'parasite';
-  data: ParasiteData;
+  rawTallies: ParasiteData;
   calculations: ParasiteCalculations;
 }
 
@@ -214,44 +225,25 @@ export interface ParasiteRecord extends CountRecordBase {
 // Union Type for All Records
 // ============================================
 
-export type CountRecord =
+export type ManualCountRecord =
   | HemocytometerRecord
   | FetalRecord
   | ReticRecord
   | ParasiteRecord;
 
 // ============================================
-// Corrections
-// ============================================
-
-export interface Correction {
-  id: string;
-  parentRecordId: string;
-  reason: string;
-  data: CountRecord['data'];
-  calculations: CountRecord['calculations'];
-  createdBy: string;
-  createdAt: Date;
-}
-
-// ============================================
 // Audit Log
 // ============================================
 
-export type AuditAction = 'create' | 'update' | 'delete' | 'verify' | 'correct';
-
-export interface AuditLogEntry {
+export interface AuditEvent {
   id: string;
   orgId: string;
-  tableName: string;
-  recordId: string;
-  action: AuditAction;
-  oldValues?: Record<string, unknown>;
-  newValues?: Record<string, unknown>;
-  userId: string;
-  timestamp: Date;
-  ipAddress?: string;
-  userAgent?: string;
+  actorUserId: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  metadata: Record<string, unknown>;
+  createdAt: Date;
 }
 
 // ============================================
@@ -285,12 +277,14 @@ export interface AuthTokens {
 export interface CreateRecordRequest {
   type: CountRecordType;
   specimenId: string;
-  specimenType: SpecimenType;
-  data: CountRecord['data'];
+  fluidType: FluidType;
+  dilution: number;
+  squaresCounted: number;
+  rawTallies: ManualCountRecord['rawTallies'];
 }
 
 export interface UpdateRecordRequest {
-  data?: CountRecord['data'];
+  rawTallies?: ManualCountRecord['rawTallies'];
   status?: RecordStatus;
 }
 
@@ -300,5 +294,21 @@ export interface VerifyRecordRequest {
 
 export interface CreateCorrectionRequest {
   reason: string;
-  data: CountRecord['data'];
+  rawTallies: ManualCountRecord['rawTallies'];
+}
+
+export interface ResetPasswordRequest {
+  temporaryPassword?: string;
+  generateTemporaryPassword?: boolean;
+}
+
+export interface CreateUserRequest {
+  username?: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  siteId: string;
+  siteIds?: string[];
+  temporaryPassword?: string;
+  generateTemporaryPassword?: boolean;
 }

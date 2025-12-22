@@ -11,7 +11,7 @@ export const OrgStatusSchema = z.enum(['active', 'inactive', 'archived']);
 export const SiteStatusSchema = z.enum(['active', 'inactive', 'archived']);
 export const CountRecordTypeSchema = z.enum(['hemocytometer', 'fetal', 'retic', 'parasite']);
 export const RecordStatusSchema = z.enum(['draft', 'pending_verification', 'verified', 'corrected']);
-export const SpecimenTypeSchema = z.enum(['csf', 'synovial', 'pleural', 'peritoneal', 'pericardial', 'other']);
+export const FluidTypeSchema = z.enum(['csf', 'synovial', 'pleural', 'peritoneal', 'pericardial', 'other']);
 
 // ============================================
 // Hemocytometer Schemas
@@ -84,12 +84,15 @@ export const CountRecordDataSchema = z.union([
 export const CreateRecordRequestSchema = z.object({
   type: CountRecordTypeSchema,
   specimenId: z.string().min(1).max(100),
-  specimenType: SpecimenTypeSchema,
-  data: CountRecordDataSchema,
+  fluidType: FluidTypeSchema,
+  dilution: z.number().min(0.1).max(1000),
+  squaresCounted: z.number().min(0.1).max(1000),
+  isQC: z.boolean().optional().default(false), // QC samples auto-verify on submit
+  rawTallies: CountRecordDataSchema,
 });
 
 export const UpdateRecordRequestSchema = z.object({
-  data: CountRecordDataSchema.optional(),
+  rawTallies: CountRecordDataSchema.optional(),
   status: RecordStatusSchema.optional(),
 });
 
@@ -99,7 +102,12 @@ export const VerifyRecordRequestSchema = z.object({
 
 export const CreateCorrectionRequestSchema = z.object({
   reason: z.string().min(1).max(500),
-  data: CountRecordDataSchema,
+  rawTallies: CountRecordDataSchema,
+});
+
+export const ResetPasswordRequestSchema = z.object({
+  temporaryPassword: z.string().min(8).max(50).optional(),
+  generateTemporaryPassword: z.boolean().optional(),
 });
 
 // ============================================
@@ -117,8 +125,10 @@ export const RecordFilterSchema = PaginationQuerySchema.extend({
   specimenId: z.string().optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
-  createdBy: z.string().uuid().optional(),
-  siteId: z.string().uuid().optional(),
+  performedBy: z.string().uuid().optional(),
+  siteId: z.string().min(1).optional(),
+  month: z.coerce.number().min(1).max(12).optional(),
+  year: z.coerce.number().min(2000).max(2100).optional(),
 });
 
 // ============================================
@@ -126,20 +136,21 @@ export const RecordFilterSchema = PaginationQuerySchema.extend({
 // ============================================
 
 export const CreateUserRequestSchema = z.object({
-  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, 'Username must be alphanumeric with underscores or hyphens'),
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, 'Username must be alphanumeric with underscores or hyphens').optional(),
   email: z.string().email(),
   name: z.string().min(1).max(100),
   role: OrgUserRoleSchema,
-  siteId: z.string().uuid(), // Primary/current site
-  siteIds: z.array(z.string().uuid()).min(1).optional(), // All assigned sites (if not provided, uses siteId)
+  siteId: z.string().min(1), // Primary/current site
+  siteIds: z.array(z.string().min(1)).min(1).optional(), // All assigned sites (if not provided, uses siteId)
   temporaryPassword: z.string().min(8).max(50).optional(),
+  generateTemporaryPassword: z.boolean().optional(),
 });
 
 export const UpdateUserRequestSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   role: OrgUserRoleSchema.optional(),
-  siteId: z.string().uuid().optional(), // Change current site
-  siteIds: z.array(z.string().uuid()).min(1).optional(), // Update assigned sites
+  siteId: z.string().min(1).optional(), // Change current site
+  siteIds: z.array(z.string().min(1)).min(1).optional(), // Update assigned sites
   status: UserStatusSchema.optional(),
 });
 
@@ -190,9 +201,11 @@ export const UpdateSiteSchema = z.object({
 // ============================================
 
 export const CreateOrgAdminSchema = z.object({
-  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, 'Username must be alphanumeric with underscores or hyphens'),
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, 'Username must be alphanumeric with underscores or hyphens').optional(),
   email: z.string().email(),
   name: z.string().min(1).max(100),
-  siteId: z.string().uuid(),
+  siteId: z.string().min(1),
+  siteIds: z.array(z.string().min(1)).min(1).optional(),
   temporaryPassword: z.string().min(8).max(50).optional(),
+  generateTemporaryPassword: z.boolean().optional(),
 });

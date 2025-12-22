@@ -30,10 +30,11 @@ model Organization {
   updatedAt  DateTime  @updatedAt @map("updated_at")
   archivedAt DateTime? @map("archived_at")
 
-  sites        Site[]
-  users        User[]
-  countRecords CountRecord[]
-  auditLogs    AuditLog[]
+  sites          Site[]
+  users          User[]
+  countRecords   ManualCountRecord[]
+  monthlyReviews MonthlyReview[]
+  auditEvents    AuditEvent[]
 
   @@map("organizations")
 }
@@ -55,10 +56,11 @@ model Site {
   updatedAt  DateTime   @updatedAt @map("updated_at")
   archivedAt DateTime?  @map("archived_at")
 
-  organization Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  users        User[]         // Users with this as their current site
-  userSites    UserSite[]     // All users assigned to this site
-  countRecords CountRecord[]
+  organization   Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  users          User[]         // Users with this as their current site
+  userSites      UserSite[]     // All users assigned to this site
+  countRecords   ManualCountRecord[]
+  monthlyReviews MonthlyReview[]
 
   @@map("sites")
 }
@@ -89,20 +91,20 @@ model User {
   email         String
   name          String
   orgId         String     @map("org_id")
-  siteId        String     @map("site_id") // Current active site
+  siteId        String?    @map("site_id") // Current active site
   role          UserRole   @default(technologist)
   status        UserStatus @default(pending)
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
   archivedAt    DateTime?  @map("archived_at")
 
-  organization    Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  site            Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  sites           UserSite[]    // All sites user can access
-  createdRecords  CountRecord[] @relation("CreatedBy")
-  verifiedRecords CountRecord[] @relation("VerifiedBy")
-  corrections     Correction[]
-  auditLogs       AuditLog[]
+  organization     Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  site             Site?         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  sites            UserSite[]    // All sites user can access
+  performedRecords ManualCountRecord[] @relation("PerformedBy")
+  verifiedRecords  ManualCountRecord[] @relation("VerifiedBy")
+  monthlyReviews   MonthlyReview[]
+  auditEvents      AuditEvent[]
 
   @@unique([orgId, email])
   @@map("users")
@@ -140,29 +142,37 @@ enum RecordStatus {
   corrected
 }
 
-model CountRecord {
-  id           String          @id @default(uuid())
-  orgId        String          @map("org_id")
-  siteId       String          @map("site_id")
-  type         CountRecordType
-  specimenId   String          @map("specimen_id")
-  specimenType String          @map("specimen_type")
-  status       RecordStatus    @default(draft)
-  data         Json
-  calculations Json
-  createdById  String          @map("created_by_id")
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt @map("updated_at")
-  verifiedById String?         @map("verified_by_id")
-  verifiedAt   DateTime?       @map("verified_at")
-  isImmutable  Boolean         @default(false) @map("is_immutable")
+model ManualCountRecord {
+  id              String          @id @default(uuid())
+  orgId           String          @map("org_id")
+  siteId          String          @map("site_id")
+  type            CountRecordType
+  specimenId      String          @map("specimen_id")
+  fluidType       String          @map("fluid_type")
+  dilution        Float           @default(1)
+  squaresCounted  Float           @default(1) @map("squares_counted")
+  isQC            Boolean         @default(false) @map("is_qc") // QC samples auto-verify
+  status          RecordStatus    @default(draft)
+  rawTallies      Json            @map("raw_tallies")
+  calculations    Json
+  performedById   String          @map("performed_by_id")
+  performedAt     DateTime        @default(now()) @map("performed_at")
+  verifiedById    String?         @map("verified_by_id")
+  verifiedAt      DateTime?       @map("verified_at")
+  version         Int             @default(1)
+  parentRecordId  String?         @map("parent_record_id")
+  correctionReason String?        @map("correction_reason")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
 
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  site         Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  createdBy    User         @relation("CreatedBy", fields: [createdById], references: [id])
-  verifiedBy   User?        @relation("VerifiedBy", fields: [verifiedById], references: [id])
-  corrections  Correction[]
+  organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  site         Site             @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  performedBy  User             @relation("PerformedBy", fields: [performedById], references: [id])
+  verifiedBy   User?            @relation("VerifiedBy", fields: [verifiedById], references: [id])
+  parentRecord ManualCountRecord? @relation("RecordVersions", fields: [parentRecordId], references: [id])
+  versions     ManualCountRecord[] @relation("RecordVersions")
 
+  @@index([orgId, siteId, status, createdAt])
   @@index([orgId, siteId])
   @@index([specimenId])
   @@index([status])
@@ -171,53 +181,48 @@ model CountRecord {
 }
 
 // ============================================
-// Corrections
+// Monthly Review (CAP Compliance)
 // ============================================
 
-model Correction {
-  id             String   @id @default(uuid())
-  parentRecordId String   @map("parent_record_id")
-  reason         String
-  data           Json
-  calculations   Json
-  createdById    String   @map("created_by_id")
-  createdAt      DateTime @default(now()) @map("created_at")
+model MonthlyReview {
+  id           String   @id @default(uuid())
+  orgId        String   @map("org_id")
+  siteId       String   @map("site_id")
+  year         Int
+  month        Int      // 1-12
+  reviewedById String   @map("reviewed_by_id")
+  reviewedAt   DateTime @default(now()) @map("reviewed_at")
+  notes        String?
+  stats        Json     // Snapshot of record counts at time of review
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  parentRecord CountRecord @relation(fields: [parentRecordId], references: [id], onDelete: Cascade)
-  createdBy    User        @relation(fields: [createdById], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  site         Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  reviewedBy   User         @relation(fields: [reviewedById], references: [id])
 
-  @@map("corrections")
+  @@unique([orgId, siteId, year, month])
+  @@index([orgId, siteId])
+  @@map("monthly_reviews")
 }
 
 // ============================================
 // Audit Log
 // ============================================
 
-enum AuditAction {
-  create
-  update
-  delete
-  verify
-  correct
-}
-
-model AuditLog {
-  id        String      @id @default(uuid())
-  orgId     String      @map("org_id")
-  tableName String      @map("table_name")
-  recordId  String      @map("record_id")
-  action    AuditAction
-  oldValues Json?       @map("old_values")
-  newValues Json?       @map("new_values")
-  userId    String      @map("user_id")
-  timestamp DateTime    @default(now())
-  ipAddress String?     @map("ip_address")
-  userAgent String?     @map("user_agent")
+model AuditEvent {
+  id          String   @id @default(uuid())
+  orgId       String   @map("org_id")
+  actorUserId String   @map("actor_user_id")
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
 
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id])
+  actor        User         @relation(fields: [actorUserId], references: [id])
 
-  @@index([orgId, tableName, recordId])
-  @@index([timestamp])
+  @@index([orgId, entityType, entityId])
+  @@index([createdAt])
   @@map("audit_logs")
 }

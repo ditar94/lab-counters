@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';
-import type { CountRecord, PaginatedResponse } from '@lab-counters/shared';
+import type { ManualCountRecord, PaginatedResponse } from '@lab-counters/shared';
 import './Dashboard.css';
 
 interface OrgSummary {
@@ -11,14 +11,30 @@ interface OrgSummary {
   _count: { users: number; sites: number };
 }
 
+interface OverdueRecord {
+  id: string;
+  specimenId: string;
+  type: string;
+  performedAt: string;
+  site: { id: string; name: string };
+  performedBy: { id: string; name: string };
+}
+
+interface OverdueResponse {
+  count: number;
+  records: OverdueRecord[];
+}
+
 export function Dashboard() {
   const { user, getToken } = useAuth();
-  const [recentRecords, setRecentRecords] = useState<CountRecord[]>([]);
+  const [recentRecords, setRecentRecords] = useState<ManualCountRecord[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [overdueRecords, setOverdueRecords] = useState<OverdueRecord[]>([]);
   const [organizations, setOrganizations] = useState<OrgSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   const isSuperadmin = user?.role === 'superadmin';
+  const canSeeOverdue = user?.role === 'supervisor' || user?.role === 'admin';
 
   useEffect(() => {
     async function fetchData() {
@@ -32,13 +48,27 @@ export function Dashboard() {
           setOrganizations(orgs);
         } else {
           // Regular users see records
-          const [records, pending] = await Promise.all([
-            api.get<PaginatedResponse<CountRecord>>('/api/records?pageSize=5', token),
-            api.get<PaginatedResponse<CountRecord>>('/api/records?status=pending_verification&pageSize=1', token),
-          ]);
+          const promises: Promise<unknown>[] = [
+            api.get<PaginatedResponse<ManualCountRecord>>('/api/records?pageSize=5', token),
+            api.get<PaginatedResponse<ManualCountRecord>>('/api/records?status=pending_verification&pageSize=1', token),
+          ];
+
+          // Supervisors/admins also get overdue alerts
+          if (canSeeOverdue) {
+            promises.push(api.get<OverdueResponse>('/api/records/alerts/overdue', token));
+          }
+
+          const results = await Promise.all(promises);
+          const records = results[0] as PaginatedResponse<ManualCountRecord>;
+          const pending = results[1] as PaginatedResponse<ManualCountRecord>;
 
           setRecentRecords(records.data);
           setPendingCount(pending.total);
+
+          if (canSeeOverdue && results[2]) {
+            const overdue = results[2] as OverdueResponse;
+            setOverdueRecords(overdue.records);
+          }
         }
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
@@ -48,7 +78,7 @@ export function Dashboard() {
     }
 
     fetchData();
-  }, [getToken, isSuperadmin]);
+  }, [getToken, isSuperadmin, canSeeOverdue]);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -101,6 +131,28 @@ export function Dashboard() {
   return (
     <div className="dashboard">
       <h1>Welcome, {user?.name}</h1>
+
+      {/* Overdue Alert Banner */}
+      {overdueRecords.length > 0 && (
+        <div className="overdue-alert">
+          <div className="alert-icon">!</div>
+          <div className="alert-content">
+            <strong>{overdueRecords.length} record(s) pending verification for over 24 hours</strong>
+            <p>
+              {overdueRecords.slice(0, 3).map((r, i) => (
+                <span key={r.id}>
+                  {i > 0 && ', '}
+                  <Link to={`/records/${r.id}`}>{r.specimenId}</Link>
+                </span>
+              ))}
+              {overdueRecords.length > 3 && ` and ${overdueRecords.length - 3} more`}
+            </p>
+          </div>
+          <Link to="/records?status=pending_verification" className="alert-action">
+            Review Now
+          </Link>
+        </div>
+      )}
 
       <div className="dashboard-grid">
         <div className="dashboard-card quick-actions">

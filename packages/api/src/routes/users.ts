@@ -2,8 +2,11 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { authenticate, authorize, enforceOrgScope } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
-import { createCognitoUser, CognitoError } from '../services/cognito';
-import { CreateUserRequestSchema, UpdateUserRequestSchema } from '@lab-counters/shared';
+import { createCognitoUser, CognitoError, disableCognitoUser, enableCognitoUser, resetCognitoUserPassword } from '../services/cognito';
+import { CreateUserRequestSchema, UpdateUserRequestSchema, ResetPasswordRequestSchema } from '@lab-counters/shared';
+import { auditLog } from '../services/audit';
+import { generateTemporaryPassword } from '../lib/passwords';
+import { buildUsernameBase, buildUsernameCandidate } from '../lib/usernames';
 
 export const usersRouter = Router();
 
@@ -119,37 +122,82 @@ usersRouter.post(
         throw new AppError(400, 'EMAIL_EXISTS', 'A user with this email already exists in this organization');
       }
 
-      // Check if username already exists
-      const existingUsername = await prisma.user.findFirst({
-        where: { username: body.username },
-      });
+      const baseUsername = buildUsernameBase(body.name);
+      let candidateUsername = body.username;
 
-      if (existingUsername) {
-        throw new AppError(400, 'USERNAME_EXISTS', 'A user with this username already exists');
+      if (!candidateUsername) {
+        let suffix = 0;
+        while (true) {
+          const possible = buildUsernameCandidate(baseUsername, suffix);
+          const existingUsername = await prisma.user.findFirst({
+            where: { username: possible },
+            select: { id: true },
+          });
+          if (!existingUsername) {
+            candidateUsername = possible;
+            break;
+          }
+          suffix += 1;
+        }
+      } else {
+        const existingUsername = await prisma.user.findFirst({
+          where: { username: candidateUsername },
+        });
+        if (existingUsername) {
+          throw new AppError(400, 'USERNAME_EXISTS', 'A user with this username already exists');
+        }
       }
+
+      const tempPassword = body.temporaryPassword || (body.generateTemporaryPassword ? generateTemporaryPassword() : undefined);
+      const suppressEmail = !!tempPassword;
 
       // Create user in Cognito first
       let cognitoResult;
-      try {
-        cognitoResult = await createCognitoUser({
-          username: body.username,
-          email: body.email,
-          name: body.name,
-          temporaryPassword: body.temporaryPassword,
-          suppressEmail: !!body.temporaryPassword,
-        });
-      } catch (error) {
-        if (error instanceof CognitoError) {
-          throw new AppError(400, error.code, error.message);
+      if (!candidateUsername) {
+        throw new AppError(400, 'INVALID_USERNAME', 'Unable to generate username');
+      }
+
+      let suffix = 0;
+      while (true) {
+        if (!body.username) {
+          const existingUsername = await prisma.user.findFirst({
+            where: { username: candidateUsername },
+            select: { id: true },
+          });
+          if (existingUsername) {
+            suffix += 1;
+            candidateUsername = buildUsernameCandidate(baseUsername, suffix);
+            continue;
+          }
         }
-        throw error;
+
+        try {
+          cognitoResult = await createCognitoUser({
+            username: candidateUsername,
+            email: body.email,
+            name: body.name,
+            temporaryPassword: tempPassword,
+            suppressEmail,
+          });
+          break;
+        } catch (error) {
+          if (!body.username && error instanceof CognitoError && error.code === 'USERNAME_EXISTS') {
+            suffix += 1;
+            candidateUsername = buildUsernameCandidate(baseUsername, suffix);
+            continue;
+          }
+          if (error instanceof CognitoError) {
+            throw new AppError(400, error.code, error.message);
+          }
+          throw error;
+        }
       }
 
       // Create user in database with Cognito ID and site assignments
       const user = await prisma.user.create({
         data: {
           cognitoId: cognitoResult.cognitoId,
-          username: body.username,
+          username: candidateUsername,
           email: body.email,
           name: body.name,
           orgId: req.user!.orgId,
@@ -169,7 +217,10 @@ usersRouter.post(
         },
       });
 
-      res.status(201).json(user);
+      res.status(201).json({
+        ...user,
+        ...(tempPassword ? { temporaryPassword: tempPassword } : {}),
+      });
     } catch (error) {
       next(error);
     }
@@ -204,6 +255,7 @@ usersRouter.patch('/:id', async (req: Request, res: Response, next: NextFunction
     }
 
     const updateData: Record<string, unknown> = {};
+    const statusChange = isAdmin && body.status && body.status !== existing.status;
 
     if (body.name) {
       updateData.name = body.name;
@@ -234,7 +286,7 @@ usersRouter.patch('/:id', async (req: Request, res: Response, next: NextFunction
         }
 
         // If not changing current siteId, ensure it's still in the list
-        if (!body.siteId && !body.siteIds.includes(existing.siteId)) {
+        if (!body.siteId && existing.siteId && !body.siteIds.includes(existing.siteId)) {
           throw new AppError(400, 'INVALID_SITE', 'Current site must remain in assigned sites');
         }
 
@@ -284,6 +336,18 @@ usersRouter.patch('/:id', async (req: Request, res: Response, next: NextFunction
       },
     });
 
+    if (statusChange && existing.username && process.env.NODE_ENV !== 'development') {
+      try {
+        if (body.status === 'inactive') {
+          await disableCognitoUser(existing.username);
+        } else if (body.status === 'active') {
+          await enableCognitoUser(existing.username);
+        }
+      } catch (err) {
+        console.warn('Failed to update Cognito user status:', err);
+      }
+    }
+
     res.json(user);
   } catch (error) {
     next(error);
@@ -318,7 +382,64 @@ usersRouter.delete(
         data: { status: 'inactive' },
       });
 
+      if (existing.username && process.env.NODE_ENV !== 'development') {
+        try {
+          await disableCognitoUser(existing.username);
+        } catch (err) {
+          console.warn('Failed to disable Cognito user:', err);
+        }
+      }
+
       res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Reset user password (admin only)
+usersRouter.post(
+  '/:id/reset-password',
+  authorize('admin'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const body = ResetPasswordRequestSchema.parse(req.body ?? {});
+
+      const existing = await prisma.user.findFirst({
+        where: {
+          id: req.params.id,
+          orgId: req.user!.orgId,
+        },
+      });
+
+      if (!existing) {
+        throw new AppError(404, 'NOT_FOUND', 'User not found');
+      }
+
+      if (existing.status === 'archived') {
+        throw new AppError(400, 'ARCHIVED', 'Cannot reset password for archived user');
+      }
+
+      const tempPassword = body.temporaryPassword || (body.generateTemporaryPassword ? generateTemporaryPassword() : undefined);
+
+      if (existing.username && process.env.NODE_ENV !== 'development') {
+        await resetCognitoUserPassword(existing.username, tempPassword);
+      }
+
+      await auditLog({
+        orgId: req.user!.orgId,
+        actorUserId: req.user!.id,
+        action: 'reset_password',
+        entityType: 'user',
+        entityId: existing.id,
+        metadata: { targetUserId: existing.id },
+        req,
+      });
+
+      res.json({
+        status: 'ok',
+        ...(tempPassword ? { temporaryPassword: tempPassword } : {}),
+      });
     } catch (error) {
       next(error);
     }
