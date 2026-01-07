@@ -450,3 +450,22 @@ input[type=text] {
   notbold {
     font-weight: lighter;
   }
+
+footer {
+    text-align: center;
+    padding: 20px 0; /* Optional: adds some breathing room */
+}
+
+#terms {
+    display: flex;
+    justify-content: center; /* This centers the list items */
+    list-style-type: none;
+    margin: 0;
+    padding: 0; /* Removes default indentation */
+}
+.terms-container {
+    border: 5px solid #1d70b8; /* Increased border width */
+    padding: 20px;
+    margin: 20px 4rem;
+    border-radius: 8px;
+}
