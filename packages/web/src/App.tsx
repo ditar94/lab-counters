@@ -9,6 +9,7 @@ import { Parasite } from './components/counters/Parasite';
 import { Fetal } from './components/counters/Fetal';
 import { RecordsList } from './components/records/RecordsList';
 import { RecordDetail } from './components/records/RecordDetail';
+import { AmendRecord } from './components/records/AmendRecord';
 import { MonthlyReview } from './components/reviews/MonthlyReview';
 import { Organizations } from './components/superadmin/Organizations';
 import { OrganizationDetail } from './components/superadmin/OrganizationDetail';
@@ -49,6 +50,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="records" element={<RecordsList />} />
         <Route path="records/:id" element={<RecordDetail />} />
+        <Route path="records/:id/amend" element={<AmendRecord />} />
         <Route path="count/hemocytometer" element={<Hemocytometer />} />
         <Route path="count/hemocytometer/:id" element={<Hemocytometer />} />
         <Route path="count/retic" element={<Retic />} />

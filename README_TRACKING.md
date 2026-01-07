@@ -235,6 +235,43 @@ Build a secure, multi-tenant web application that replaces manual hemocytometer 
 - Files: README_TRACKING.md, packages/api/prisma/migrations/20260101100000_add_status_fields/migration.sql, packages/api/prisma/migrations/20260101112000_add_username_to_users/migration.sql, packages/api/prisma/migrations/20260101112500_create_user_sites/migration.sql
 - Commands: `npx prisma migrate deploy`, `npm run db:seed`, `npm run generate`
 
+10) [DONE] Enhanced Verification UI & Dashboard Visibility
+- Requirements: Add legal attestation checkbox on verify screen ("I, {Verifier}, have reviewed..."). Add "Pending Verifications" list to dashboard. Add badges for records pending > X hours. Add "Verified By" and "Verified On" columns to record lists.
+- Files: README_TRACKING.md, packages/web/src/components/records/RecordDetail.tsx, packages/web/src/components/records/RecordsList.tsx, packages/web/src/components/records/Records.css, packages/web/src/components/Dashboard.tsx, packages/web/src/components/Dashboard.css
+- Commands: `npm run dev`
+
+11) [DONE] Data Export & Reporting Capabilities
+- Requirements: Ability to export records to CSV/Excel. Generate "Monthly Review" shorthand report (Date, Specimen ID, Squares counted TNC/RBC, Dilution (TNC/RBC), Performer/Time, Verifier/Time).
+- Files: README_TRACKING.md, packages/api/src/routes/export.ts, packages/api/src/index.ts, packages/web/src/api/client.ts, packages/web/src/components/records/RecordsList.tsx, packages/web/src/components/records/Records.css
+- Commands: `npm run build`
+
+12) [DONE] Formal Correction Workflow
+- Requirements: "Amend" action creates a new version of the record. Requires "Reason for Amendment". Requires new verifier attestation. UI must show version history/chain.
+- Files: README_TRACKING.md, packages/api/src/routes/records.ts, packages/web/src/components/records/RecordDetail.tsx, packages/web/src/components/records/AmendRecord.tsx, packages/web/src/components/records/Records.css, packages/web/src/App.tsx
+- Commands: `npm run build`
+
+13) [TODO] Advanced Counter Templating & Method Safety (Critical)
+- Requirements:
+  - Architecture: Separate Templates (Code/Schema/Formulas) from Parameters (Targets/Thresholds).
+  - Safety: Every record MUST store `methodTemplateId`, `methodVersion`, and `paramsSnapshot` (e.g., targetRBC=500) to ensure historical accuracy if defaults change.
+  - Config: Store Org defaults in `organization.methodConfigs`.
+  - UI: Superadmin selects/configures counters available to each Org.
+- Files: README_TRACKING.md
+- Commands: TBD
+
+14) [TODO] Enhanced Audit System (Traceability + Config Log)
+- Requirements:
+  - Record Traceability: Rely on record snapshots for "what method was used".
+  - Config Audit: Log Organization setting changes (e.g., "Org X changed targetRBC 500 -> 1000") to `AuditLog`.
+  - Access Control: Superadmin (Global), Org Admin (Local only).
+  - UI: Admin Audit page with filters (Time, Actor, Action, Target).
+- Files: README_TRACKING.md
+- Commands: TBD
+
+15) [TODO] Prevent records from being finalized if target count isn't met
+
+16) [TODO] When count data is amended, the specific parameters and amounts and any calculations changed as a result should be noted in the audit log
+
 ## How To Run Locally
 - Run: `npm run dev:local`
 - Notes: This script will copy env examples if missing, start Postgres via Docker, install deps, run Prisma generate/migrate, and start dev servers.

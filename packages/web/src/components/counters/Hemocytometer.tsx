@@ -42,7 +42,7 @@ const SQUARES_OPTIONS: { value: SquaresCounted; label: string }[] = [
 export function Hemocytometer() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
   const inputRef1 = useRef<HTMLInputElement>(null);
   const inputRef2 = useRef<HTMLInputElement>(null);
 
@@ -90,6 +90,7 @@ export function Hemocytometer() {
   const [showPrelim, setShowPrelim] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [performerAttestationChecked, setPerformerAttestationChecked] = useState(false);
 
   // When toggling to separate settings, copy shared to both
   useEffect(() => {
@@ -341,7 +342,8 @@ export function Hemocytometer() {
       }
 
       if (submit && recordId) {
-        await api.post(`/api/records/${recordId}/submit`, {}, token);
+        const performerAttestation = `I, ${user?.name}, attest to having performed this count, verified the results for accuracy, and entered the data into the LIS pending verification by a second person.`;
+        await api.post(`/api/records/${recordId}/submit`, { performerAttestation }, token);
       }
 
       navigate('/records');
@@ -355,7 +357,7 @@ export function Hemocytometer() {
 
   const calculations = calculate();
   const bothDone = side1.isDone && side2.isDone;
-  const canSubmit = bothDone && calculations.rbcWithinTolerance && calculations.tncWithinTolerance;
+  const canSubmit = bothDone && calculations.rbcWithinTolerance && calculations.tncWithinTolerance && (isQC || performerAttestationChecked);
   const { rbcSquares, rbcDilution, tncSquares, tncDilution } = getEffectiveSettings();
 
   return (
@@ -747,6 +749,22 @@ export function Hemocytometer() {
             </div>
             <p> ≈ {calculations.finalTnc}</p>
           </div>
+        </div>
+      )}
+
+      {/* Performer Attestation */}
+      {!isQC && bothDone && calculations.rbcWithinTolerance && calculations.tncWithinTolerance && (
+        <div className="attestation-section">
+          <label className="attestation-checkbox">
+            <input
+              type="checkbox"
+              checked={performerAttestationChecked}
+              onChange={(e) => setPerformerAttestationChecked(e.target.checked)}
+            />
+            <span>
+              I, <strong>{user?.name}</strong>, attest to having performed this count, verified the results for accuracy, and entered the data into the LIS pending verification by a second person.
+            </span>
+          </label>
         </div>
       )}
 

@@ -11,25 +11,32 @@ interface OrgSummary {
   _count: { users: number; sites: number };
 }
 
-interface OverdueRecord {
+// Record with relations included from API response
+type RecordWithRelations = ManualCountRecord & {
+  site?: { id: string; name: string };
+  performedBy?: { id: string; name: string };
+};
+
+interface PendingRecord {
   id: string;
   specimenId: string;
   type: string;
   performedAt: string;
   site: { id: string; name: string };
   performedBy: { id: string; name: string };
+  isOwnRecord?: boolean;
 }
 
 interface OverdueResponse {
   count: number;
-  records: OverdueRecord[];
+  records: PendingRecord[];
 }
 
 export function Dashboard() {
   const { user, getToken } = useAuth();
-  const [recentRecords, setRecentRecords] = useState<ManualCountRecord[]>([]);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [overdueRecords, setOverdueRecords] = useState<OverdueRecord[]>([]);
+  const [recentRecords, setRecentRecords] = useState<RecordWithRelations[]>([]);
+  const [pendingVerifications, setPendingVerifications] = useState<PendingRecord[]>([]);
+  const [overdueRecords, setOverdueRecords] = useState<PendingRecord[]>([]);
   const [organizations, setOrganizations] = useState<OrgSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,27 +54,35 @@ export function Dashboard() {
           const orgs = await api.get<OrgSummary[]>('/api/superadmin/organizations', token);
           setOrganizations(orgs);
         } else {
-          // Regular users see records
-          const promises: Promise<unknown>[] = [
-            api.get<PaginatedResponse<ManualCountRecord>>('/api/records?pageSize=5', token),
-            api.get<PaginatedResponse<ManualCountRecord>>('/api/records?status=pending_verification&pageSize=1', token),
-          ];
+          // Regular users see records - fetch all data in parallel
+          const [recentResponse, pendingListResponse] = await Promise.all([
+            api.get<PaginatedResponse<RecordWithRelations>>('/api/records?pageSize=5', token),
+            api.get<PaginatedResponse<RecordWithRelations>>('/api/records?status=pending_verification&pageSize=10', token),
+          ]);
 
-          // Supervisors/admins also get overdue alerts
+          setRecentRecords(recentResponse.data);
+
+          // Process pending verifications
+          const allPending = pendingListResponse.data.map((r) => ({
+            id: r.id,
+            specimenId: r.specimenId,
+            type: r.type,
+            performedAt: String(r.performedAt),
+            site: r.site || { id: '', name: '' },
+            performedBy: r.performedBy || { id: '', name: '' },
+            isOwnRecord: r.performedBy?.id === user?.id,
+          }));
+          setPendingVerifications(allPending);
+
+          // Fetch overdue alerts separately (only for supervisors/admins) - don't let failures break dashboard
           if (canSeeOverdue) {
-            promises.push(api.get<OverdueResponse>('/api/records/alerts/overdue', token));
-          }
-
-          const results = await Promise.all(promises);
-          const records = results[0] as PaginatedResponse<ManualCountRecord>;
-          const pending = results[1] as PaginatedResponse<ManualCountRecord>;
-
-          setRecentRecords(records.data);
-          setPendingCount(pending.total);
-
-          if (canSeeOverdue && results[2]) {
-            const overdue = results[2] as OverdueResponse;
-            setOverdueRecords(overdue.records);
+            try {
+              const overdue = await api.get<OverdueResponse>('/api/records/alerts/overdue', token);
+              setOverdueRecords(overdue.records);
+            } catch (err) {
+              console.error('Failed to fetch overdue alerts:', err);
+              // Don't break the dashboard if overdue alerts fail
+            }
           }
         }
       } catch (err) {
@@ -78,7 +93,7 @@ export function Dashboard() {
     }
 
     fetchData();
-  }, [getToken, isSuperadmin, canSeeOverdue]);
+  }, [getToken, isSuperadmin, canSeeOverdue, user?.id]);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -178,15 +193,49 @@ export function Dashboard() {
           </div>
         </div>
 
-        {(user?.role === 'supervisor' || user?.role === 'admin') && pendingCount > 0 && (
-          <div className="dashboard-card pending">
-            <h2>Pending Verification</h2>
-            <p className="pending-count">{pendingCount}</p>
-            <Link to="/records?status=pending_verification" className="view-link">
-              Review pending records
-            </Link>
-          </div>
-        )}
+        <div className="dashboard-card pending-verifications">
+          <h2>Pending Verifications</h2>
+          {pendingVerifications.length === 0 ? (
+            <p className="no-records">No records pending verification</p>
+          ) : (
+            <>
+              <p className="pending-subtitle">Records awaiting verification</p>
+              <ul className="verification-list">
+                {pendingVerifications.slice(0, 5).map((record) => {
+                  const hoursOld = Math.floor(
+                    (Date.now() - new Date(record.performedAt).getTime()) / (1000 * 60 * 60)
+                  );
+                  const isOverdue = hoursOld >= 24;
+                  return (
+                    <li key={record.id} className={record.isOwnRecord ? 'own-record' : ''}>
+                      <Link to={`/records/${record.id}`}>
+                        <div className="verification-item">
+                          <span className="specimen-id">{record.specimenId}</span>
+                          <span className="record-type">{record.type}</span>
+                          {record.isOwnRecord ? (
+                            <span className="own-record-badge">Yours</span>
+                          ) : (
+                            <span className="can-verify-badge">Verify</span>
+                          )}
+                          {isOverdue && <span className="overdue-badge">Overdue</span>}
+                        </div>
+                        <div className="verification-meta">
+                          <span>By {record.performedBy.name}</span>
+                          {record.site?.name && <span> • {record.site.name}</span>}
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {pendingVerifications.length > 5 && (
+                <Link to="/records?status=pending_verification" className="view-link">
+                  View all {pendingVerifications.length} pending
+                </Link>
+              )}
+            </>
+          )}
+        </div>
 
         <div className="dashboard-card recent">
           <h2>Recent Records</h2>

@@ -2,7 +2,22 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../api/client';
+import type {
+  CountRecordType,
+  HemocytometerMethodParams,
+  ReticMethodParams,
+  ParasiteMethodParams,
+} from '@lab-counters/shared';
 import './SuperAdmin.css';
+
+type MethodConfig = HemocytometerMethodParams | ReticMethodParams | ParasiteMethodParams | Record<string, never>;
+
+interface MethodConfigUI {
+  counterType: CountRecordType;
+  config: MethodConfig;
+  isCustomized: boolean;
+  version: number;
+}
 
 interface Site {
   id: string;
@@ -52,6 +67,8 @@ export function OrganizationDetail() {
     username?: string;
     temporaryPassword: string;
   } | null>(null);
+  const [methodConfigs, setMethodConfigs] = useState<MethodConfigUI[]>([]);
+  const [editingConfig, setEditingConfig] = useState<CountRecordType | null>(null);
 
   useEffect(() => {
     fetchOrganization();
@@ -264,11 +281,74 @@ export function OrganizationDetail() {
         token
       );
       setOrg(data);
+      // Also fetch method configs
+      fetchMethodConfigs();
     } catch (err) {
       console.error('Failed to fetch organization:', err);
       setError('Failed to load organization');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchMethodConfigs() {
+    if (!id) return;
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const configs = await api.get<MethodConfigUI[]>(
+        `/api/superadmin/organizations/${id}/method-config`,
+        token
+      );
+      setMethodConfigs(configs);
+    } catch (err) {
+      console.error('Failed to fetch method configs:', err);
+    }
+  }
+
+  async function handleMethodConfigUpdate(
+    counterType: CountRecordType,
+    config: MethodConfig
+  ) {
+    if (!id) return;
+    setActionLoading(`config-${counterType}`);
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      await api.put(
+        `/api/superadmin/organizations/${id}/method-config/${counterType}`,
+        config,
+        token
+      );
+      await fetchMethodConfigs();
+      setEditingConfig(null);
+    } catch (err) {
+      console.error('Failed to update method config:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update config');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleMethodConfigReset(counterType: CountRecordType) {
+    if (!id || !confirm(`Reset ${counterType} config to system defaults?`)) return;
+    setActionLoading(`config-${counterType}`);
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      await api.delete(
+        `/api/superadmin/organizations/${id}/method-config/${counterType}`,
+        token
+      );
+      await fetchMethodConfigs();
+    } catch (err) {
+      console.error('Failed to reset method config:', err);
+      setError(err instanceof Error ? err.message : 'Failed to reset config');
+    } finally {
+      setActionLoading(null);
     }
   }
 
@@ -614,6 +694,249 @@ export function OrganizationDetail() {
           </tbody>
         </table>
       </section>
+
+      {/* Method Config Section */}
+      <section className="detail-section">
+        <div className="section-header">
+          <h2>Method Configuration</h2>
+        </div>
+
+        <div className="method-config-grid">
+          {methodConfigs.map((mc) => (
+            <div
+              key={mc.counterType}
+              className={`config-card ${mc.isCustomized ? 'config-card-customized' : ''}`}
+            >
+              <div className="config-card-header">
+                <h3 className="config-title">{formatCounterType(mc.counterType)}</h3>
+                <span className={`config-badge ${mc.isCustomized ? 'customized' : 'default'}`}>
+                  {mc.isCustomized ? 'Customized' : 'Default'}
+                </span>
+              </div>
+
+              {editingConfig === mc.counterType ? (
+                <MethodConfigForm
+                  counterType={mc.counterType}
+                  config={mc.config}
+                  onSave={(config) => handleMethodConfigUpdate(mc.counterType, config)}
+                  onCancel={() => setEditingConfig(null)}
+                  saving={actionLoading === `config-${mc.counterType}`}
+                />
+              ) : (
+                <>
+                  <div className="config-params">
+                    <MethodParamsDisplay counterType={mc.counterType} config={mc.config} />
+                  </div>
+                  <div className="config-actions">
+                    <button
+                      className="btn secondary small"
+                      onClick={() => setEditingConfig(mc.counterType)}
+                    >
+                      Edit
+                    </button>
+                    {mc.isCustomized && (
+                      <button
+                        className="btn small"
+                        onClick={() => handleMethodConfigReset(mc.counterType)}
+                        disabled={actionLoading === `config-${mc.counterType}`}
+                      >
+                        Reset to Default
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+
+          {methodConfigs.length === 0 && (
+            <div className="empty-state small">
+              <p>Loading method configurations...</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function formatCounterType(type: CountRecordType): string {
+  const names: Record<CountRecordType, string> = {
+    hemocytometer: 'Hemocytometer',
+    fetal: 'Fetal Cell (KB Test)',
+    retic: 'Reticulocyte',
+    parasite: 'Parasite',
+  };
+  return names[type] || type;
+}
+
+function MethodParamsDisplay({
+  counterType,
+  config,
+}: {
+  counterType: CountRecordType;
+  config: MethodConfig;
+}) {
+  if (counterType === 'hemocytometer') {
+    const hc = config as HemocytometerMethodParams;
+    return (
+      <dl className="params-list">
+        <dt>Default Dilution</dt>
+        <dd>{hc.defaultDilution}</dd>
+        <dt>Default Squares</dt>
+        <dd>{hc.defaultSquaresCounted}</dd>
+        <dt>Tolerance %</dt>
+        <dd>{hc.tolerancePercent}%</dd>
+        <dt>Low Count Tolerance</dt>
+        <dd>{hc.lowCountTolerance}</dd>
+        <dt>Low Count Threshold</dt>
+        <dd>{hc.lowCountThreshold}</dd>
+      </dl>
+    );
+  }
+
+  if (counterType === 'retic' || counterType === 'parasite') {
+    const pc = config as ReticMethodParams;
+    return (
+      <dl className="params-list">
+        <dt>Target RBC Count</dt>
+        <dd>{pc.targetRbcCount}</dd>
+      </dl>
+    );
+  }
+
+  // Fetal has no params
+  return <p className="no-params">No configurable parameters</p>;
+}
+
+function MethodConfigForm({
+  counterType,
+  config,
+  onSave,
+  onCancel,
+  saving,
+}: {
+  counterType: CountRecordType;
+  config: MethodConfig;
+  onSave: (config: MethodConfig) => void;
+  onCancel: () => void;
+  saving: boolean;
+}) {
+  const [formData, setFormData] = useState(config);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData as MethodConfig);
+  };
+
+  if (counterType === 'hemocytometer') {
+    const hc = formData as HemocytometerMethodParams;
+    const updateHc = (field: keyof HemocytometerMethodParams, value: number) => {
+      setFormData({ ...hc, [field]: value } as HemocytometerMethodParams);
+    };
+    return (
+      <form onSubmit={handleSubmit} className="config-form">
+        <div className="form-group">
+          <label>Default Dilution</label>
+          <input
+            type="number"
+            min={1}
+            max={200}
+            value={hc.defaultDilution}
+            onChange={(e) => updateHc('defaultDilution', Number(e.target.value))}
+          />
+        </div>
+        <div className="form-group">
+          <label>Default Squares Counted</label>
+          <select
+            value={hc.defaultSquaresCounted}
+            onChange={(e) => updateHc('defaultSquaresCounted', Number(e.target.value) as 0.2 | 4 | 9)}
+          >
+            <option value={0.2}>0.2</option>
+            <option value={4}>4</option>
+            <option value={9}>9</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Tolerance %</label>
+          <input
+            type="number"
+            min={1}
+            max={100}
+            value={hc.tolerancePercent}
+            onChange={(e) => updateHc('tolerancePercent', Number(e.target.value))}
+          />
+        </div>
+        <div className="form-group">
+          <label>Low Count Tolerance</label>
+          <input
+            type="number"
+            min={1}
+            max={50}
+            value={hc.lowCountTolerance}
+            onChange={(e) => updateHc('lowCountTolerance', Number(e.target.value))}
+          />
+        </div>
+        <div className="form-group">
+          <label>Low Count Threshold</label>
+          <input
+            type="number"
+            min={1}
+            max={100}
+            value={hc.lowCountThreshold}
+            onChange={(e) => updateHc('lowCountThreshold', Number(e.target.value))}
+          />
+        </div>
+        <div className="form-actions">
+          <button type="button" className="btn secondary small" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="submit" className="btn primary small" disabled={saving}>
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  if (counterType === 'retic' || counterType === 'parasite') {
+    const pc = formData as ReticMethodParams;
+    const updatePc = (value: number) => {
+      setFormData({ targetRbcCount: value } as ReticMethodParams);
+    };
+    return (
+      <form onSubmit={handleSubmit} className="config-form">
+        <div className="form-group">
+          <label>Target RBC Count</label>
+          <input
+            type="number"
+            min={100}
+            max={10000}
+            value={pc.targetRbcCount}
+            onChange={(e) => updatePc(Number(e.target.value))}
+          />
+        </div>
+        <div className="form-actions">
+          <button type="button" className="btn secondary small" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="submit" className="btn primary small" disabled={saving}>
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  // Fetal has no params
+  return (
+    <div className="config-form">
+      <p className="no-params">No configurable parameters for this counter type.</p>
+      <div className="form-actions">
+        <button type="button" className="btn secondary small" onClick={onCancel}>
+          Close
+        </button>
+      </div>
     </div>
   );
 }

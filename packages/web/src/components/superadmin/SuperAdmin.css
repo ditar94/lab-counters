@@ -586,6 +586,120 @@
   font-size: 0.75rem;
 }
 
+/* Method Config Section */
+.method-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.config-card {
+  background: var(--color-gray-50);
+  border-radius: var(--radius);
+  padding: 1rem;
+  border: 1px solid var(--color-gray-200);
+}
+
+.config-card-customized {
+  border-left: 3px solid var(--color-primary);
+}
+
+.config-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.config-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.config-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.config-badge.default {
+  background: var(--color-gray-200);
+  color: var(--color-gray-600);
+}
+
+.config-badge.customized {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary);
+}
+
+.config-params {
+  margin-bottom: 0.75rem;
+}
+
+.params-list {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.params-list dt {
+  color: var(--color-gray-500);
+}
+
+.params-list dd {
+  margin: 0;
+  font-weight: 500;
+  text-align: right;
+}
+
+.no-params {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  font-style: italic;
+}
+
+.config-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.config-form {
+  padding-top: 0.5rem;
+}
+
+.config-form .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.config-form .form-group label {
+  font-size: 0.75rem;
+}
+
+.config-form .form-group input,
+.config-form .form-group select {
+  padding: 0.5rem 0.625rem;
+  font-size: 0.875rem;
+}
+
+.config-form .form-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-gray-200);
+  margin-top: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .page-header {
@@ -603,5 +717,9 @@
 
   .inline-form .form-group {
     width: 100%;
+  }
+
+  .method-config-grid {
+    grid-template-columns: 1fr;
   }
 }

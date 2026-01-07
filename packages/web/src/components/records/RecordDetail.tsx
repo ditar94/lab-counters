@@ -17,6 +17,10 @@ import type {
   FetalRecord,
   FetalData,
   FetalCalculations,
+  ParamsSnapshot,
+  MethodParams,
+  HemocytometerMethodParams,
+  ReticMethodParams,
 } from '@lab-counters/shared';
 import './Records.css';
 
@@ -29,10 +33,40 @@ interface RecordWithRelations {
   rawTallies: HemocytometerData | unknown;
   calculations: HemocytometerCalculations | unknown;
   performedAt: Date | string;
+  performerAttestation?: string;
+  performerAttestedAt?: Date | string;
   verifiedAt?: Date | string;
+  verifierAttestation?: string;
+  performedById: string;
   performedBy: { id: string; name: string; email: string };
   verifiedBy?: { id: string; name: string; email: string };
   site?: { id: string; name: string };
+  methodVersion?: string;
+  paramsSnapshot?: ParamsSnapshot;
+  version?: number;
+  parentRecordId?: string;
+  correctionReason?: string;
+}
+
+interface AuditChange {
+  before: unknown;
+  after: unknown;
+}
+
+interface AuditEvent {
+  id: string;
+  action: string;
+  createdAt: string;
+  actor: { id: string; name: string } | null;
+  metadata: {
+    correctionReason?: string;
+    changes?: Record<string, AuditChange>;
+    changedFields?: string[];
+  };
+}
+
+interface AuditLogResponse {
+  events: AuditEvent[];
 }
 
 export function RecordDetail() {
@@ -43,6 +77,8 @@ export function RecordDetail() {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attestationChecked, setAttestationChecked] = useState(false);
+  const [auditLog, setAuditLog] = useState<AuditEvent[]>([]);
 
   useEffect(() => {
     async function fetchRecord() {
@@ -54,6 +90,14 @@ export function RecordDetail() {
 
         const data = await api.get<RecordWithRelations>(`/api/records/${id}`, token);
         setRecord(data);
+
+        // Fetch audit log for amendment history
+        try {
+          const auditData = await api.get<AuditLogResponse>(`/api/records/${id}/audit`, token);
+          setAuditLog(auditData.events);
+        } catch {
+          // Ignore errors fetching audit log
+        }
       } catch (err) {
         console.error('Failed to fetch record:', err);
         setError('Failed to load record');
@@ -75,7 +119,10 @@ export function RecordDetail() {
       const token = await getToken();
       if (!token) throw new Error('Not authenticated');
 
-      await api.post(`/api/records/${id}/verify`, {}, token);
+      // Construct the verifier attestation statement
+      const verifierAttestation = `I, ${user?.name}, attest that I have reviewed the count performed by ${record.performedBy.name} and confirmed the results are correctly entered in the LIS.`;
+
+      await api.post(`/api/records/${id}/verify`, { verifierAttestation }, token);
       navigate('/records');
     } catch (err) {
       console.error('Verify error:', err);
@@ -87,6 +134,50 @@ export function RecordDetail() {
 
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleString();
+  };
+
+  const formatAuditAction = (action: string): string => {
+    const actionMap: Record<string, string> = {
+      'create': 'Record Created',
+      'update': 'Record Updated',
+      'submit': 'Submitted for Verification',
+      'verify': 'Record Verified',
+      'amend': 'Record Amended',
+    };
+    return actionMap[action] || action.replace(/_/g, ' ');
+  };
+
+  const formatFieldName = (field: string): string => {
+    const fieldMap: Record<string, string> = {
+      'rawTallies': 'Count Data',
+      'calculations': 'Calculations',
+      'specimenId': 'Specimen ID',
+      'performedAt': 'Performed Date/Time',
+    };
+    return fieldMap[field] || field;
+  };
+
+  const formatChangeValue = (field: string, value: unknown): string => {
+    if (value === null || value === undefined) return 'N/A';
+    if (field === 'performedAt') {
+      return formatDate(value as string | Date);
+    }
+    if (field === 'rawTallies') {
+      return 'Count data';
+    }
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
+  const formatChangeDescription = (field: string, change: AuditChange): string => {
+    if (field === 'rawTallies') {
+      return 'Count data was modified';
+    }
+    const beforeStr = formatChangeValue(field, change.before);
+    const afterStr = formatChangeValue(field, change.after);
+    return `${formatFieldName(field)} changed from "${beforeStr}" to "${afterStr}"`;
   };
 
   if (loading) {
@@ -104,6 +195,11 @@ export function RecordDetail() {
 
   const canEdit = record.status === 'draft';
 
+  // Can amend verified or corrected records: supervisors/admins can amend any, technologists can amend their own
+  const isOwnRecord = record.performedById === user?.id;
+  const isSupervisorOrAdmin = user?.role === 'supervisor' || user?.role === 'admin';
+  const canAmend = (record.status === 'verified' || record.status === 'corrected') && (isSupervisorOrAdmin || isOwnRecord);
+
   return (
     <div className="record-detail">
       <header className="page-header">
@@ -120,6 +216,11 @@ export function RecordDetail() {
           {canEdit && (
             <Link to={`/count/${record.type}/${record.id}`} className="btn primary">
               Edit
+            </Link>
+          )}
+          {canAmend && (
+            <Link to={`/records/${record.id}/amend`} className="btn warning">
+              Amend Record
             </Link>
           )}
         </div>
@@ -158,6 +259,15 @@ export function RecordDetail() {
         </div>
       </div>
 
+      {/* Correction Reason (for amended records) */}
+      {record.correctionReason && (
+        <div className="correction-reason-section">
+          <h2>Amendment Reason</h2>
+          <p className="correction-reason-text">{record.correctionReason}</p>
+        </div>
+      )}
+
+      {/* Count Data - displayed first for easy visibility */}
       {record.type === 'hemocytometer' && (
         <HemocytometerDetails record={record as unknown as HemocytometerRecord} />
       )}
@@ -174,14 +284,112 @@ export function RecordDetail() {
         <FetalDetails record={record as unknown as FetalRecord} />
       )}
 
+      {/* Attestations Section */}
+      {(record.performerAttestation || record.verifierAttestation) && (
+        <div className="attestations-section">
+          <h2>Attestations</h2>
+
+          {record.performerAttestation && (
+            <div className="attestation-display">
+              <h3>Performer Attestation</h3>
+              <p className="attestation-text">{record.performerAttestation}</p>
+              {record.performerAttestedAt && (
+                <p className="attestation-timestamp">
+                  Attested on {formatDate(record.performerAttestedAt)}
+                </p>
+              )}
+            </div>
+          )}
+
+          {record.verifierAttestation && (
+            <div className="attestation-display">
+              <h3>Verifier Attestation</h3>
+              <p className="attestation-text">{record.verifierAttestation}</p>
+              {record.verifiedAt && (
+                <p className="attestation-timestamp">
+                  Attested on {formatDate(record.verifiedAt)}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Method Parameters Section */}
+      {record.paramsSnapshot && (
+        <div className="method-params-section">
+          <h2>Method Parameters</h2>
+          <div className="params-header">
+            <span className="method-version">v{record.methodVersion || '1.0.0'}</span>
+            <span className={`source-badge source-${record.paramsSnapshot.source}`}>
+              {record.paramsSnapshot.source === 'org' ? 'Org Config' : 'System Default'}
+            </span>
+          </div>
+          <RecordMethodParamsDisplay
+            type={record.type}
+            params={record.paramsSnapshot.params}
+          />
+        </div>
+      )}
+
+      {/* Audit Log Section - at bottom for reference */}
+      <div className="audit-log-section">
+        <h2>Audit Log</h2>
+        {auditLog.length > 0 ? (
+          <div className="audit-list">
+            {auditLog.map((event) => (
+              <div key={event.id} className="audit-item">
+                <div className="audit-header">
+                  <span className="audit-action">{formatAuditAction(event.action)}</span>
+                  <span className="audit-time">{formatDate(event.createdAt)}</span>
+                </div>
+                <div className="audit-actor">
+                  By: {event.actor?.name || 'System'}
+                </div>
+                {event.metadata.correctionReason && (
+                  <div className="audit-reason">
+                    Reason: {event.metadata.correctionReason}
+                  </div>
+                )}
+                {event.metadata.changes && Object.keys(event.metadata.changes).length > 0 && (
+                  <div className="audit-changes">
+                    <span className="changes-label">Changes:</span>
+                    <ul className="changes-list">
+                      {Object.entries(event.metadata.changes).map(([field, change]) => (
+                        <li key={field} className="change-item">
+                          {formatChangeDescription(field, change)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="no-audit-events">No activity recorded for this record.</p>
+        )}
+      </div>
+
       {canVerify && (
         <div className="verify-section">
           <h2>Verification</h2>
           <p>Review the count data above and verify if it is correct.</p>
+          <label className="attestation-checkbox">
+            <input
+              type="checkbox"
+              checked={attestationChecked}
+              onChange={(e) => setAttestationChecked(e.target.checked)}
+            />
+            <span>
+              I, <strong>{user?.name}</strong>, attest that I have reviewed the count performed by{' '}
+              <strong>{record.performedBy.name}</strong> and confirmed the results are correctly entered in the LIS.
+            </span>
+          </label>
           <button
             className="btn success"
             onClick={handleVerify}
-            disabled={verifying}
+            disabled={verifying || !attestationChecked}
           >
             {verifying ? 'Verifying...' : 'Verify Record'}
           </button>
@@ -402,6 +610,53 @@ function FetalDetails({ record }: { record: FetalRecord }) {
           <span className="value">{calculations.percentFetal}%</span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function RecordMethodParamsDisplay({
+  type,
+  params,
+}: {
+  type: CountRecordType;
+  params: MethodParams;
+}) {
+  if (type === 'hemocytometer') {
+    const hc = params as HemocytometerMethodParams;
+    return (
+      <div className="params-display">
+        <dl className="params-grid">
+          <dt>Default Dilution</dt>
+          <dd>{hc.defaultDilution}</dd>
+          <dt>Default Squares</dt>
+          <dd>{hc.defaultSquaresCounted}</dd>
+          <dt>Tolerance %</dt>
+          <dd>{hc.tolerancePercent}%</dd>
+          <dt>Low Count Tolerance</dt>
+          <dd>{hc.lowCountTolerance}</dd>
+          <dt>Low Count Threshold</dt>
+          <dd>{hc.lowCountThreshold}</dd>
+        </dl>
+      </div>
+    );
+  }
+
+  if (type === 'retic' || type === 'parasite') {
+    const pc = params as ReticMethodParams;
+    return (
+      <div className="params-display">
+        <dl className="params-grid">
+          <dt>Target RBC Count</dt>
+          <dd>{pc.targetRbcCount}</dd>
+        </dl>
+      </div>
+    );
+  }
+
+  // Fetal has no params
+  return (
+    <div className="params-display">
+      <p className="no-params-text">No configurable parameters for this counter type.</p>
     </div>
   );
 }

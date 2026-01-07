@@ -15,6 +15,8 @@ import { usersRouter } from './routes/users';
 import { healthRouter } from './routes/health';
 import { superadminRouter } from './routes/superadmin';
 import { reviewsRouter } from './routes/reviews';
+import { methodConfigRouter } from './routes/method-config';
+import { exportRouter } from './routes/export';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -74,6 +76,8 @@ app.use('/api/records', recordsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/superadmin', superadminRouter);
+app.use('/api/method-config', methodConfigRouter);
+app.use('/api/export', exportRouter);
 
 // Error handling
 app.use(errorHandler);

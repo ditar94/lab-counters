@@ -271,6 +271,82 @@ export interface AuthTokens {
 }
 
 // ============================================
+// Method Versioning & Parameters
+// ============================================
+
+/** Current method version - increment when formula/logic changes */
+export const CURRENT_METHOD_VERSION = '1.0.0';
+
+/** Hemocytometer method parameters */
+export interface HemocytometerMethodParams {
+  /** Default dilution factor (1-200) */
+  defaultDilution: number;
+  /** Default squares counted option */
+  defaultSquaresCounted: 0.2 | 4 | 9;
+  /** Tolerance percent for QC check (when count >= lowCountThreshold) */
+  tolerancePercent: number;
+  /** Absolute tolerance for low counts (when count < lowCountThreshold) */
+  lowCountTolerance: number;
+  /** Threshold below which lowCountTolerance applies */
+  lowCountThreshold: number;
+}
+
+/** Fetal (KB Test) method parameters - placeholder for future */
+export interface FetalMethodParams {
+  // No configurable parameters currently
+}
+
+/** Reticulocyte method parameters */
+export interface ReticMethodParams {
+  /** Target RBC count to reach */
+  targetRbcCount: number;
+}
+
+/** Parasite method parameters */
+export interface ParasiteMethodParams {
+  /** Target RBC count to reach */
+  targetRbcCount: number;
+}
+
+/** Union type of all method params */
+export type MethodParams =
+  | HemocytometerMethodParams
+  | FetalMethodParams
+  | ReticMethodParams
+  | ParasiteMethodParams;
+
+/** Map counter type to its params type */
+export interface MethodParamsByType {
+  hemocytometer: HemocytometerMethodParams;
+  fetal: FetalMethodParams;
+  retic: ReticMethodParams;
+  parasite: ParasiteMethodParams;
+}
+
+/** Params snapshot stored on each record for historical accuracy */
+export interface ParamsSnapshot {
+  /** Method version used at count time */
+  methodVersion: string;
+  /** Counter-specific params that were applied */
+  params: MethodParams;
+  /** Source of params: 'org' | 'system_default' */
+  source: 'org' | 'system_default';
+  /** Org config version if source is 'org' */
+  orgConfigVersion?: number;
+}
+
+/** Org method config record */
+export interface OrgMethodConfig {
+  id: string;
+  orgId: string;
+  counterType: CountRecordType;
+  config: MethodParams;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================
 // Request/Response Types
 // ============================================
 

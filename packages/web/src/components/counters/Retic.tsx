@@ -10,7 +10,7 @@ const MAX_COUNT = 1000;
 export function Retic() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
 
   // Specimen info
   const [specimenId, setSpecimenId] = useState('');
@@ -23,6 +23,7 @@ export function Retic() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [performerAttestationChecked, setPerformerAttestationChecked] = useState(false);
 
   // Load existing record if editing
   useEffect(() => {
@@ -151,7 +152,8 @@ export function Retic() {
       }
 
       if (submit && recordId) {
-        await api.post(`/api/records/${recordId}/submit`, {}, token);
+        const performerAttestation = `I, ${user?.name}, attest to having performed this count, verified the results for accuracy, and entered the data into the LIS pending verification by a second person.`;
+        await api.post(`/api/records/${recordId}/submit`, { performerAttestation }, token);
       }
 
       navigate('/records');
@@ -164,7 +166,7 @@ export function Retic() {
   };
 
   const calculations = calculate();
-  const canSubmit = rbcCount > 0;
+  const canSubmit = rbcCount > 0 && (isQC || performerAttestationChecked);
 
   return (
     <div className="counter-page retic-counter">
@@ -257,6 +259,22 @@ export function Retic() {
             </div>
             <p> × 100 = {calculations.percentRetic}%</p>
           </div>
+        </div>
+      )}
+
+      {/* Performer Attestation */}
+      {!isQC && rbcCount > 0 && (
+        <div className="attestation-section">
+          <label className="attestation-checkbox">
+            <input
+              type="checkbox"
+              checked={performerAttestationChecked}
+              onChange={(e) => setPerformerAttestationChecked(e.target.checked)}
+            />
+            <span>
+              I, <strong>{user?.name}</strong>, attest to having performed this count, verified the results for accuracy, and entered the data into the LIS pending verification by a second person.
+            </span>
+          </label>
         </div>
       )}
 

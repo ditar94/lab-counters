@@ -4,6 +4,7 @@ import { organizationsRouter } from './organizations';
 import { sitesRouter } from './sites';
 import { usersRouter } from './users';
 import { syncRouter } from './sync';
+import { methodConfigRouter } from './method-config';
 
 export const superadminRouter = Router();
 
@@ -15,6 +16,7 @@ superadminRouter.use(superadminOnly);
 superadminRouter.use('/organizations', organizationsRouter);
 superadminRouter.use('/sync', syncRouter);
 
-// Nested routes for sites and users under organizations
+// Nested routes for sites, users, and method-config under organizations
 superadminRouter.use('/organizations/:orgId/sites', sitesRouter);
 superadminRouter.use('/organizations/:orgId/users', usersRouter);
+superadminRouter.use('/organizations/:orgId/method-config', methodConfigRouter);

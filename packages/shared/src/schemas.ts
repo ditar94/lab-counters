@@ -96,13 +96,20 @@ export const UpdateRecordRequestSchema = z.object({
   status: RecordStatusSchema.optional(),
 });
 
+export const SubmitRecordRequestSchema = z.object({
+  performerAttestation: z.string().min(1).max(500),
+});
+
 export const VerifyRecordRequestSchema = z.object({
   comments: z.string().max(500).optional(),
+  verifierAttestation: z.string().min(1).max(500),
 });
 
 export const CreateCorrectionRequestSchema = z.object({
   reason: z.string().min(1).max(500),
-  rawTallies: CountRecordDataSchema,
+  rawTallies: CountRecordDataSchema.optional(), // Optional - if not provided, uses original tallies
+  specimenId: z.string().min(1).max(100).optional(), // Optional - change specimen ID
+  performedAt: z.coerce.date().optional(), // Optional - change performed date/time
 });
 
 export const ResetPasswordRequestSchema = z.object({
@@ -209,3 +216,45 @@ export const CreateOrgAdminSchema = z.object({
   temporaryPassword: z.string().min(8).max(50).optional(),
   generateTemporaryPassword: z.boolean().optional(),
 });
+
+// ============================================
+// Method Parameter Schemas
+// ============================================
+
+export const HemocytometerMethodParamsSchema = z.object({
+  defaultDilution: z.number().min(1).max(200),
+  defaultSquaresCounted: z.union([z.literal(0.2), z.literal(4), z.literal(9)]),
+  tolerancePercent: z.number().min(1).max(100),
+  lowCountTolerance: z.number().min(1).max(50),
+  lowCountThreshold: z.number().min(1).max(100),
+});
+
+export const FetalMethodParamsSchema = z.object({});
+
+export const ReticMethodParamsSchema = z.object({
+  targetRbcCount: z.number().min(100).max(10000),
+});
+
+export const ParasiteMethodParamsSchema = z.object({
+  targetRbcCount: z.number().min(100).max(10000),
+});
+
+/** Schema for updating org method config - uses discriminated union by counterType */
+export const UpdateOrgMethodConfigSchema = z.discriminatedUnion('counterType', [
+  z.object({
+    counterType: z.literal('hemocytometer'),
+    config: HemocytometerMethodParamsSchema.partial(),
+  }),
+  z.object({
+    counterType: z.literal('fetal'),
+    config: FetalMethodParamsSchema.partial(),
+  }),
+  z.object({
+    counterType: z.literal('retic'),
+    config: ReticMethodParamsSchema.partial(),
+  }),
+  z.object({
+    counterType: z.literal('parasite'),
+    config: ParasiteMethodParamsSchema.partial(),
+  }),
+]);

@@ -4,11 +4,15 @@ import { authenticate, authorize, enforceOrgScope } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
 import { sensitiveRateLimiter } from '../middleware/security';
 import { auditLog } from '../services/audit';
+import { createParamsSnapshot } from '../services/method-config';
 import {
   CreateRecordRequestSchema,
   UpdateRecordRequestSchema,
+  SubmitRecordRequestSchema,
   VerifyRecordRequestSchema,
+  CreateCorrectionRequestSchema,
   RecordFilterSchema,
+  CURRENT_METHOD_VERSION,
 } from '@lab-counters/shared';
 import { calculateResults } from '../services/calculations';
 
@@ -95,8 +99,18 @@ recordsRouter.get('/alerts/overdue', authorize('supervisor', 'admin'), async (re
   try {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    // Get sites user has access to
-    const userSiteIds = req.user!.sites?.map((s: { siteId: string }) => s.siteId) || [];
+    // Get sites user has access to by querying UserSite table
+    const userSites = await prisma.userSite.findMany({
+      where: { userId: req.user!.id },
+      select: { siteId: true },
+    });
+    const userSiteIds = userSites.map((us) => us.siteId);
+
+    // If user has no site assignments, return empty result
+    if (userSiteIds.length === 0) {
+      res.json({ count: 0, records: [] });
+      return;
+    }
 
     const overdueRecords = await prisma.manualCountRecord.findMany({
       where: {
@@ -158,6 +172,9 @@ recordsRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
     const body = CreateRecordRequestSchema.parse(req.body);
     const calculations = calculateResults(body.type, body.rawTallies);
 
+    // Capture method params snapshot for historical accuracy
+    const paramsSnapshot = await createParamsSnapshot(req.user!.orgId, body.type);
+
     const record = await prisma.manualCountRecord.create({
       data: {
         orgId: req.user!.orgId,
@@ -171,6 +188,8 @@ recordsRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
         status: 'draft',
         rawTallies: body.rawTallies as object,
         calculations: calculations as object,
+        methodVersion: CURRENT_METHOD_VERSION,
+        paramsSnapshot: paramsSnapshot as object,
         performedById: req.user!.id,
       },
       include: {
@@ -251,6 +270,8 @@ recordsRouter.patch('/:id', async (req: Request, res: Response, next: NextFuncti
 // Submit for verification (QC records auto-verify)
 recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const body = SubmitRecordRequestSchema.parse(req.body);
+
     const existing = await prisma.manualCountRecord.findFirst({
       where: {
         id: req.params.id,
@@ -274,6 +295,8 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
       where: { id: req.params.id },
       data: {
         status: newStatus,
+        performerAttestation: body.performerAttestation,
+        performerAttestedAt: new Date(),
         ...(isQC && {
           verifiedById: req.user!.id,
           verifiedAt: new Date(),
@@ -286,7 +309,7 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
       entityType: 'manual_count_record',
       entityId: record.id,
       action: isQC ? 'submit_qc_auto_verified' : 'submit_pending',
-      metadata: { statusBefore: existing.status, statusAfter: record.status, isQC },
+      metadata: { statusBefore: existing.status, statusAfter: record.status, isQC, performerAttestation: body.performerAttestation },
       actorUserId: req.user!.id,
       req,
     });
@@ -305,7 +328,7 @@ recordsRouter.post(
   authorize('technologist', 'supervisor', 'admin'),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      VerifyRecordRequestSchema.parse(req.body);
+      const body = VerifyRecordRequestSchema.parse(req.body);
 
       const existing = await prisma.manualCountRecord.findFirst({
         where: {
@@ -333,6 +356,7 @@ recordsRouter.post(
           status: 'verified',
           verifiedById: req.user!.id,
           verifiedAt: new Date(),
+          verifierAttestation: body.verifierAttestation,
         },
         include: {
           performedBy: { select: { id: true, name: true } },
@@ -345,7 +369,7 @@ recordsRouter.post(
         entityType: 'manual_count_record',
         entityId: record.id,
         action: 'verify',
-        metadata: { statusBefore: existing.status, statusAfter: record.status, verifiedById: record.verifiedById },
+        metadata: { statusBefore: existing.status, statusAfter: record.status, verifiedById: record.verifiedById, verifierAttestation: body.verifierAttestation },
         actorUserId: req.user!.id,
         req,
       });
@@ -398,3 +422,166 @@ recordsRouter.delete(
     }
   }
 );
+
+// Amend/correct a verified record (updates in place, no new version)
+// Supervisors/admins can amend any record, technologists can only amend their own
+// Status changes to 'corrected', changes are logged to audit trail
+recordsRouter.post(
+  '/:id/amend',
+  sensitiveRateLimiter,
+  authorize('technologist', 'supervisor', 'admin'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const body = CreateCorrectionRequestSchema.parse(req.body);
+
+      const existing = await prisma.manualCountRecord.findFirst({
+        where: {
+          id: req.params.id,
+          orgId: req.user!.orgId,
+        },
+        include: {
+          performedBy: { select: { id: true, name: true } },
+          verifiedBy: { select: { id: true, name: true } },
+        },
+      });
+
+      if (!existing) {
+        throw new AppError(404, 'NOT_FOUND', 'Record not found');
+      }
+
+      // Allow amending verified or already-corrected records
+      if (existing.status !== 'verified' && existing.status !== 'corrected') {
+        throw new AppError(400, 'INVALID_STATUS', 'Only verified or corrected records can be amended');
+      }
+
+      // Check permission: technologists can only amend their own records
+      const isOwnRecord = existing.performedById === req.user!.id;
+      const isSupervisorOrAdmin = req.user!.role === 'supervisor' || req.user!.role === 'admin';
+
+      if (!isOwnRecord && !isSupervisorOrAdmin) {
+        throw new AppError(403, 'FORBIDDEN', 'You can only amend your own records');
+      }
+
+      // Track what changed for the audit log
+      const changes: Record<string, { before: unknown; after: unknown }> = {};
+
+      // Determine what's being changed
+      const rawTalliesToUse = body.rawTallies ?? existing.rawTallies;
+      const talliesChanged = body.rawTallies !== undefined &&
+        JSON.stringify(body.rawTallies) !== JSON.stringify(existing.rawTallies);
+
+      if (talliesChanged) {
+        changes.rawTallies = { before: existing.rawTallies, after: body.rawTallies };
+        // Note: calculations is a derived field, not tracked separately in changedFields
+      }
+
+      if (body.specimenId && body.specimenId !== existing.specimenId) {
+        changes.specimenId = { before: existing.specimenId, after: body.specimenId };
+      }
+
+      if (body.performedAt) {
+        const newPerformedAt = new Date(body.performedAt);
+        if (newPerformedAt.getTime() !== existing.performedAt.getTime()) {
+          changes.performedAt = { before: existing.performedAt, after: newPerformedAt };
+        }
+      }
+
+      // Must have at least one change
+      if (Object.keys(changes).length === 0) {
+        throw new AppError(400, 'NO_CHANGES', 'No changes were made to the record');
+      }
+
+      // Build update data
+      const updateData: Record<string, unknown> = {
+        status: 'corrected',
+        correctionReason: body.reason,
+      };
+
+      if (talliesChanged && body.rawTallies) {
+        updateData.rawTallies = body.rawTallies;
+        updateData.calculations = calculateResults(existing.type, body.rawTallies as Record<string, unknown>);
+      }
+
+      if (body.specimenId) {
+        updateData.specimenId = body.specimenId;
+      }
+
+      if (body.performedAt) {
+        updateData.performedAt = new Date(body.performedAt);
+      }
+
+      // Update the record in place
+      const updatedRecord = await prisma.manualCountRecord.update({
+        where: { id: req.params.id },
+        data: updateData,
+        include: {
+          site: { select: { id: true, name: true } },
+          performedBy: { select: { id: true, name: true } },
+          verifiedBy: { select: { id: true, name: true } },
+        },
+      });
+
+      // Log detailed changes to audit trail
+      await auditLog({
+        orgId: req.user!.orgId,
+        entityType: 'manual_count_record',
+        entityId: updatedRecord.id,
+        action: 'amend',
+        metadata: {
+          correctionReason: body.reason,
+          changes,
+          changedFields: Object.keys(changes),
+        },
+        actorUserId: req.user!.id,
+        req,
+      });
+
+      res.json(updatedRecord);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Get audit log for a record
+// Returns all audit events related to this record
+recordsRouter.get('/:id/audit', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const record = await prisma.manualCountRecord.findFirst({
+      where: {
+        id: req.params.id,
+        orgId: req.user!.orgId,
+      },
+    });
+
+    if (!record) {
+      throw new AppError(404, 'NOT_FOUND', 'Record not found');
+    }
+
+    // Get all audit events for this record
+    const auditEvents = await prisma.auditEvent.findMany({
+      where: {
+        entityType: 'manual_count_record',
+        entityId: req.params.id,
+        orgId: req.user!.orgId,
+      },
+      include: {
+        actor: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // Format the audit events for display
+    const events = auditEvents.map((event) => ({
+      id: event.id,
+      action: event.action,
+      createdAt: event.createdAt,
+      actor: event.actor,
+      metadata: event.metadata as Record<string, unknown>,
+    }));
+
+    res.json({ events });
+  } catch (error) {
+    next(error);
+  }
+});

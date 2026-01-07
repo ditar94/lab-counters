@@ -11,8 +11,10 @@ interface RecordWithSite {
   type: CountRecordType;
   status: RecordStatus;
   performedAt: Date | string;
+  verifiedAt?: Date | string;
   site?: { id: string; name: string };
   performedBy?: { id: string; name: string };
+  verifiedBy?: { id: string; name: string };
 }
 
 export function RecordsList() {
@@ -22,6 +24,7 @@ export function RecordsList() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [exporting, setExporting] = useState(false);
 
   const statusFilter = searchParams.get('status') as RecordStatus | null;
   const typeFilter = searchParams.get('type') as CountRecordType | null;
@@ -88,6 +91,11 @@ export function RecordsList() {
     return new Date(date).toLocaleString();
   };
 
+  const isOverdue = (date: Date | string) => {
+    const hoursOld = (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60);
+    return hoursOld >= 24;
+  };
+
   const getStatusClass = (status: RecordStatus) => {
     switch (status) {
       case 'draft':
@@ -104,14 +112,85 @@ export function RecordsList() {
   };
 
   const canVerify = user?.role === 'technologist' || user?.role === 'supervisor' || user?.role === 'admin';
+  const canExport = user?.role === 'supervisor' || user?.role === 'admin';
+
+  // Check if monthly review export is available (requires month, year, and site selection)
+  const canExportMonthlyReview = canExport && monthFilter && yearFilter && siteFilter;
+
+  const handleExportRecords = async () => {
+    setExporting(true);
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const params = new URLSearchParams();
+      if (statusFilter) params.set('status', statusFilter);
+      if (typeFilter) params.set('type', typeFilter);
+      if (siteFilter) params.set('siteId', siteFilter);
+      if (monthFilter) params.set('month', monthFilter);
+      if (yearFilter) params.set('year', yearFilter);
+
+      await api.download(`/api/export/records?${params}`, token);
+    } catch (err) {
+      console.error('Export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportMonthlyReview = async () => {
+    if (!monthFilter || !yearFilter || !siteFilter) return;
+
+    setExporting(true);
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const params = new URLSearchParams({
+        siteId: siteFilter,
+        month: monthFilter,
+        year: yearFilter,
+      });
+      if (typeFilter) params.set('type', typeFilter);
+
+      await api.download(`/api/export/monthly-review?${params}`, token);
+    } catch (err) {
+      console.error('Monthly review export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="records-page">
       <header className="page-header">
         <h1>Count Records</h1>
-        <Link to="/count/hemocytometer" className="btn primary">
-          New Count
-        </Link>
+        <div className="header-actions">
+          {canExport && (
+            <>
+              <button
+                className="btn secondary"
+                onClick={handleExportRecords}
+                disabled={exporting}
+              >
+                {exporting ? 'Exporting...' : 'Export CSV'}
+              </button>
+              {canExportMonthlyReview && (
+                <button
+                  className="btn secondary"
+                  onClick={handleExportMonthlyReview}
+                  disabled={exporting}
+                  title="Export Monthly Review (requires Month, Year, and Site filters)"
+                >
+                  Monthly Review
+                </button>
+              )}
+            </>
+          )}
+          <Link to="/count/hemocytometer" className="btn primary">
+            New Count
+          </Link>
+        </div>
       </header>
 
       <div className="filters">
@@ -214,8 +293,10 @@ export function RecordsList() {
                 <th>Type</th>
                 <th>Site</th>
                 <th>Status</th>
-                <th>Performed</th>
+                <th>Performed On</th>
                 <th>Performed By</th>
+                <th>Verified On</th>
+                <th>Verified By</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -231,9 +312,14 @@ export function RecordsList() {
                     <span className={`status-badge ${getStatusClass(record.status)}`}>
                       {record.status.replace('_', ' ')}
                     </span>
+                    {record.status === 'pending_verification' && isOverdue(record.performedAt) && (
+                      <span className="overdue-badge-table">Overdue</span>
+                    )}
                   </td>
                   <td>{formatDate(record.performedAt)}</td>
                   <td>{record.performedBy?.name || '-'}</td>
+                  <td>{record.verifiedAt ? formatDate(record.verifiedAt) : '-'}</td>
+                  <td>{record.verifiedBy?.name || '-'}</td>
                   <td className="actions">
                     <Link to={`/records/${record.id}`} className="btn-link">
                       View

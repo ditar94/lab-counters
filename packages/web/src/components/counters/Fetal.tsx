@@ -8,7 +8,7 @@ import './Counter.css';
 export function Fetal() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
 
   // Specimen info
   const [specimenId, setSpecimenId] = useState('');
@@ -29,6 +29,7 @@ export function Fetal() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [performerAttestationChecked, setPerformerAttestationChecked] = useState(false);
 
   // Load existing record if editing
   useEffect(() => {
@@ -188,7 +189,8 @@ export function Fetal() {
       }
 
       if (submit && recordId) {
-        await api.post(`/api/records/${recordId}/submit`, {}, token);
+        const performerAttestation = `I, ${user?.name}, attest to having performed this count, verified the results for accuracy, and entered the data into the LIS pending verification by a second person.`;
+        await api.post(`/api/records/${recordId}/submit`, { performerAttestation }, token);
       }
 
       navigate('/records');
@@ -201,7 +203,7 @@ export function Fetal() {
   };
 
   const calculations = calculate();
-  const canSubmit = calculations.totalRbcIn5Fields > 0;
+  const canSubmit = calculations.totalRbcIn5Fields > 0 && (isQC || performerAttestationChecked);
 
   return (
     <div className="counter-page fetal-counter">
@@ -222,14 +224,16 @@ export function Fetal() {
             />
           </div>
           <div className="form-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={isQC}
-                onChange={(e) => setIsQC(e.target.checked)}
-              />
-              QC Sample (no verification required)
-            </label>
+             <label className="checkbox-label">
+  <input
+    type="checkbox"
+    checked={isQC}
+    onChange={(e) => setIsQC(e.target.checked)}
+  />
+  <span>
+    QC Sample <small>(no verification required)</small>
+  </span>
+</label>
           </div>
         </div>
       </header>
@@ -395,6 +399,22 @@ export function Fetal() {
             </div>
             <p> × 100 = {calculations.percentFetal}%</p>
           </div>
+        </div>
+      )}
+
+      {/* Performer Attestation */}
+      {!isQC && calculations.totalRbcIn5Fields > 0 && (
+        <div className="attestation-section">
+          <label className="attestation-checkbox">
+            <input
+              type="checkbox"
+              checked={performerAttestationChecked}
+              onChange={(e) => setPerformerAttestationChecked(e.target.checked)}
+            />
+            <span>
+              I, <strong>{user?.name}</strong>, attest to having performed this count, verified the results for accuracy, and entered the data into the LIS pending verification by a second person.
+            </span>
+          </label>
         </div>
       )}
 

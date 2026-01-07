@@ -35,6 +35,7 @@ model Organization {
   countRecords   ManualCountRecord[]
   monthlyReviews MonthlyReview[]
   auditEvents    AuditEvent[]
+  methodConfigs  OrgMethodConfig[]
 
   @@map("organizations")
 }
@@ -155,10 +156,15 @@ model ManualCountRecord {
   status          RecordStatus    @default(draft)
   rawTallies      Json            @map("raw_tallies")
   calculations    Json
+  methodVersion   String          @default("1.0.0") @map("method_version") // Version of calculation method used
+  paramsSnapshot  Json?           @map("params_snapshot") // Snapshot of method params at count time
   performedById   String          @map("performed_by_id")
   performedAt     DateTime        @default(now()) @map("performed_at")
+  performerAttestation String?    @map("performer_attestation") // Attestation statement from performer
+  performerAttestedAt DateTime?   @map("performer_attested_at")
   verifiedById    String?         @map("verified_by_id")
   verifiedAt      DateTime?       @map("verified_at")
+  verifierAttestation String?     @map("verifier_attestation") // Attestation statement from verifier
   version         Int             @default(1)
   parentRecordId  String?         @map("parent_record_id")
   correctionReason String?        @map("correction_reason")
@@ -225,4 +231,24 @@ model AuditEvent {
   @@index([orgId, entityType, entityId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ============================================
+// Method Configuration (Per-Org Counter Settings)
+// ============================================
+
+model OrgMethodConfig {
+  id          String          @id @default(uuid())
+  orgId       String          @map("org_id")
+  counterType CountRecordType @map("counter_type")
+  config      Json            // Counter-specific configuration parameters
+  version     Int             @default(1) // Incremented on each update for audit trail
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, counterType])
+  @@index([orgId])
+  @@map("org_method_configs")
 }

@@ -270,6 +270,38 @@
   padding: 0.25rem 0.5rem 0;
 }
 
+/* Performer Attestation */
+.attestation-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.attestation-section .attestation-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.attestation-section .attestation-checkbox input {
+  margin-top: 0.25rem;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.attestation-section .attestation-checkbox span {
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.attestation-section .attestation-checkbox strong {
+  color: var(--primary-color);
+}
+
 /* Actions */
 .actions {
   display: flex;
@@ -319,6 +351,28 @@
   justify-content: center;
   margin-bottom: 1.5rem;
 }
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+
+  /* FIX */
+  margin-bottom: 0;
+}
+
+
+.checkbox-label input {
+  margin: 0; /* remove browser default margin */
+}
+
+.checkbox-label small {
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+
 
 .input-mode-toggle label {
   display: flex;
