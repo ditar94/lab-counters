@@ -463,6 +463,7 @@ footer {
     margin: 0;
     padding: 0; /* Removes default indentation */
 }
+
 .terms-container {
     border: 5px solid #1d70b8; /* Increased border width */
     padding: 20px;
