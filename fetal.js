@@ -137,9 +137,16 @@ function buttonChange(thisButton) {
 }
 
 function calculateAverage() {
-    average_RBC = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5)) / 5;
+    if (document.getElementById('wantCounter').checked) {
+        average_RBC = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5)) / 5;
+        five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));
+
+    } else if (document.getElementById('noCounter').checked) {
+         average_RBC = parseInt(field_1);
+         five_Fields = (average_RBC * 5);
+    }
+    
     thirty_Fields = parseInt(average_RBC * 30);
-    five_Fields = (parseInt(field_1) + parseInt(field_2) + parseInt(field_3) + parseInt(field_4) + parseInt(field_5));
     updateCounter()
 }
 
