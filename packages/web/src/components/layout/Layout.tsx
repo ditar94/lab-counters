@@ -19,12 +19,18 @@ export function Layout() {
   const navItems = [
     { path: '/', label: 'Dashboard' },
     ...(isSuperadmin
-      ? [{ path: '/superadmin/organizations', label: 'Organizations' }]
+      ? [
+          { path: '/superadmin/organizations', label: 'Organizations' },
+          { path: '/admin/audit', label: 'Audit Log' },
+        ]
       : [
           { path: '/records', label: 'Records' },
           { path: '/count/hemocytometer', label: 'Hemocytometer' },
           ...(canReview ? [{ path: '/reviews', label: 'Monthly Review' }] : []),
-          ...(isAdmin ? [{ path: '/admin/users', label: 'Users' }] : []),
+          ...(isAdmin ? [
+            { path: '/admin/users', label: 'Users' },
+            { path: '/admin/audit', label: 'Audit Log' },
+          ] : []),
         ]),
   ];
 

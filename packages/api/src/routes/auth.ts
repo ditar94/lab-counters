@@ -133,14 +133,16 @@ authRouter.get('/dev-users', async (req: Request, res: Response, next: NextFunct
     });
 
     // Group by organization
-    const grouped = users.reduce((acc, user) => {
+    type UserType = typeof users[number];
+    type OrgGroupType = Record<string, { org: UserType['organization']; users: UserType[] }>;
+    const grouped = users.reduce((acc: OrgGroupType, user: UserType) => {
       const orgName = user.organization.name;
       if (!acc[orgName]) {
         acc[orgName] = { org: user.organization, users: [] };
       }
       acc[orgName].users.push(user);
       return acc;
-    }, {} as Record<string, { org: typeof users[0]['organization']; users: typeof users }>);
+    }, {} as OrgGroupType);
 
     res.json({
       organizations: Object.values(grouped),

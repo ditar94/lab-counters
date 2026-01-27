@@ -104,7 +104,7 @@ recordsRouter.get('/alerts/overdue', authorize('supervisor', 'admin'), async (re
       where: { userId: req.user!.id },
       select: { siteId: true },
     });
-    const userSiteIds = userSites.map((us) => us.siteId);
+    const userSiteIds = userSites.map((us: { siteId: string }) => us.siteId);
 
     // If user has no site assignments, return empty result
     if (userSiteIds.length === 0) {
@@ -234,7 +234,14 @@ recordsRouter.patch('/:id', async (req: Request, res: Response, next: NextFuncti
       throw new AppError(400, 'INVALID_STATUS', 'Only draft records can be updated');
     }
 
-    const updateData: Record<string, unknown> = {};
+    // Optimistic concurrency check
+    if (body.expectedVersion !== undefined && existing.version !== body.expectedVersion) {
+      throw new AppError(409, 'VERSION_CONFLICT', `Record was modified by another user. Expected version ${body.expectedVersion}, but current version is ${existing.version}. Please refresh and try again.`);
+    }
+
+    const updateData: Record<string, unknown> = {
+      version: existing.version + 1, // Increment version on update
+    };
     if (body.rawTallies) {
       updateData.rawTallies = body.rawTallies;
       updateData.calculations = calculateResults(existing.type, body.rawTallies);
@@ -256,7 +263,7 @@ recordsRouter.patch('/:id', async (req: Request, res: Response, next: NextFuncti
       entityType: 'manual_count_record',
       entityId: record.id,
       action: 'update',
-      metadata: { before: existing, after: record },
+      metadata: { before: existing, after: record, versionBefore: existing.version, versionAfter: record.version },
       actorUserId: req.user!.id,
       req,
     });
@@ -287,6 +294,11 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
       throw new AppError(400, 'INVALID_STATUS', 'Only draft records can be submitted');
     }
 
+    // Optimistic concurrency check
+    if (body.expectedVersion !== undefined && existing.version !== body.expectedVersion) {
+      throw new AppError(409, 'VERSION_CONFLICT', `Record was modified by another user. Expected version ${body.expectedVersion}, but current version is ${existing.version}. Please refresh and try again.`);
+    }
+
     // QC records auto-verify (no peer review needed)
     const isQC = existing.isQC;
     const newStatus = isQC ? 'verified' : 'pending_verification';
@@ -295,6 +307,7 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
       where: { id: req.params.id },
       data: {
         status: newStatus,
+        version: existing.version + 1, // Increment version on submit
         performerAttestation: body.performerAttestation,
         performerAttestedAt: new Date(),
         ...(isQC && {
@@ -309,7 +322,7 @@ recordsRouter.post('/:id/submit', async (req: Request, res: Response, next: Next
       entityType: 'manual_count_record',
       entityId: record.id,
       action: isQC ? 'submit_qc_auto_verified' : 'submit_pending',
-      metadata: { statusBefore: existing.status, statusAfter: record.status, isQC, performerAttestation: body.performerAttestation },
+      metadata: { statusBefore: existing.status, statusAfter: record.status, isQC, performerAttestation: body.performerAttestation, versionBefore: existing.version, versionAfter: record.version },
       actorUserId: req.user!.id,
       req,
     });
@@ -350,10 +363,16 @@ recordsRouter.post(
         throw new AppError(403, 'SELF_VERIFICATION_NOT_ALLOWED', 'You cannot verify your own records');
       }
 
+      // Optimistic concurrency check
+      if (body.expectedVersion !== undefined && existing.version !== body.expectedVersion) {
+        throw new AppError(409, 'VERSION_CONFLICT', `Record was modified by another user. Expected version ${body.expectedVersion}, but current version is ${existing.version}. Please refresh and try again.`);
+      }
+
       const record = await prisma.manualCountRecord.update({
         where: { id: req.params.id },
         data: {
           status: 'verified',
+          version: existing.version + 1, // Increment version on verify
           verifiedById: req.user!.id,
           verifiedAt: new Date(),
           verifierAttestation: body.verifierAttestation,
@@ -369,7 +388,7 @@ recordsRouter.post(
         entityType: 'manual_count_record',
         entityId: record.id,
         action: 'verify',
-        metadata: { statusBefore: existing.status, statusAfter: record.status, verifiedById: record.verifiedById, verifierAttestation: body.verifierAttestation },
+        metadata: { statusBefore: existing.status, statusAfter: record.status, verifiedById: record.verifiedById, verifierAttestation: body.verifierAttestation, versionBefore: existing.version, versionAfter: record.version },
         actorUserId: req.user!.id,
         req,
       });
@@ -423,7 +442,7 @@ recordsRouter.delete(
   }
 );
 
-// Amend/correct a verified record (updates in place, no new version)
+// Amend/correct a verified record (updates in place, increments version)
 // Supervisors/admins can amend any record, technologists can only amend their own
 // Status changes to 'corrected', changes are logged to audit trail
 recordsRouter.post(
@@ -452,6 +471,11 @@ recordsRouter.post(
       // Allow amending verified or already-corrected records
       if (existing.status !== 'verified' && existing.status !== 'corrected') {
         throw new AppError(400, 'INVALID_STATUS', 'Only verified or corrected records can be amended');
+      }
+
+      // Optimistic concurrency check
+      if (body.expectedVersion !== undefined && existing.version !== body.expectedVersion) {
+        throw new AppError(409, 'VERSION_CONFLICT', `Record was modified by another user. Expected version ${body.expectedVersion}, but current version is ${existing.version}. Please refresh and try again.`);
       }
 
       // Check permission: technologists can only amend their own records
@@ -494,6 +518,7 @@ recordsRouter.post(
       // Build update data
       const updateData: Record<string, unknown> = {
         status: 'corrected',
+        version: existing.version + 1, // Increment version on amend
         correctionReason: body.reason,
       };
 
@@ -531,6 +556,8 @@ recordsRouter.post(
           correctionReason: body.reason,
           changes,
           changedFields: Object.keys(changes),
+          versionBefore: existing.version,
+          versionAfter: updatedRecord.version,
         },
         actorUserId: req.user!.id,
         req,
@@ -572,7 +599,7 @@ recordsRouter.get('/:id/audit', async (req: Request, res: Response, next: NextFu
     });
 
     // Format the audit events for display
-    const events = auditEvents.map((event) => ({
+    const events = auditEvents.map((event: typeof auditEvents[number]) => ({
       id: event.id,
       action: event.action,
       createdAt: event.createdAt,

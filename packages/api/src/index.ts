@@ -17,6 +17,8 @@ import { superadminRouter } from './routes/superadmin';
 import { reviewsRouter } from './routes/reviews';
 import { methodConfigRouter } from './routes/method-config';
 import { exportRouter } from './routes/export';
+import { auditRouter } from './routes/audit';
+import { pdfRouter } from './routes/pdf';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -78,6 +80,8 @@ app.use('/api/reviews', reviewsRouter);
 app.use('/api/superadmin', superadminRouter);
 app.use('/api/method-config', methodConfigRouter);
 app.use('/api/export', exportRouter);
+app.use('/api/audit', auditRouter);
+app.use('/api/pdf', pdfRouter);
 
 // Error handling
 app.use(errorHandler);

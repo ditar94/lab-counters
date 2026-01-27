@@ -20,7 +20,7 @@ syncRouter.get('/cognito-users', async (req: Request, res: Response, next: NextF
       select: { cognitoId: true },
     });
 
-    const dbCognitoIds = new Set(dbUsers.map((u) => u.cognitoId));
+    const dbCognitoIds = new Set(dbUsers.map((u: { cognitoId: string | null }) => u.cognitoId));
 
     // Mark orphaned users
     const usersWithStatus: OrphanedUser[] = cognitoUsers.map((user) => ({

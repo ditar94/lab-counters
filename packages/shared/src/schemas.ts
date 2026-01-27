@@ -94,15 +94,18 @@ export const CreateRecordRequestSchema = z.object({
 export const UpdateRecordRequestSchema = z.object({
   rawTallies: CountRecordDataSchema.optional(),
   status: RecordStatusSchema.optional(),
+  expectedVersion: z.number().int().min(1).optional(), // Optimistic concurrency check
 });
 
 export const SubmitRecordRequestSchema = z.object({
   performerAttestation: z.string().min(1).max(500),
+  expectedVersion: z.number().int().min(1).optional(), // Optimistic concurrency check
 });
 
 export const VerifyRecordRequestSchema = z.object({
   comments: z.string().max(500).optional(),
   verifierAttestation: z.string().min(1).max(500),
+  expectedVersion: z.number().int().min(1).optional(), // Optimistic concurrency check
 });
 
 export const CreateCorrectionRequestSchema = z.object({
@@ -110,6 +113,7 @@ export const CreateCorrectionRequestSchema = z.object({
   rawTallies: CountRecordDataSchema.optional(), // Optional - if not provided, uses original tallies
   specimenId: z.string().min(1).max(100).optional(), // Optional - change specimen ID
   performedAt: z.coerce.date().optional(), // Optional - change performed date/time
+  expectedVersion: z.number().int().min(1).optional(), // Optimistic concurrency check
 });
 
 export const ResetPasswordRequestSchema = z.object({

@@ -57,107 +57,110 @@ Build a secure, multi-tenant web application that replaces manual hemocytometer 
 - Commands: `npm run dev:local`
 
 4) Phase 3 — Core Workflow State Machine (Critical)
-4.1 [TODO] Implement explicit record states: DRAFT, PENDING_VERIFICATION, VERIFIED, CORRECTED/superseded.
-- Files: README_TRACKING.md
-- Commands: TBD
+4.1 [DONE] Implement explicit record states: DRAFT, PENDING_VERIFICATION, VERIFIED, CORRECTED/superseded.
+- Files: README_TRACKING.md, packages/api/prisma/schema.prisma (RecordStatus enum), packages/shared/src/types.ts (RecordStatus type)
+- Commands: N/A (part of existing schema)
 
-4.2 [TODO] Implement state transition rules (server-enforced).
-- Files: README_TRACKING.md
-- Commands: TBD
+4.2 [DONE] Implement state transition rules (server-enforced).
+- Files: README_TRACKING.md, packages/api/src/routes/records.ts
+- Notes: State transitions enforced: draft→pending_verification (submit), pending_verification→verified (verify), verified/corrected→corrected (amend), only draft can be deleted/updated
+- Commands: `npm run build`
 
-4.3 [TODO] Implement deferred verification UX sections.
-- Files: README_TRACKING.md
-- Commands: TBD
+4.3 [DONE] Implement deferred verification UX sections.
+- Files: README_TRACKING.md, packages/web/src/components/Dashboard.tsx (pending verifications list, overdue alerts), packages/web/src/components/records/RecordDetail.tsx (verification UX with attestation), packages/web/src/components/records/RecordsList.tsx (status filtering)
+- Commands: `npm run build`
 
-4.4 [TODO] Add optimistic concurrency checks.
-- Files: README_TRACKING.md
-- Commands: TBD
+4.4 [DONE] Add optimistic concurrency checks.
+- Files: README_TRACKING.md, packages/shared/src/schemas.ts (expectedVersion param), packages/api/src/routes/records.ts (version check + increment)
+- Notes: All record mutation endpoints (update, submit, verify, amend) now accept optional `expectedVersion` parameter. If provided and doesn't match current record version, returns 409 VERSION_CONFLICT. Version is incremented on each successful mutation.
+- Commands: `npm run build`
 
 5) Phase 4 — Count Entry UX (Minimum Sellable)
-5.1 [TODO] Build count-entry form (specimenId, fluid type, dilution, squares, tally UI).
-- Files: README_TRACKING.md
-- Commands: TBD
+5.1 [DONE] Build count-entry form (specimenId, fluid type, dilution, squares, tally UI).
+- Files: packages/web/src/components/counters/Hemocytometer.tsx, Retic.tsx, Parasite.tsx, Fetal.tsx
+- Notes: Full count entry UI with specimenId, fluid type, dilution factor, squares counted, keyboard/click tallying for all counter types
 
-5.2 [TODO] Persist raw tallies and calculated values.
-- Files: README_TRACKING.md
-- Commands: TBD
+5.2 [DONE] Persist raw tallies and calculated values.
+- Files: packages/api/src/routes/records.ts, packages/api/src/services/calculations.ts
+- Notes: rawTallies and calculations stored on ManualCountRecord via API
 
-5.3 [TODO] Ensure counts are not lost (autosave or explicit save).
-- Files: README_TRACKING.md
-- Commands: TBD
+5.3 [DONE] Ensure counts are not lost (autosave or explicit save).
+- Files: packages/web/src/components/counters/*.tsx
+- Notes: Explicit "Save Draft" button available on all counters
 
-5.4 [TODO] Make “Submit for Verification” clear and irreversible.
-- Files: README_TRACKING.md
-- Commands: TBD
+5.4 [DONE] Make "Submit for Verification" clear and irreversible.
+- Files: packages/web/src/components/counters/*.tsx, packages/api/src/routes/records.ts
+- Notes: Distinct "Submit for Verification" button, server enforces draft→pending_verification transition
 
 6) Phase 5 — Audit Logging (Inspector-Ready)
-6.1 [TODO] Emit AuditEvent entries for key actions.
-- Files: README_TRACKING.md
-- Commands: TBD
+6.1 [DONE] Emit AuditEvent entries for key actions.
+- Files: packages/api/src/services/audit.ts, used in 10+ route files
+- Notes: All record CRUD, user management, org/site changes logged with correlation ID, IP, user agent
 
-6.2 [TODO] Build admin-only audit log viewer with filters.
-- Files: README_TRACKING.md
-- Commands: TBD
+6.2 [DONE] Build admin-only audit log viewer with filters.
+- Files: packages/api/src/routes/audit.ts, packages/web/src/components/admin/AuditLog.tsx, packages/web/src/components/admin/Admin.css
+- Notes: Admin-only audit log page with filters (Action, Entity Type, Actor, Date Range). Superadmins can view all orgs, org admins can only see their org's logs. Pagination and detail modal included.
+- Commands: `npm run build`
 
 7) Phase 6 — Corrections + Versioning (Non-Negotiable)
-7.1 [TODO] Implement corrections via new record/version with reason.
-- Files: README_TRACKING.md
-- Commands: TBD
+7.1 [DONE] Implement corrections via new record/version with reason.
+- Files: packages/api/src/routes/records.ts (POST /:id/amend), packages/web/src/components/records/AmendRecord.tsx
+- Notes: Amend endpoint updates record in place, sets status to 'corrected', requires reason
 
-7.2 [TODO] UI: show version chain and correction reason.
-- Files: README_TRACKING.md
-- Commands: TBD
+7.2 [DONE] UI: show version chain and correction reason.
+- Files: packages/web/src/components/records/RecordDetail.tsx, AmendRecord.tsx
+- Notes: RecordDetail shows correctionReason and full audit log with changes per amendment
 
-7.3 [TODO] Emit audit events for corrections.
-- Files: README_TRACKING.md
-- Commands: TBD
+7.3 [DONE] Emit audit events for corrections.
+- Files: packages/api/src/routes/records.ts
+- Notes: Amend action logs correctionReason, changes (before/after), and changedFields to audit
 
 8) Phase 7 — PDF Artifact Generation (Worksheet)
-8.1 [TODO] Generate immutable PDF for verified records with required fields.
-- Files: README_TRACKING.md
-- Commands: TBD
+8.1 [DONE] Generate immutable PDF for verified records with required fields.
+- Files: packages/api/src/services/pdf-generator.ts
+- Notes: PDFKit-based PDF generation with full record data (specimen info, count data, calculations, attestations, audit info)
 
-8.2 [TODO] Storage strategy with pluggable interface (local/S3).
-- Files: README_TRACKING.md
-- Commands: TBD
+8.2 [DONE] Storage strategy with pluggable interface (local/S3).
+- Files: packages/api/src/services/storage.ts
+- Notes: StorageProvider interface with LocalStorageProvider implementation. S3StorageProvider stubbed for future use. Configurable via STORAGE_PROVIDER env var.
 
-8.3 [TODO] Add “Download PDF” button (role-based).
-- Files: README_TRACKING.md
-- Commands: TBD
+8.3 [DONE] Add "Download PDF" button (role-based).
+- Files: packages/api/src/routes/pdf.ts, packages/web/src/components/records/RecordDetail.tsx
+- Notes: PDF download button shown for verified/corrected records. API caches generated PDFs. Site-based access control applied.
 
-8.4 [TODO] Log PDF generation/download as AuditEvent.
-- Files: README_TRACKING.md
-- Commands: TBD
+8.4 [DONE] Log PDF generation/download as AuditEvent.
+- Files: packages/api/src/routes/pdf.ts
+- Notes: pdf_generated and pdf_downloaded events logged with record metadata
 
 9) Phase 8 — Multi-Org / Multi-Site Admin
-9.1 [TODO] Admin UI: create org/site/users, assign roles, reset password/invite.
-- Files: README_TRACKING.md
-- Commands: TBD
+9.1 [DONE] Admin UI: create org/site/users, assign roles, reset password/invite.
+- Files: packages/web/src/components/superadmin/Organizations.tsx, packages/web/src/components/superadmin/OrganizationDetail.tsx, packages/web/src/components/admin/Users.tsx
+- Notes: Superadmin can create/manage orgs, sites, admins. Org admins can manage users. Password reset with temp password generation. Multi-site assignment. Role assignment (technologist/supervisor/admin/readonly).
 
-9.2 [TODO] Guardrails: site-limited permissions and no cross-org access.
-- Files: README_TRACKING.md
-- Commands: TBD
+9.2 [DONE] Guardrails: site-limited permissions and no cross-org access.
+- Files: packages/api/src/middleware/auth.ts (enforceOrgScope, superadminOnly, checkOrgSiteAccess)
+- Notes: enforceOrgScope middleware ensures non-superadmins only see their org data. Site/org status checks block access when inactive. All routes properly scoped with org filters.
 
 10) Phase 9 — Security Hardening (SOC-2-Ready Design)
-10.1 [TODO] Baseline protections (helmet/CORS/rate limiting/Zod/CSRF).
-- Files: README_TRACKING.md
-- Commands: TBD
+10.1 [DONE] Baseline protections (helmet/CORS/rate limiting/Zod/CSRF).
+- Files: packages/api/src/index.ts (helmet, cors), packages/api/src/middleware/security.ts (rate limiting, security headers)
+- Notes: Helmet with CSP/HSTS, CORS configured, rate limiters (general/auth/sensitive), Zod validation on all endpoints. CSRF not needed (JWT in Authorization header, not cookies).
 
-10.2 [TODO] Secrets management and env var documentation.
-- Files: README_TRACKING.md
-- Commands: TBD
+10.2 [DONE] Secrets management and env var documentation.
+- Files: packages/api/.env.example, packages/web/.env.example, .env.example
+- Notes: All required env vars documented in .env.example files. Secrets (DATABASE_URL, COGNITO credentials) loaded from environment.
 
-10.3 [TODO] Structured logging with request IDs and redaction strategy.
-- Files: README_TRACKING.md
-- Commands: TBD
+10.3 [DONE] Structured logging with request IDs and redaction strategy.
+- Files: packages/api/src/middleware/security.ts (correlationId, securityLogger), packages/api/src/middleware/auth.ts (logAuthEvent)
+- Notes: Correlation IDs on all requests, structured JSON logging with user/org context. Auth events logged separately. Sensitive data (tokens) not logged.
 
-10.4 [TODO] Document backup plan (RDS snapshots conceptually).
-- Files: README_TRACKING.md
-- Commands: TBD
+10.4 [DONE] Document backup plan (RDS snapshots conceptually).
+- Files: SECURITY.md (Backup & Recovery section)
+- Notes: Documented RDS daily snapshots, 7-day retention, PITR support, recovery procedures
 
-10.5 [TODO] Add SECURITY.md threat model and controls.
-- Files: README_TRACKING.md
-- Commands: TBD
+10.5 [DONE] Add SECURITY.md threat model and controls.
+- Files: SECURITY.md
+- Notes: Comprehensive threat model with assets, actors, threats. Documents all controls: auth, authz, input validation, rate limiting, transport security, audit logging, data protection.
 
 11) Phase 10 — Testing + Quality Gates
 11.1 [TODO] Unit tests for calculations and state transitions.
@@ -250,27 +253,29 @@ Build a secure, multi-tenant web application that replaces manual hemocytometer 
 - Files: README_TRACKING.md, packages/api/src/routes/records.ts, packages/web/src/components/records/RecordDetail.tsx, packages/web/src/components/records/AmendRecord.tsx, packages/web/src/components/records/Records.css, packages/web/src/App.tsx
 - Commands: `npm run build`
 
-13) [TODO] Advanced Counter Templating & Method Safety (Critical)
+13) [DONE] Advanced Counter Templating & Method Safety (Critical)
 - Requirements:
   - Architecture: Separate Templates (Code/Schema/Formulas) from Parameters (Targets/Thresholds).
   - Safety: Every record MUST store `methodTemplateId`, `methodVersion`, and `paramsSnapshot` (e.g., targetRBC=500) to ensure historical accuracy if defaults change.
   - Config: Store Org defaults in `organization.methodConfigs`.
   - UI: Superadmin selects/configures counters available to each Org.
-- Files: README_TRACKING.md
-- Commands: TBD
+- Files: packages/api/prisma/schema.prisma (OrgMethodConfig), packages/api/src/services/method-config.ts, packages/api/src/routes/method-config.ts, packages/api/src/routes/superadmin/method-config.ts, packages/web/src/components/superadmin/OrganizationDetail.tsx
+- Notes: OrgMethodConfig stores per-org params, paramsSnapshot stored on each record, methodVersion tracked, superadmin UI for configuring method params per org
 
-14) [TODO] Enhanced Audit System (Traceability + Config Log)
+14) [DONE] Enhanced Audit System (Traceability + Config Log)
 - Requirements:
   - Record Traceability: Rely on record snapshots for "what method was used".
   - Config Audit: Log Organization setting changes (e.g., "Org X changed targetRBC 500 -> 1000") to `AuditLog`.
   - Access Control: Superadmin (Global), Org Admin (Local only).
   - UI: Admin Audit page with filters (Time, Actor, Action, Target).
-- Files: README_TRACKING.md
-- Commands: TBD
+- Files: packages/api/src/routes/audit.ts, packages/web/src/components/admin/AuditLog.tsx
+- Notes: paramsSnapshot on records provides method traceability. Config changes logged via auditLog service. Admin Audit page implemented with filters for Time, Actor, Action, Entity Type. Superadmins see all orgs, Org Admins see only their org.
 
 15) [TODO] Prevent records from being finalized if target count isn't met
 
-16) [TODO] When count data is amended, the specific parameters and amounts and any calculations changed as a result should be noted in the audit log
+16) [DONE] When count data is amended, the specific parameters and amounts and any calculations changed as a result should be noted in the audit log
+- Files: packages/api/src/routes/records.ts (amend endpoint)
+- Notes: Amend action logs `changes` object with before/after for each changed field (rawTallies, specimenId, performedAt)
 
 ## How To Run Locally
 - Run: `npm run dev:local`

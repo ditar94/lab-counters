@@ -14,6 +14,7 @@ import { MonthlyReview } from './components/reviews/MonthlyReview';
 import { Organizations } from './components/superadmin/Organizations';
 import { OrganizationDetail } from './components/superadmin/OrganizationDetail';
 import { Users } from './components/admin/Users';
+import { AuditLog } from './components/admin/AuditLog';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -62,6 +63,7 @@ export default function App() {
 
         {/* Admin routes */}
         <Route path="admin/users" element={<Users />} />
+        <Route path="admin/audit" element={<AuditLog />} />
         <Route path="reviews" element={<MonthlyReview />} />
 
         {/* Superadmin routes */}

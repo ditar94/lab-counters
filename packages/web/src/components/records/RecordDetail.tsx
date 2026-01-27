@@ -76,6 +76,7 @@ export function RecordDetail() {
   const [record, setRecord] = useState<RecordWithRelations | null>(null);
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [attestationChecked, setAttestationChecked] = useState(false);
   const [auditLog, setAuditLog] = useState<AuditEvent[]>([]);
@@ -129,6 +130,48 @@ export function RecordDetail() {
       setError(err instanceof Error ? err.message : 'Failed to verify');
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!id || !record) return;
+
+    setDownloadingPdf(true);
+    setError(null);
+
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Not authenticated');
+
+      // Fetch the PDF as a blob
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/pdf/records/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to download PDF');
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary link and click it to download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${record.specimenId}_${record.type}_v${record.version || 1}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('PDF download error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to download PDF');
+    } finally {
+      setDownloadingPdf(false);
     }
   };
 
@@ -200,6 +243,9 @@ export function RecordDetail() {
   const isSupervisorOrAdmin = user?.role === 'supervisor' || user?.role === 'admin';
   const canAmend = (record.status === 'verified' || record.status === 'corrected') && (isSupervisorOrAdmin || isOwnRecord);
 
+  // PDF download available for verified or corrected records
+  const canDownloadPdf = record.status === 'verified' || record.status === 'corrected';
+
   return (
     <div className="record-detail">
       <header className="page-header">
@@ -222,6 +268,15 @@ export function RecordDetail() {
             <Link to={`/records/${record.id}/amend`} className="btn warning">
               Amend Record
             </Link>
+          )}
+          {canDownloadPdf && (
+            <button
+              className="btn secondary"
+              onClick={handleDownloadPdf}
+              disabled={downloadingPdf}
+            >
+              {downloadingPdf ? 'Generating...' : 'Download PDF'}
+            </button>
           )}
         </div>
       </header>

@@ -305,7 +305,7 @@ usersRouter.patch('/:id', async (req: Request, res: Response, next: NextFunction
 
       if (body.siteId) {
         // Verify the new current site is in user's assigned sites
-        const assignedSiteIds = body.siteIds || existing.sites.map((s) => s.siteId);
+        const assignedSiteIds = body.siteIds || existing.sites.map((s: { siteId: string }) => s.siteId);
         if (!assignedSiteIds.includes(body.siteId)) {
           throw new AppError(400, 'INVALID_SITE', 'Current site must be in assigned sites');
         }
