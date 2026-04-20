@@ -44,8 +44,9 @@ export const HemocytometerDataSchema = z.object({
 // ============================================
 
 export const FetalDataSchema = z.object({
-  fields: z.array(z.number().min(0)).length(5),
+  fields: z.array(z.number().min(0)).min(1).max(50),
   fetalCellCount: z.number().min(0),
+  fetalFieldsCounted: z.number().min(0).max(200).optional(),
 });
 
 // ============================================
@@ -233,7 +234,10 @@ export const HemocytometerMethodParamsSchema = z.object({
   lowCountThreshold: z.number().min(1).max(100),
 });
 
-export const FetalMethodParamsSchema = z.object({});
+export const FetalMethodParamsSchema = z.object({
+  rbcFieldsCount: z.number().min(1).max(50),
+  fetalFieldsCount: z.number().min(1).max(200),
+});
 
 export const ReticMethodParamsSchema = z.object({
   targetRbcCount: z.number().min(100).max(10000),
@@ -243,22 +247,67 @@ export const ParasiteMethodParamsSchema = z.object({
   targetRbcCount: z.number().min(100).max(10000),
 });
 
+export const HemocytometerMethodIdSchema = z.enum(['standard_v1']);
+export const FetalMethodIdSchema = z.enum(['kb_fields_v1']);
+export const ReticMethodIdSchema = z.enum(['standard_v1']);
+export const ParasiteMethodIdSchema = z.enum(['standard_v1']);
+
+export const HemocytometerMethodConfigSchema = z.object({
+  method: HemocytometerMethodIdSchema,
+  params: HemocytometerMethodParamsSchema,
+});
+
+export const FetalMethodConfigSchema = z.object({
+  method: FetalMethodIdSchema,
+  params: FetalMethodParamsSchema,
+});
+
+export const ReticMethodConfigSchema = z.object({
+  method: ReticMethodIdSchema,
+  params: ReticMethodParamsSchema,
+});
+
+export const ParasiteMethodConfigSchema = z.object({
+  method: ParasiteMethodIdSchema,
+  params: ParasiteMethodParamsSchema,
+});
+
+export const HemocytometerMethodConfigUpdateSchema = z.object({
+  method: HemocytometerMethodIdSchema.optional(),
+  params: HemocytometerMethodParamsSchema.partial().optional(),
+});
+
+export const FetalMethodConfigUpdateSchema = z.object({
+  method: FetalMethodIdSchema.optional(),
+  params: FetalMethodParamsSchema.partial().optional(),
+});
+
+export const ReticMethodConfigUpdateSchema = z.object({
+  method: ReticMethodIdSchema.optional(),
+  params: ReticMethodParamsSchema.partial().optional(),
+});
+
+export const ParasiteMethodConfigUpdateSchema = z.object({
+  method: ParasiteMethodIdSchema.optional(),
+  params: ParasiteMethodParamsSchema.partial().optional(),
+});
+
 /** Schema for updating org method config - uses discriminated union by counterType */
 export const UpdateOrgMethodConfigSchema = z.discriminatedUnion('counterType', [
   z.object({
     counterType: z.literal('hemocytometer'),
-    config: HemocytometerMethodParamsSchema.partial(),
+    config: HemocytometerMethodConfigUpdateSchema,
   }),
   z.object({
     counterType: z.literal('fetal'),
-    config: FetalMethodParamsSchema.partial(),
+    config: FetalMethodConfigUpdateSchema,
   }),
   z.object({
     counterType: z.literal('retic'),
-    config: ReticMethodParamsSchema.partial(),
+    config: ReticMethodConfigUpdateSchema,
   }),
   z.object({
     counterType: z.literal('parasite'),
-    config: ParasiteMethodParamsSchema.partial(),
+    config: ParasiteMethodConfigUpdateSchema,
   }),
 ]);

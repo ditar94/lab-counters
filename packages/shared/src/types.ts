@@ -166,8 +166,9 @@ export interface HemocytometerRecord extends Omit<ManualCountRecordBase, 'rawTal
 // ============================================
 
 export interface FetalData {
-  fields: number[]; // 5 fields for RBC count
-  fetalCellCount: number; // Count in 30 fields
+  fields: number[]; // RBC counts across configured fields
+  fetalCellCount: number; // Count across configured fetal fields
+  fetalFieldsCounted?: number; // Number of fetal fields completed
 }
 
 export interface FetalCalculations {
@@ -291,9 +292,12 @@ export interface HemocytometerMethodParams {
   lowCountThreshold: number;
 }
 
-/** Fetal (KB Test) method parameters - placeholder for future */
+/** Fetal (KB Test) method parameters */
 export interface FetalMethodParams {
-  // No configurable parameters currently
+  /** Number of fields used to count RBCs */
+  rbcFieldsCount: number;
+  /** Number of fields used to count fetal cells */
+  fetalFieldsCount: number;
 }
 
 /** Reticulocyte method parameters */
@@ -307,6 +311,18 @@ export interface ParasiteMethodParams {
   /** Target RBC count to reach */
   targetRbcCount: number;
 }
+
+/** Method IDs per counter */
+export type HemocytometerMethodId = 'standard_v1';
+export type FetalMethodId = 'kb_fields_v1';
+export type ReticMethodId = 'standard_v1';
+export type ParasiteMethodId = 'standard_v1';
+
+export type MethodId =
+  | HemocytometerMethodId
+  | FetalMethodId
+  | ReticMethodId
+  | ParasiteMethodId;
 
 /** Union type of all method params */
 export type MethodParams =
@@ -323,10 +339,28 @@ export interface MethodParamsByType {
   parasite: ParasiteMethodParams;
 }
 
+export interface MethodIdByType {
+  hemocytometer: HemocytometerMethodId;
+  fetal: FetalMethodId;
+  retic: ReticMethodId;
+  parasite: ParasiteMethodId;
+}
+
+export interface MethodConfigByType {
+  hemocytometer: { method: HemocytometerMethodId; params: HemocytometerMethodParams };
+  fetal: { method: FetalMethodId; params: FetalMethodParams };
+  retic: { method: ReticMethodId; params: ReticMethodParams };
+  parasite: { method: ParasiteMethodId; params: ParasiteMethodParams };
+}
+
+export type MethodConfig = MethodConfigByType[CountRecordType];
+
 /** Params snapshot stored on each record for historical accuracy */
 export interface ParamsSnapshot {
   /** Method version used at count time */
   methodVersion: string;
+  /** Method ID used at count time */
+  methodId: MethodId;
   /** Counter-specific params that were applied */
   params: MethodParams;
   /** Source of params: 'org' | 'system_default' */
@@ -340,7 +374,7 @@ export interface OrgMethodConfig {
   id: string;
   orgId: string;
   counterType: CountRecordType;
-  config: MethodParams;
+  config: MethodConfig;
   version: number;
   createdAt: Date;
   updatedAt: Date;

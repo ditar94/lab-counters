@@ -3,17 +3,25 @@
   "version": "0.0.1",
   "private": true,
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "dev:local": "bash scripts/dev-local.sh",
+    "dev:safe": "bash scripts/dev-safe.sh",
+    "dev:docker": "docker-compose up -d && npm run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "db:migrate": "npm run migrate --workspace=@lab-counters/api",
     "db:generate": "npm run generate --workspace=@lab-counters/api",
+    "db:seed": "npm run db:seed --workspace=@lab-counters/api",
+    "db:studio": "npm run db:studio --workspace=@lab-counters/api",
+    "db:push": "npm run db:push --workspace=@lab-counters/api",
+    "db:reset": "npm run db:migrate --workspace=@lab-counters/api -- --force-reset",
+    "db:deploy": "npm run deploy --workspace=@lab-counters/api",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {

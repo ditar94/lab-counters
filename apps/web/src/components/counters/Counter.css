@@ -1,0 +1,777 @@
+/* Shared styles for simple counters (Retic, Parasite) */
+
+.counter-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem 0.75rem;
+}
+
+.counter-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.counter-header.compact {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.counter-header.compact .title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.counter-header.compact h1 {
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.counter-header.compact .counter-description {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.counter-header.compact + .results-section {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .counter-header.compact h1 {
+    font-size: 1.2rem;
+  }
+}
+
+.counter-header h1 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.counter-description {
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.specimen-info {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.specimen-info .form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.specimen-info label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.specimen-info input,
+.specimen-info select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  min-width: 200px;
+}
+
+.error-banner {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Results Section */
+.results-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.result-display {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.result-display .label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.result-display .value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Counter Section */
+.counter-section {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+}
+
+.count-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.count-buttons.two-button .count-btn {
+  flex: 1;
+  max-width: 200px;
+}
+
+.count-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 120px;
+}
+
+.count-btn:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.count-btn:active {
+  transform: scale(0.98);
+}
+
+.count-btn span:first-child {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.count-btn .count-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.count-btn .hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.count-btn.retic {
+  border-color: #0ea5e9;
+}
+
+.count-btn.retic:hover {
+  background: rgba(14, 165, 233, 0.12);
+}
+
+.count-btn.rbc {
+  border-color: #f97316;
+}
+
+.count-btn.rbc:hover {
+  background: rgba(249, 115, 22, 0.12);
+}
+
+.count-btn.parasite {
+  border-color: #14b8a6;
+}
+
+.count-btn.parasite:hover {
+  background: rgba(20, 184, 166, 0.12);
+}
+
+.count-btn.field {
+  border-color: var(--color-primary);
+}
+
+.count-btn.field:hover {
+  background: rgba(14, 116, 144, 0.12);
+}
+
+/* Counter Input */
+.counter-input {
+  margin-bottom: 1rem;
+}
+
+.counter-input input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+}
+
+.counter-input input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* Counter Controls */
+.counter-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.mode-btn,
+.reset-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn.add {
+  background: #4caf50;
+  color: white;
+}
+
+.mode-btn.subtract {
+  background: #ff9800;
+  color: white;
+}
+
+.mode-btn:hover {
+  opacity: 0.9;
+}
+
+.reset-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.reset-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* Formula Display */
+.formula-display {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.formula-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.formula-row p {
+  margin: 0;
+}
+
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.fraction .numerator {
+  border-bottom: 1px solid var(--text-primary);
+  padding: 0 0.5rem 0.25rem;
+}
+
+.fraction .denominator {
+  padding: 0.25rem 0.5rem 0;
+}
+
+/* Performer Attestation */
+.attestation-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.attestation-section .attestation-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.attestation-section .attestation-checkbox input {
+  margin-top: 0.25rem;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.attestation-section .attestation-checkbox span {
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.attestation-section .attestation-checkbox strong {
+  color: var(--primary-color);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn.secondary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn.success {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+/* Input Mode Toggle */
+.input-mode-toggle {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.stepper-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stepper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stepper-header h3 {
+  margin: 0.35rem 0 0;
+}
+
+.step-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(14, 116, 144, 0.12);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stepper-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stepper-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.step-dot.active {
+  background: linear-gradient(135deg, var(--color-primary), #0d9488);
+  color: white;
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+}
+
+.stepper-body .fields-section,
+.stepper-body .fetal-count-section {
+  margin-bottom: 0;
+}
+
+.stepper-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  margin-bottom: 1rem;
+}
+
+.stepper-metrics .metric {
+  text-align: center;
+}
+
+.stepper-metrics .label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+
+.stepper-metrics .value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.step-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  background: var(--bg-secondary);
+}
+
+@media (max-width: 640px) {
+  .stepper-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stepper-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .stepper-metrics {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+}
+
+.step-summary .label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.step-summary .value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.field-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  margin-bottom: 1rem;
+}
+
+.field-progress .label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+
+.field-progress .value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.field-progress-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .field-progress {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+
+  /* FIX */
+  margin-bottom: 0;
+}
+
+
+.checkbox-label input {
+  margin: 0; /* remove browser default margin */
+}
+
+.checkbox-label small {
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+
+
+.input-mode-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* Fetal Counter Specific */
+.fetal-counter .fields-section {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.fetal-counter .fields-section h3 {
+  margin: 0 0 1rem;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.fetal-counter .field-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.fetal-counter .field-tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fetal-counter .field-tab:hover {
+  background: var(--bg-hover);
+}
+
+.fetal-counter .field-tab.active {
+  background: linear-gradient(135deg, var(--color-primary), #0d9488);
+  color: #f8fafc;
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+}
+
+.fetal-counter .fields-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.fetal-counter .field-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fetal-counter .field-input label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.fetal-counter .field-input input {
+  width: 100%;
+  padding: 0.65rem;
+  font-size: 1.1rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.fetal-counter .calculations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.fetal-counter .calc-item {
+  background: var(--bg-secondary);
+  padding: 0.85rem;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.fetal-counter .calc-item .label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.fetal-counter .calc-item .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.fetal-counter .fetal-count-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+}
+
+.fetal-counter .fetal-count-section h3 {
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.fetal-counter .count-display {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.fetal-counter .count-item {
+  text-align: center;
+}
+
+.fetal-counter .count-item .label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.fetal-counter .count-item .value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .count-buttons {
+    flex-direction: column;
+  }
+
+  .count-buttons.two-button .count-btn {
+    max-width: none;
+  }
+
+  .fetal-counter .fields-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fetal-counter .calculations-grid {
+    grid-template-columns: 1fr;
+  }
+}
