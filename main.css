@@ -472,7 +472,7 @@ footer {
     border-radius: 8px;
 }
 
-/* Calculator pages (Cell Suspension, Lab Dilution) start */
+/* Cell Suspension Calculator page start */
 
 .calc-container {
     align-self: stretch;
@@ -511,14 +511,9 @@ footer {
     font-size: 14px;
 }
 
-.calc-tabs label:has(+ input:checked),
-.calc-tabs:has(input:checked) label[data-active="true"] {
-    background-color: #1d70b8;
-    color: white;
-}
-
-/* Simpler, broadly-supported active-tab styling driven by JS toggling
-   this class (kept in addition to the :has() rule above). */
+/* Active-tab styling is driven entirely by JS toggling this class on
+   the label whose own radio is checked (see updateActiveTabs() in
+   cell-suspension-calculator.js). */
 .calc-tabs label.active-tab {
     background-color: #1d70b8;
     color: white;
@@ -713,86 +708,6 @@ details.calc-details code {
     border-radius: 4px;
 }
 
-.ratio-visual {
-    display: flex;
-    width: 100%;
-    height: 2.5rem;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 0.1rem solid black;
-    margin: 0.75rem 0;
-}
-
-.ratio-visual-specimen,
-.ratio-visual-diluent {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-    white-space: nowrap;
-    overflow: hidden;
-    padding: 0 0.25rem;
-}
-
-.ratio-visual-specimen {
-    background-color: #1d70b8;
-}
-
-.ratio-visual-diluent {
-    background-color: #505a5f;
-}
-
-.calc-content-section {
-    align-self: stretch;
-    text-align: left;
-    border-top: 0.1vw solid #f3f2f1;
-    padding-top: 1rem;
-    margin-top: 1.5rem;
-}
-
-.calc-content-section h2,
-.calc-content-section h3 {
-    text-align: left;
-}
-
-.calc-content-section p,
-.calc-content-section li {
-    text-align: left;
-    line-height: 1.5;
-}
-
-/* The sitewide `ul` rule lays lists out as a horizontal flex row (built
-   for the nav bar) — restore normal block list behavior for ordinary
-   bulleted content inside the calculator pages. */
-.calc-content-section ul,
-.calc-related-links ul {
-    display: block;
-    list-style-type: disc;
-    padding-left: 1.5rem;
-}
-
-.calc-content-section li,
-.calc-related-links li {
-    display: list-item;
-    list-style-type: disc;
-}
-
-.calc-faq dt {
-    font-weight: bold;
-    margin-top: 0.75rem;
-}
-
-.calc-faq dd {
-    margin: 0.25rem 0 0 0;
-}
-
-.calc-related-links {
-    align-self: stretch;
-    text-align: left;
-}
-
 .ad-slot {
     align-self: stretch;
     width: 100%;
@@ -824,4 +739,4 @@ details.calc-details code {
     }
 }
 
-/* Calculator pages (Cell Suspension, Lab Dilution) end */
+/* Cell Suspension Calculator page end */

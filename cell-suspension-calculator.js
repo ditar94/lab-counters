@@ -69,34 +69,24 @@ function updatePanels() {
 // ---------------------------------------------------------------------
 
 function clearResultsModeA() {
-    ["a-result-volume-per-tube", "a-result-total-volume", "a-result-overage-additional",
-        "a-result-total-with-overage", "a-result-total-cells"].forEach(function (id) {
+    ["a-result-volume-per-tube", "a-result-total-volume"].forEach(function (id) {
         setText(id, "—");
     });
 }
 
 function recalcModeA() {
     var errorBanner = document.getElementById("a-banner-error");
-    var pipetteBanner = document.getElementById("a-banner-pipette");
-    var feasibilityBanner = document.getElementById("a-banner-feasibility");
     if (!errorBanner) return; // page not loaded yet
 
     var concentration = readNumber("a-concentration");
     var concentrationUnit = document.getElementById("a-concentration-unit").value;
     var targetCellsPerTube = readNumber("a-target-cells");
     var numberOfTubes = readNumber("a-tubes");
-    var overagePercent = readNumber("a-overage");
-    if (overagePercent === null) overagePercent = 0;
-    var availableVolume = readNumber("a-available-volume");
-    var availableVolumeUnit = document.getElementById("a-available-volume-unit").value;
-    var minPipetteVolumeUL = readNumber("a-min-pipette");
 
     var hasCoreInputs = concentration !== null && targetCellsPerTube !== null && numberOfTubes !== null;
     if (!hasCoreInputs) {
         clearResultsModeA();
         hideBanner(errorBanner);
-        hideBanner(pipetteBanner);
-        hideBanner(feasibilityBanner);
         return;
     }
 
@@ -104,62 +94,22 @@ function recalcModeA() {
         concentration: concentration,
         concentrationUnit: concentrationUnit,
         targetCellsPerTube: targetCellsPerTube,
-        numberOfTubes: numberOfTubes,
-        overagePercent: overagePercent,
-        availableVolume: availableVolume,
-        availableVolumeUnit: availableVolumeUnit,
-        minPipetteVolumeUL: minPipetteVolumeUL
+        numberOfTubes: numberOfTubes
     });
 
     if (result.errors.length) {
         showBanner(errorBanner, result.errors.join(" "));
         clearResultsModeA();
-        hideBanner(pipetteBanner);
-        hideBanner(feasibilityBanner);
         return;
     }
     hideBanner(errorBanner);
 
     setText("a-result-volume-per-tube", fmt(result.volumePerTubeUL) + " µL");
     setText("a-result-total-volume", fmt(result.totalVolumeUL) + " µL");
-    setText("a-result-overage-additional", fmt(result.additionalOverageUL) + " µL");
-    setText("a-result-total-with-overage", fmt(result.totalWithOverageUL) + " µL");
-    setText("a-result-total-cells", fmt(result.totalCellsRequired, 6) + " cells");
 
     setText("a-calc-concentration-perul", fmt(result.concentrationPerUL, 6));
     setText("a-calc-volume-per-tube", fmt(result.volumePerTubeUL));
     setText("a-calc-total-volume", fmt(result.totalVolumeUL));
-    setText("a-calc-overage-pct", fmt(overagePercent));
-    setText("a-calc-total-with-overage", fmt(result.totalWithOverageUL));
-
-    if (result.belowMinPipette === true) {
-        showBanner(
-            pipetteBanner,
-            "The specimen volume required per tube (" + fmt(result.volumePerTubeUL) + " µL) is below " +
-            "your specified minimum reliable pipetting volume (" + fmt(minPipetteVolumeUL) + " µL). " +
-            "Consider using a larger target volume or diluting the specimen first."
-        );
-    } else {
-        hideBanner(pipetteBanner);
-    }
-
-    if (result.sufficient === true) {
-        feasibilityBanner.className = "calc-banner calc-feasible";
-        showBanner(
-            feasibilityBanner,
-            "Sufficient specimen available: " + fmt(result.availableVolumeUL) + " µL available vs. " +
-            fmt(result.totalWithOverageUL) + " µL needed (surplus of " + fmt(result.surplusOrDeficitUL) + " µL)."
-        );
-    } else if (result.sufficient === false) {
-        feasibilityBanner.className = "calc-banner calc-infeasible";
-        showBanner(
-            feasibilityBanner,
-            "Insufficient specimen: " + fmt(result.availableVolumeUL) + " µL available vs. " +
-            fmt(result.totalWithOverageUL) + " µL needed (short by " + fmt(Math.abs(result.surplusOrDeficitUL)) + " µL)."
-        );
-    } else {
-        hideBanner(feasibilityBanner);
-    }
 }
 
 function resetModeA() {
@@ -167,10 +117,6 @@ function resetModeA() {
     document.getElementById("a-concentration-unit").value = "cellsPerUL";
     document.getElementById("a-target-cells").value = "";
     document.getElementById("a-tubes").value = "";
-    document.getElementById("a-overage").value = "0";
-    document.getElementById("a-available-volume").value = "";
-    document.getElementById("a-available-volume-unit").value = "uL";
-    document.getElementById("a-min-pipette").value = "";
     recalcModeA();
 }
 
