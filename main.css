@@ -549,6 +549,33 @@ footer {
     font-weight: normal;
 }
 
+/* A shared/master setting (e.g. a unit that governs more than one field
+   below it) gets its own highlighted band instead of sitting in the
+   grid looking like just another plain input. */
+.calc-field-unit-highlight {
+    align-self: stretch;
+    background-color: #fff7e5;
+    border: 0.15rem solid #b58a00;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0 0 0;
+    max-width: 20rem;
+}
+
+.calc-field-unit-highlight select.calc-select {
+    border-color: #b58a00;
+    font-weight: bold;
+    background-color: white;
+}
+
+.calc-field-unit-badge {
+    display: block;
+    font-weight: normal;
+    font-size: 12px;
+    color: #6b5300;
+    margin-top: 0.15rem;
+}
+
 .calc-input-row {
     display: flex;
     gap: 0.5rem;
