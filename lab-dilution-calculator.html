@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lab Dilution Calculator | Dilution Ratios &amp; C1V1=C2V2 | CellCounter</title>
+        <meta name="description" content="Free laboratory dilution calculator. Calculate 1:5, 1:10, and other dilution ratios, specimen volumes, diluent volumes, and C1V1=C2V2 concentrations.">
+        <meta name="author" content="Dionicy Tarantino">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://cellcounter.io/lab-dilution-calculator">
+
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Lab Dilution Calculator | Dilution Ratios &amp; C1V1=C2V2 | CellCounter">
+        <meta property="og:description" content="Free laboratory dilution calculator. Calculate 1:5, 1:10, and other dilution ratios, specimen volumes, diluent volumes, and C1V1=C2V2 concentrations.">
+        <meta property="og:url" content="https://cellcounter.io/lab-dilution-calculator">
+        <meta property="og:site_name" content="CellCounter">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Lab Dilution Calculator | CellCounter">
+        <meta name="twitter:description" content="Free laboratory dilution calculator. Calculate 1:5, 1:10, and other dilution ratios, specimen volumes, diluent volumes, and C1V1=C2V2 concentrations.">
+
+        <meta name="google-adsense-account" content="ca-pub-8727841619590493">
+
+        <link rel="stylesheet" href="main.css" type="text/css">
+        <script src="Time.js"></script>
+        <script src="calculators/labDilutionCalc.js"></script>
+        <script src="lab-dilution-calculator.js"></script>
+
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "SoftwareApplication",
+                    "name": "Laboratory Dilution Calculator",
+                    "url": "https://cellcounter.io/lab-dilution-calculator",
+                    "applicationCategory": "HealthApplication",
+                    "operatingSystem": "Any (web browser)",
+                    "browserRequirements": "Requires JavaScript",
+                    "isAccessibleForFree": true,
+                    "description": "Free browser-based calculator for laboratory dilution ratios (e.g. 1:5, 1:10) and C1V1=C2V2 mass-concentration dilutions.",
+                    "offers": {
+                        "@type": "Offer",
+                        "price": "0",
+                        "priceCurrency": "USD"
+                    },
+                    "publisher": {
+                        "@type": "Person",
+                        "name": "Dionicy Tarantino"
+                    }
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Home",
+                            "item": "https://cellcounter.io/home"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": "Laboratory Dilution Calculator",
+                            "item": "https://cellcounter.io/lab-dilution-calculator"
+                        }
+                    ]
+                }
+            ]
+        }
+        </script>
+    </head>
+
+    <body>
+        <header>
+            <div id="webTitleBar">
+                <p>CellCounter</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="fetal.html">Fetal Hgb Counter</a></li>
+                    <li><a href="retic.html">Retic Counter</a></li>
+                    <li><a href="parasite.html">Parasite Counter</a></li>
+                    <li><a href="hemocytometer.html">Hemocytometer Counter</a></li>
+                    <li><a href="cell-suspension-calculator.html">Cell Suspension Calculator</a></li>
+                    <li><a href="lab-dilution-calculator.html">Lab Dilution Calculator</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div id="main-body">
+            <h1>Laboratory Dilution Calculator</h1>
+            <h2>Calculate dilution ratios like 1:5 and 1:10, and C1V1=C2V2 concentration dilutions, for routine laboratory use.</h2>
+
+            <div class="calc-intro">
+                <p>
+                    This free laboratory dilution calculator covers two routine jobs on the bench: splitting a final volume into specimen and diluent according to a <strong>dilution ratio</strong> (such as 1:5 or 1:10), and working out a <strong>concentration dilution</strong> using C1V1 = C2V2. Results update instantly as you type — no "Calculate" button needed. Dilution-ratio notation is a common source of error, so this tool makes the convention you're using explicit at every step.
+                </p>
+            </div>
+
+            <div class="ad-slot" id="ad-slot-top" aria-hidden="true"></div>
+
+            <div class="calc-container">
+                <div class="calc-tabs" role="tablist" aria-label="Dilution calculation mode">
+                    <input type="radio" name="dilution-mode" id="mode-ratio" checked>
+                    <label for="mode-ratio" class="active-tab">Dilution Ratio</label>
+                    <input type="radio" name="dilution-mode" id="mode-concentration">
+                    <label for="mode-concentration">Concentration (C1V1=C2V2)</label>
+                </div>
+
+                <section class="calc-panel" id="panel-mode-ratio" aria-labelledby="mode-ratio">
+                    <h2>Mode A: Dilution Ratio Calculator</h2>
+                    <p>
+                        A dilution ratio like "1:5" is written the same way under two different, incompatible conventions. This tool asks you explicitly which one you mean, so your specimen and diluent volumes always come out correctly.
+                    </p>
+
+                    <div class="calc-note" style="margin-bottom: 0.5rem;">
+                        <strong>Convention 1 — "1 in X" (1 part specimen in X total parts):</strong> a 1:5 dilution means 1 part specimen + 4 parts diluent = 5 total parts.<br>
+                        <strong>Convention 2 — "1 plus X" (1 part specimen plus X parts diluent):</strong> a 1:5 dilution means 1 part specimen + 5 parts diluent = 6 total parts.<br>
+                        These give different volumes for the same "1:5" label — always confirm which convention your protocol uses. Convention 1 is selected by default below.
+                    </div>
+
+                    <div class="calc-grid">
+                        <div class="calc-field">
+                            <label for="r-preset">Dilution ratio</label>
+                            <select class="calc-select" id="r-preset">
+                                <option value="2">1:2</option>
+                                <option value="5" selected>1:5</option>
+                                <option value="10">1:10</option>
+                                <option value="20">1:20</option>
+                                <option value="50">1:50</option>
+                                <option value="100">1:100</option>
+                                <option value="custom">Custom…</option>
+                            </select>
+                        </div>
+
+                        <div class="calc-field" id="r-custom-field" style="display:none;">
+                            <label for="r-custom-n">Custom ratio — the X in 1:X</label>
+                            <input class="calc-input" type="number" inputmode="numeric" min="2" step="1" id="r-custom-n" value="5">
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="r-final-volume">Desired final volume</label>
+                            <div class="calc-input-row">
+                                <input class="calc-input" type="number" inputmode="decimal" min="0" id="r-final-volume" value="1000">
+                                <select class="calc-select" id="r-volume-unit" aria-label="Final volume unit">
+                                    <option value="uL">µL</option>
+                                    <option value="mL">mL</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <fieldset style="border: 0.1rem solid black; border-radius: 8px; padding: 0.75rem; margin: 0.5rem 0; text-align:left;">
+                        <legend style="font-weight:bold;">Dilution convention</legend>
+                        <div>
+                            <input type="radio" name="r-convention" id="r-convention-1" value="totalParts" checked>
+                            <label for="r-convention-1">Convention 1: 1 part specimen in X total parts (default)</label>
+                        </div>
+                        <div>
+                            <input type="radio" name="r-convention" id="r-convention-2" value="specimenToDiluent">
+                            <label for="r-convention-2">Convention 2: 1 part specimen plus X parts diluent</label>
+                        </div>
+                    </fieldset>
+
+                    <div class="calc-actions">
+                        <button type="button" onclick="resetRatioMode()">Reset</button>
+                    </div>
+
+                    <div class="calc-banner calc-error" id="r-banner-error" role="alert" hidden></div>
+
+                    <div class="ratio-visual" id="r-ratio-visual" role="img" aria-label="Proportion of specimen to diluent">
+                        <div class="ratio-visual-specimen" id="r-ratio-visual-specimen">Specimen</div>
+                        <div class="ratio-visual-diluent" id="r-ratio-visual-diluent">Diluent</div>
+                    </div>
+
+                    <div class="calc-results">
+                        <div class="result-card result-primary">
+                            <p class="result-label">Specimen volume</p>
+                            <p class="result-value" id="r-result-specimen-volume">—</p>
+                        </div>
+                        <div class="result-card result-primary">
+                            <p class="result-label">Diluent volume</p>
+                            <p class="result-value" id="r-result-diluent-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Final volume</p>
+                            <p class="result-value" id="r-result-final-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Effective dilution ratio</p>
+                            <p class="result-value" id="r-result-effective-ratio">—</p>
+                        </div>
+                    </div>
+                    <p class="calc-note" id="r-mixing-instructions"></p>
+
+                    <details class="calc-details">
+                        <summary>Show calculation</summary>
+                        <div class="calc-details-body" id="r-calc-details-body"></div>
+                    </details>
+                </section>
+
+                <section class="calc-panel hide" id="panel-mode-concentration" aria-labelledby="mode-concentration">
+                    <h2>Mode B: Concentration Dilution Calculator</h2>
+                    <p>
+                        Calculate a mass-concentration dilution using <strong>C1V1 = C2V2</strong>. Enter your stock (starting) concentration, the target concentration, and the final volume you want to prepare.
+                    </p>
+
+                    <div class="calc-grid">
+                        <div class="calc-field">
+                            <label for="c-starting-concentration">Starting concentration (C1)</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="c-starting-concentration" value="10">
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="c-target-concentration">Target concentration (C2)</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="c-target-concentration" value="2">
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="c-concentration-unit">Concentration unit (applies to both C1 and C2)</label>
+                            <select class="calc-select" id="c-concentration-unit">
+                                <option value="mgPerML" selected>mg/mL</option>
+                                <option value="ugPerML">µg/mL</option>
+                                <option value="ngPerML">ng/mL</option>
+                            </select>
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="c-final-volume">Final volume (V2)</label>
+                            <div class="calc-input-row">
+                                <input class="calc-input" type="number" inputmode="decimal" min="0" id="c-final-volume" value="500">
+                                <select class="calc-select" id="c-volume-unit" aria-label="Final volume unit">
+                                    <option value="uL" selected>µL</option>
+                                    <option value="mL">mL</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button type="button" onclick="resetConcentrationMode()">Reset</button>
+                    </div>
+
+                    <div class="calc-banner calc-error" id="c-banner-error" role="alert" hidden></div>
+                    <div class="calc-banner calc-infeasible" id="c-banner-infeasible" role="alert" hidden></div>
+
+                    <div class="calc-results">
+                        <div class="result-card result-primary">
+                            <p class="result-label">Stock volume (V1)</p>
+                            <p class="result-value" id="c-result-stock-volume">—</p>
+                        </div>
+                        <div class="result-card result-primary">
+                            <p class="result-label">Diluent volume</p>
+                            <p class="result-value" id="c-result-diluent-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Final volume</p>
+                            <p class="result-value" id="c-result-final-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Dilution factor</p>
+                            <p class="result-value" id="c-result-dilution-factor">—</p>
+                        </div>
+                    </div>
+
+                    <details class="calc-details">
+                        <summary>Show calculation</summary>
+                        <div class="calc-details-body">
+                            <p><code>C1V1 = C2V2</code>, so <code>V1 = (C2 × V2) / C1</code>, then <code>Diluent = V2 − V1</code></p>
+                            <p>V1 = <strong id="c-calc-v1">—</strong></p>
+                            <p>Diluent = <strong id="c-calc-diluent">—</strong></p>
+                            <p>Dilution factor = C1 ÷ C2 = <strong id="c-calc-factor">—</strong></p>
+                        </div>
+                    </details>
+                </section>
+            </div>
+
+            <div class="ad-slot" id="ad-slot-bottom" aria-hidden="true"></div>
+
+            <div class="calc-content-section">
+                <h2>What This Calculator Does</h2>
+                <p>
+                    This is a general-purpose <strong>dilution calculator</strong> and <strong>laboratory dilution calculator</strong> for two of the most common dilution questions on the bench: converting a <strong>dilution ratio calculator</strong> request like "1:5" or "1:10 dilution calculator" into actual specimen and diluent volumes, and solving a <strong>C1V1 C2V2 calculator</strong> problem for mass concentrations (mg/mL, µg/mL, ng/mL). It functions as a straightforward <strong>sample dilution calculator</strong> for a single dilution step.
+                </p>
+
+                <h2>When Laboratory Technologists Use It</h2>
+                <p>
+                    Dilution ratios come up constantly — diluting a reagent, a specimen, or a control to a working strength before testing. The trouble is that "1:5" is written identically for two different real-world dilutions depending on which convention a protocol follows, which is a frequent source of bench errors. This tool makes the convention explicit and shows the resulting volumes for whichever one you select, alongside a simple proportional visual.
+                </p>
+
+                <h2>How the Formulas Work</h2>
+                <h3>Mode A — Dilution Ratio</h3>
+                <p>
+                    <strong>Convention 1 (1 in X total parts):</strong> <code>Specimen = Final volume ÷ X</code>, <code>Diluent = Final volume − Specimen</code>.<br>
+                    <strong>Convention 2 (1 part specimen + X parts diluent):</strong> <code>Specimen = Final volume ÷ (1 + X)</code>, <code>Diluent = Final volume − Specimen</code>.
+                </p>
+                <h3>Mode B — Concentration Dilution</h3>
+                <p>
+                    <code>C1 × V1 = C2 × V2</code>, rearranged to <code>V1 = (C2 × V2) / C1</code>, with <code>Diluent = V2 − V1</code>.
+                </p>
+
+                <h2>Worked Examples</h2>
+                <h3>Example — Dilution Ratio, Convention 1</h3>
+                <p>
+                    A 1:5 final dilution under Convention 1 means 1 part specimen + 4 parts diluent. For a 1,000 µL final volume: specimen = 1,000 ÷ 5 = <strong>200 µL</strong>, diluent = <strong>800 µL</strong>.
+                </p>
+                <h3>Example — Dilution Ratio, Convention 2</h3>
+                <p>
+                    A 1:5 specimen-to-diluent dilution under Convention 2 means 1 part specimen + 5 parts diluent (6 total parts). For a 1,200 µL final volume: specimen = 1,200 ÷ 6 = <strong>200 µL</strong>, diluent = <strong>1,000 µL</strong>.
+                </p>
+                <h3>Example — Concentration Dilution</h3>
+                <p>
+                    Starting concentration: 10 mg/mL. Target concentration: 2 mg/mL. Final volume: 500 µL.<br>
+                    V1 = (2 × 500) ÷ 10 = <strong>100 µL stock</strong>. Diluent = 500 − 100 = <strong>400 µL diluent</strong>.
+                </p>
+
+                <h2>Common Mistakes</h2>
+                <ul>
+                    <li><strong>Confusing the two ratio conventions.</strong> "1:5" means a different real dilution depending on whether it's read as "1 in 5 total parts" or "1 part plus 5 parts diluent." Always confirm which your protocol intends.</li>
+                    <li><strong>Treating a dilution factor and a dilution ratio as interchangeable without checking.</strong> A "5-fold dilution" and a "1:5 dilution" are usually the same thing under Convention 1, but not under Convention 2 — read labels carefully.</li>
+                    <li><strong>Mixing concentration units between C1 and C2.</strong> This tool uses one shared unit for both; converting only one side by hand is a common source of 1000-fold errors.</li>
+                    <li><strong>Assuming a higher target concentration is reachable by dilution.</strong> Dilution can only lower concentration — a target above the starting concentration requires concentrating the sample, not diluting it.</li>
+                    <li><strong>Treating this as a serial dilution planner.</strong> This tool calculates one dilution step at a time; it does not generate a serial dilution series.</li>
+                </ul>
+
+                <h2>Units &amp; Assumptions</h2>
+                <p>
+                    Dilution ratio mode works in µL or mL and is unit-agnostic otherwise — the ratio applies regardless of volume unit. Concentration mode supports mg/mL, µg/mL, and ng/mL, converted internally to a common base unit before the C1V1=C2V2 calculation is performed. Both modes assume accurate pipetting and a well-mixed final solution; neither mode plans a multi-step serial dilution.
+                </p>
+
+                <h2>Frequently Asked Questions</h2>
+                <dl class="calc-faq">
+                    <dt>What's the difference between the two dilution-ratio conventions?</dt>
+                    <dd>Convention 1 treats "1:5" as 1 part specimen in 5 total parts (4 parts diluent). Convention 2 treats "1:5" as 1 part specimen plus 5 parts diluent (6 total parts). They produce different volumes for the same label, which is exactly why this tool asks you to pick one explicitly.</dd>
+
+                    <dt>Which convention should I use?</dt>
+                    <dd>Whichever your protocol or reference method specifies. If you're unsure, Convention 1 ("1 in X total parts") is the more common usage in clinical laboratory serology and general dilution language, and is selected by default here — but always confirm against your SOP.</dd>
+
+                    <dt>Does this calculator plan a serial dilution series?</dt>
+                    <dd>No. It solves one dilution step at a time; it does not generate or plan a multi-step serial dilution.</dd>
+
+                    <dt>Can I use different units for C1 and C2 in the concentration mode?</dt>
+                    <dd>The current interface uses one shared unit for both C1 and C2. Choose the unit dropdown that matches your reagent's labeling.</dd>
+
+                    <dt>Does this replace manual verification in my lab?</dt>
+                    <dd>No. Treat results as a calculation aid and verify them against your institution's SOPs before use, as noted in the disclaimer below.</dd>
+                </dl>
+            </div>
+
+            <div class="calc-related-links">
+                <h2>Related Tools</h2>
+                <ul>
+                    <li><a href="cell-suspension-calculator.html">Cell Suspension Calculator</a> — for flow cytometry specimen volumes, cells per tube, and target cell concentrations.</li>
+                    <li><a href="hemocytometer.html">Hemocytometer Counter</a> — for manual RBC/TNC counts in body fluids.</li>
+                </ul>
+            </div>
+
+            <p class="calc-note">
+                <strong>Notice:</strong> CellCounter's calculators are intended as calculation aids only. All inputs are processed locally in your browser — nothing is transmitted, stored, or shared. Results must be independently verified in accordance with your institution's SOPs prior to use.
+            </p>
+
+            <br>
+            <span id="clock"></span>
+            <br>
+        </div>
+
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8727841619590493"
+     crossorigin="anonymous"></script>
+        <script src="ads.js"></script>
+
+        <script>
+            initLabDilutionCalculator();
+        </script>
+
+        <footer>
+            <p>© 2024-2026 CellCounter. All rights reserved. | Version 1.0</p>
+            <ul id="terms">
+                <li><a href="Terms.html">Terms of Use</a></li>
+            </ul>
+        </footer>
+    </body>
+</html>

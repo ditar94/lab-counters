@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cell Suspension Calculator | Flow Cytometry Cell Counts | CellCounter</title>
+        <meta name="description" content="Free cell suspension calculator for flow cytometry and laboratory use. Calculate specimen volume, cells per tube, and cell dilution concentrations instantly.">
+        <meta name="author" content="Dionicy Tarantino">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://cellcounter.io/cell-suspension-calculator">
+
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Cell Suspension Calculator | Flow Cytometry Cell Counts | CellCounter">
+        <meta property="og:description" content="Free cell suspension calculator for flow cytometry and laboratory use. Calculate specimen volume, cells per tube, and cell dilution concentrations instantly.">
+        <meta property="og:url" content="https://cellcounter.io/cell-suspension-calculator">
+        <meta property="og:site_name" content="CellCounter">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Cell Suspension Calculator | CellCounter">
+        <meta name="twitter:description" content="Free cell suspension calculator for flow cytometry and laboratory use. Calculate specimen volume, cells per tube, and cell dilution concentrations instantly.">
+
+        <meta name="google-adsense-account" content="ca-pub-8727841619590493">
+
+        <link rel="stylesheet" href="main.css" type="text/css">
+        <script src="Time.js"></script>
+        <script src="calculators/cellSuspensionCalc.js"></script>
+        <script src="cell-suspension-calculator.js"></script>
+
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "SoftwareApplication",
+                    "name": "Cell Suspension Calculator",
+                    "url": "https://cellcounter.io/cell-suspension-calculator",
+                    "applicationCategory": "HealthApplication",
+                    "operatingSystem": "Any (web browser)",
+                    "browserRequirements": "Requires JavaScript",
+                    "isAccessibleForFree": true,
+                    "description": "Free browser-based calculator for determining specimen volume, cells per tube, and target cell suspension concentrations for flow cytometry and laboratory use.",
+                    "offers": {
+                        "@type": "Offer",
+                        "price": "0",
+                        "priceCurrency": "USD"
+                    },
+                    "publisher": {
+                        "@type": "Person",
+                        "name": "Dionicy Tarantino"
+                    }
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Home",
+                            "item": "https://cellcounter.io/home"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": "Cell Suspension Calculator",
+                            "item": "https://cellcounter.io/cell-suspension-calculator"
+                        }
+                    ]
+                }
+            ]
+        }
+        </script>
+    </head>
+
+    <body>
+        <header>
+            <div id="webTitleBar">
+                <p>CellCounter</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="fetal.html">Fetal Hgb Counter</a></li>
+                    <li><a href="retic.html">Retic Counter</a></li>
+                    <li><a href="parasite.html">Parasite Counter</a></li>
+                    <li><a href="hemocytometer.html">Hemocytometer Counter</a></li>
+                    <li><a href="cell-suspension-calculator.html">Cell Suspension Calculator</a></li>
+                    <li><a href="lab-dilution-calculator.html">Lab Dilution Calculator</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div id="main-body">
+            <h1>Cell Suspension Calculator</h1>
+            <h2>Calculate specimen volume, cells per tube, and target cell concentrations for flow cytometry and laboratory cell suspensions.</h2>
+
+            <div class="calc-intro">
+                <p>
+                    This free cell suspension calculator helps medical laboratory technologists and flow cytometry technologists work out two related, everyday questions: how much specimen volume is needed to deliver a target number of <strong>cells per tube</strong>, and how much specimen plus diluent is needed to prepare a suspension at a <strong>target cell concentration</strong>. Choose a mode below — results update instantly as you type, with no "Calculate" button required.
+                </p>
+            </div>
+
+            <div class="ad-slot" id="ad-slot-top" aria-hidden="true"></div>
+
+            <div class="calc-container">
+                <div class="calc-tabs" role="tablist" aria-label="Cell suspension calculation mode">
+                    <input type="radio" name="suspension-mode" id="mode-a" checked>
+                    <label for="mode-a" class="active-tab">Target Cells Per Tube</label>
+                    <input type="radio" name="suspension-mode" id="mode-b">
+                    <label for="mode-b">Target Cell Concentration</label>
+                </div>
+
+                <section class="calc-panel" id="panel-mode-a" aria-labelledby="mode-a">
+                    <h2>Mode A: Target Cells Per Tube</h2>
+                    <p>
+                        Work out the specimen volume needed to deliver a specific number of cells in each tube — for example, preparing tubes for a flow cytometry panel that calls for 1,000,000 cells per tube. Starting cell concentration and the desired cells per tube must refer to the <strong>same cell population</strong> (e.g. total viable nucleated cells, or a specific gated subset — not a mix of the two).
+                    </p>
+
+                    <div class="calc-grid">
+                        <div class="calc-field">
+                            <label for="a-concentration">Starting cell concentration</label>
+                            <div class="calc-input-row">
+                                <input class="calc-input" type="number" inputmode="decimal" min="0" id="a-concentration" value="20000" aria-describedby="a-concentration-help">
+                                <select class="calc-select" id="a-concentration-unit" aria-label="Starting cell concentration unit">
+                                    <option value="cellsPerUL">cells/µL</option>
+                                    <option value="cellsPerML">cells/mL</option>
+                                    <option value="millionCellsPerML">million cells/mL</option>
+                                </select>
+                            </div>
+                            <span class="calc-help" id="a-concentration-help">The concentration of the specimen as counted (e.g. on a hemocytometer or analyzer).</span>
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="a-target-cells">Desired cells per tube</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="a-target-cells" value="1000000">
+                            <span class="calc-help">Total cells wanted in each tube, of the same population as above.</span>
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="a-tubes">Number of tubes</label>
+                            <input class="calc-input" type="number" inputmode="numeric" min="1" step="1" id="a-tubes" value="4">
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="a-overage">Preparation overage (%)</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="a-overage" value="0">
+                            <span class="calc-help">Optional. Extra specimen to pad for pipetting loss, e.g. 10%. Defaults to 0%.</span>
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="a-available-volume">Available specimen volume</label>
+                            <div class="calc-input-row">
+                                <input class="calc-input" type="number" inputmode="decimal" min="0" id="a-available-volume" placeholder="Optional">
+                                <select class="calc-select" id="a-available-volume-unit" aria-label="Available specimen volume unit">
+                                    <option value="uL">µL</option>
+                                    <option value="mL">mL</option>
+                                </select>
+                            </div>
+                            <span class="calc-help">Optional. Enter what you actually have on hand to check feasibility.</span>
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="a-min-pipette">Minimum reliable pipetting volume (µL)</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="a-min-pipette" placeholder="Optional, e.g. 10">
+                            <span class="calc-help">Optional. Warns you if the volume per tube is too small to pipette accurately.</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button type="button" onclick="resetModeA()">Reset</button>
+                    </div>
+
+                    <div class="calc-banner calc-error" id="a-banner-error" role="alert" hidden></div>
+                    <div class="calc-banner calc-warning" id="a-banner-pipette" role="alert" hidden></div>
+                    <div class="calc-banner calc-feasible" id="a-banner-feasibility" role="status" hidden></div>
+
+                    <div class="calc-results">
+                        <div class="result-card result-primary">
+                            <p class="result-label">Specimen per tube</p>
+                            <p class="result-value" id="a-result-volume-per-tube">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Total specimen (no overage)</p>
+                            <p class="result-value" id="a-result-total-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Additional for overage</p>
+                            <p class="result-value" id="a-result-overage-additional">—</p>
+                        </div>
+                        <div class="result-card result-primary">
+                            <p class="result-label">Total specimen needed</p>
+                            <p class="result-value" id="a-result-total-with-overage">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Total cells required</p>
+                            <p class="result-value" id="a-result-total-cells">—</p>
+                        </div>
+                    </div>
+
+                    <details class="calc-details">
+                        <summary>Show calculation</summary>
+                        <div class="calc-details-body">
+                            <p><code>Volume per tube = Target cells per tube ÷ Cell concentration</code></p>
+                            <p>Starting concentration converts to <strong id="a-calc-concentration-perul">—</strong> cells/µL.</p>
+                            <p>Volume per tube = <strong id="a-calc-volume-per-tube">—</strong> µL</p>
+                            <p>Total specimen volume = Volume per tube × Number of tubes = <strong id="a-calc-total-volume">—</strong> µL</p>
+                            <p>Total with overage = Total specimen volume × (1 + <strong id="a-calc-overage-pct">—</strong>% / 100) = <strong id="a-calc-total-with-overage">—</strong> µL</p>
+                        </div>
+                    </details>
+                </section>
+
+                <section class="calc-panel hide" id="panel-mode-b" aria-labelledby="mode-b">
+                    <h2>Mode B: Target Cell Concentration</h2>
+                    <p>
+                        Work out how much specimen and diluent are needed to prepare a suspension at a specific final concentration, using the standard dilution relationship <strong>C1 × V1 = C2 × V2</strong>.
+                    </p>
+
+                    <div class="calc-grid">
+                        <div class="calc-field">
+                            <label for="b-starting-concentration">Starting cell concentration (C1)</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="b-starting-concentration" value="20000">
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="b-target-concentration">Desired final cell concentration (C2)</label>
+                            <input class="calc-input" type="number" inputmode="decimal" min="0" id="b-target-concentration" value="10000">
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="b-concentration-unit">Concentration unit (applies to both C1 and C2)</label>
+                            <select class="calc-select" id="b-concentration-unit">
+                                <option value="cellsPerUL">cells/µL</option>
+                                <option value="cellsPerML">cells/mL</option>
+                                <option value="millionCellsPerML">million cells/mL</option>
+                            </select>
+                        </div>
+
+                        <div class="calc-field">
+                            <label for="b-final-volume">Desired final suspension volume (V2)</label>
+                            <div class="calc-input-row">
+                                <input class="calc-input" type="number" inputmode="decimal" min="0" id="b-final-volume" value="1000">
+                                <select class="calc-select" id="b-volume-unit" aria-label="Final volume unit">
+                                    <option value="uL">µL</option>
+                                    <option value="mL">mL</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button type="button" onclick="resetModeB()">Reset</button>
+                    </div>
+
+                    <div class="calc-banner calc-error" id="b-banner-error" role="alert" hidden></div>
+                    <div class="calc-banner calc-infeasible" id="b-banner-infeasible" role="alert" hidden></div>
+
+                    <div class="calc-results">
+                        <div class="result-card result-primary">
+                            <p class="result-label">Specimen volume (V1)</p>
+                            <p class="result-value" id="b-result-specimen-volume">—</p>
+                        </div>
+                        <div class="result-card result-primary">
+                            <p class="result-label">Diluent volume</p>
+                            <p class="result-value" id="b-result-diluent-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Final prepared volume</p>
+                            <p class="result-value" id="b-result-final-volume">—</p>
+                        </div>
+                        <div class="result-card">
+                            <p class="result-label">Dilution factor</p>
+                            <p class="result-value" id="b-result-dilution-factor">—</p>
+                        </div>
+                    </div>
+                    <p class="calc-note" id="b-mixing-instructions"></p>
+
+                    <details class="calc-details">
+                        <summary>Show calculation</summary>
+                        <div class="calc-details-body">
+                            <p><code>V1 = (C2 × V2) / C1</code>, then <code>Diluent = V2 − V1</code></p>
+                            <p>V1 = <strong id="b-calc-v1">—</strong></p>
+                            <p>Diluent = <strong id="b-calc-diluent">—</strong></p>
+                            <p>Dilution factor = C1 ÷ C2 = <strong id="b-calc-factor">—</strong></p>
+                        </div>
+                    </details>
+                </section>
+            </div>
+
+            <div class="ad-slot" id="ad-slot-bottom" aria-hidden="true"></div>
+
+            <div class="calc-content-section">
+                <h2>What This Calculator Does</h2>
+                <p>
+                    The cell suspension calculator is a specimen volume calculator and cell concentration calculator rolled into one tool. It supports two of the most common manual calculations in a hematology or flow cytometry lab: figuring out how much specimen volume delivers a specific cell count per tube (a <strong>cells per tube calculator</strong>), and figuring out how much specimen and diluent are needed to hit a target final concentration (a <strong>cell dilution calculator</strong>). All math runs instantly in your browser as you type — nothing is sent anywhere.
+                </p>
+
+                <h2>When Laboratory Technologists Use It</h2>
+                <p>
+                    Flow cytometry technologists routinely need to standardize how many cells go into each tube before adding antibody panels, so that staining and acquisition are comparable across tubes and runs. This <strong>flow cytometry cell calculator</strong> is also useful any time a specimen needs to be brought to a specific <strong>cells per microliter</strong> concentration before plating, counting on a secondary instrument, or banking an aliquot — without reaching for a calculator app or doing the arithmetic by hand under time pressure.
+                </p>
+
+                <h2>How the Formulas Work</h2>
+                <h3>Mode A — Target Cells Per Tube</h3>
+                <p>
+                    <code>Volume per tube = Target cells per tube ÷ Cell concentration (in cells/µL)</code><br>
+                    <code>Total specimen volume = Volume per tube × Number of tubes</code><br>
+                    <code>Total with overage = Total specimen volume × (1 + Overage% / 100)</code>
+                </p>
+                <h3>Mode B — Target Cell Concentration</h3>
+                <p>
+                    This mode uses the standard dilution relationship:<br>
+                    <code>C1 × V1 = C2 × V2</code>, rearranged to <code>V1 = (C2 × V2) / C1</code>, with <code>Diluent = V2 − V1</code>.
+                </p>
+
+                <h2>Worked Examples</h2>
+                <h3>Example — Target Cells Per Tube</h3>
+                <p>
+                    Starting concentration: 20,000 cells/µL. Target: 1,000,000 cells per tube. Number of tubes: 4.<br>
+                    Volume per tube = 1,000,000 ÷ 20,000 = <strong>50 µL</strong>. Total specimen volume = 50 µL × 4 tubes = <strong>200 µL</strong>.
+                </p>
+                <h3>Example — Target Cell Concentration</h3>
+                <p>
+                    Starting concentration: 20,000 cells/µL. Target concentration: 10,000 cells/µL. Final volume: 1,000 µL.<br>
+                    V1 = (10,000 × 1,000) ÷ 20,000 = <strong>500 µL specimen</strong>. Diluent = 1,000 − 500 = <strong>500 µL diluent</strong>.
+                </p>
+
+                <h2>Common Mistakes</h2>
+                <ul>
+                    <li><strong>Mixing up concentration units.</strong> Entering a value in cells/mL while meaning cells/µL (or vice versa) introduces a 1000-fold error. Always double-check the unit dropdown.</li>
+                    <li><strong>Mismatched cell populations.</strong> The starting concentration and the target cells-per-tube (or target concentration) must describe the same population — e.g. don't divide a target subset count by a total nucleated cell concentration.</li>
+                    <li><strong>Assuming dilution can increase concentration.</strong> Diluting a specimen can only lower its concentration, never raise it — if your target concentration is higher than your starting concentration, dilution alone cannot get you there.</li>
+                    <li><strong>Ignoring pipetting limits.</strong> Calculated volumes under roughly 5–10 µL are difficult to pipette accurately on standard lab pipettes; use the minimum pipetting volume field to catch this.</li>
+                    <li><strong>Forgetting overage.</strong> Preparing the exact calculated volume with no pad leaves no margin for pipetting loss or repeat tubes.</li>
+                </ul>
+
+                <h2>Units &amp; Assumptions</h2>
+                <p>
+                    Concentration can be entered as cells/µL, cells/mL, or million cells/mL (equivalent to ×10⁶ cells/mL); volumes can be entered in µL or mL. The calculator assumes the specimen is homogeneous (well-mixed) and that the entered concentration already reflects the population of interest — it does not adjust for viability, debris, or counting error from whatever method produced that concentration. This tool does not plan multi-step serial dilutions; each calculation is a single specimen-to-tube or specimen-to-final-volume step.
+                </p>
+
+                <h2>Frequently Asked Questions</h2>
+                <dl class="calc-faq">
+                    <dt>What is a cell suspension calculator used for?</dt>
+                    <dd>It converts a desired cell count or concentration into the specimen (and, where relevant, diluent) volume needed to achieve it — avoiding manual arithmetic when setting up tubes for flow cytometry or other cell-based assays.</dd>
+
+                    <dt>Can this tool account for cell viability or dead cells?</dt>
+                    <dd>No. It assumes the cell concentration you enter already represents the population you care about. If you need a viable-cell-only concentration, calculate that first and enter the viable concentration here.</dd>
+
+                    <dt>What happens if I don't have enough specimen?</dt>
+                    <dd>If you enter an available specimen volume, the calculator compares it against the total volume needed (including overage) and clearly flags whether the preparation is feasible.</dd>
+
+                    <dt>Does this tool support planning a serial dilution series?</dt>
+                    <dd>No — this calculator performs a single specimen-to-target step. It does not plan multi-step serial dilutions.</dd>
+
+                    <dt>Does this replace manual verification in my lab?</dt>
+                    <dd>No. Treat results as a calculation aid and verify them against your institution's SOPs before use, as noted in the disclaimer below.</dd>
+                </dl>
+            </div>
+
+            <div class="calc-related-links">
+                <h2>Related Tools</h2>
+                <ul>
+                    <li><a href="lab-dilution-calculator.html">Laboratory Dilution Calculator</a> — for dilution ratios (1:5, 1:10, etc.) and C1V1=C2V2 mass-concentration dilutions.</li>
+                    <li><a href="hemocytometer.html">Hemocytometer Counter</a> — for manually counting and calculating the starting cell concentration itself.</li>
+                </ul>
+            </div>
+
+            <p class="calc-note">
+                <strong>Notice:</strong> CellCounter's calculators are intended as calculation aids only. All inputs are processed locally in your browser — nothing is transmitted, stored, or shared. Results must be independently verified in accordance with your institution's SOPs prior to use in specimen preparation.
+            </p>
+
+            <br>
+            <span id="clock"></span>
+            <br>
+        </div>
+
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8727841619590493"
+     crossorigin="anonymous"></script>
+        <script src="ads.js"></script>
+
+        <script>
+            initCellSuspensionCalculator();
+        </script>
+
+        <footer>
+            <p>© 2024-2026 CellCounter. All rights reserved. | Version 1.0</p>
+            <ul id="terms">
+                <li><a href="Terms.html">Terms of Use</a></li>
+            </ul>
+        </footer>
+    </body>
+</html>

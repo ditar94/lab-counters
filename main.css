@@ -59,6 +59,7 @@ ul {
     padding: 0;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
     column-gap: 10px;
 
@@ -470,3 +471,357 @@ footer {
     margin: 20px 4rem;
     border-radius: 8px;
 }
+
+/* Calculator pages (Cell Suspension, Lab Dilution) start */
+
+.calc-container {
+    align-self: stretch;
+    max-width: 48rem;
+    width: 100%;
+}
+
+.calc-intro {
+    text-align: left;
+}
+
+.calc-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    border-bottom: 0.15rem solid #f3f2f1;
+    padding-bottom: 0.75rem;
+}
+
+.calc-tabs input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+}
+
+.calc-tabs label {
+    cursor: pointer;
+    padding: 0.6rem 1rem;
+    border: 0.1rem solid #1d70b8;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #1d70b8;
+    background-color: white;
+    font-size: 14px;
+}
+
+.calc-tabs label:has(+ input:checked),
+.calc-tabs:has(input:checked) label[data-active="true"] {
+    background-color: #1d70b8;
+    color: white;
+}
+
+/* Simpler, broadly-supported active-tab styling driven by JS toggling
+   this class (kept in addition to the :has() rule above). */
+.calc-tabs label.active-tab {
+    background-color: #1d70b8;
+    color: white;
+}
+
+.calc-panel.hide {
+    display: none;
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.calc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    text-align: left;
+}
+
+.calc-field label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.calc-field .calc-help {
+    font-size: 12px;
+    color: #555;
+    font-weight: normal;
+}
+
+.calc-input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.calc-input,
+.calc-select {
+    height: 44px;
+    font-size: 16px;
+    padding: 0 0.6rem;
+    border: 0.1rem solid black;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.calc-input:focus,
+.calc-select:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+}
+
+.calc-input-row .calc-select {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 7rem;
+}
+
+.calc-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.result-card {
+    border: 0.1rem solid black;
+    border-radius: 10px;
+    padding: 0.75rem;
+    background-color: #1d70b814;
+    text-align: center;
+}
+
+.result-card.result-primary {
+    background-color: #1d70b884;
+}
+
+.result-card p.result-label {
+    margin: 0 0 0.3rem 0;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.result-card p.result-value {
+    margin: 0;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.result-card p.result-unit {
+    margin: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.calc-banner {
+    width: 100%;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    text-align: left;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.calc-banner.calc-error {
+    background-color: #ffe9e9;
+    border: 0.1rem solid #d4351c;
+    color: #942718;
+}
+
+.calc-banner.calc-warning {
+    background-color: #fff7e5;
+    border: 0.1rem solid #b58a00;
+    color: #6b5300;
+}
+
+.calc-banner.calc-feasible {
+    background-color: #e9f7e9;
+    border: 0.1rem solid #1a7a1a;
+    color: #1a5c1a;
+}
+
+.calc-banner.calc-infeasible {
+    background-color: #ffe9e9;
+    border: 0.1rem solid #d4351c;
+    color: #942718;
+}
+
+.calc-banner[hidden] {
+    display: none;
+}
+
+.calc-note {
+    font-size: 13px;
+    color: #555;
+    text-align: left;
+}
+
+.calc-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.calc-actions button {
+    background-color: #eee;
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 0.5rem 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.calc-actions button:active {
+    background-color: #1d70b884;
+}
+
+details.calc-details {
+    width: 100%;
+    text-align: left;
+    border: 0.1rem solid #f3f2f1;
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    margin: 1rem 0;
+    background-color: #fafafa;
+}
+
+details.calc-details summary {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.4rem 0;
+    font-size: 14px;
+}
+
+details.calc-details .calc-details-body {
+    padding: 0.5rem 0 0.25rem 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+details.calc-details code {
+    background-color: #eee;
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+}
+
+.ratio-visual {
+    display: flex;
+    width: 100%;
+    height: 2.5rem;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 0.1rem solid black;
+    margin: 0.75rem 0;
+}
+
+.ratio-visual-specimen,
+.ratio-visual-diluent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 0.25rem;
+}
+
+.ratio-visual-specimen {
+    background-color: #1d70b8;
+}
+
+.ratio-visual-diluent {
+    background-color: #505a5f;
+}
+
+.calc-content-section {
+    align-self: stretch;
+    text-align: left;
+    border-top: 0.1vw solid #f3f2f1;
+    padding-top: 1rem;
+    margin-top: 1.5rem;
+}
+
+.calc-content-section h2,
+.calc-content-section h3 {
+    text-align: left;
+}
+
+.calc-content-section p,
+.calc-content-section li {
+    text-align: left;
+    line-height: 1.5;
+}
+
+/* The sitewide `ul` rule lays lists out as a horizontal flex row (built
+   for the nav bar) — restore normal block list behavior for ordinary
+   bulleted content inside the calculator pages. */
+.calc-content-section ul,
+.calc-related-links ul {
+    display: block;
+    list-style-type: disc;
+    padding-left: 1.5rem;
+}
+
+.calc-content-section li,
+.calc-related-links li {
+    display: list-item;
+    list-style-type: disc;
+}
+
+.calc-faq dt {
+    font-weight: bold;
+    margin-top: 0.75rem;
+}
+
+.calc-faq dd {
+    margin: 0.25rem 0 0 0;
+}
+
+.calc-related-links {
+    align-self: stretch;
+    text-align: left;
+}
+
+.ad-slot {
+    align-self: stretch;
+    width: 100%;
+    max-width: 728px;
+    margin: 1rem auto;
+    text-align: center;
+}
+
+.ad-slot[data-configured="true"] {
+    min-height: 100px;
+}
+
+.ad-slot-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.25rem 0;
+}
+
+@media screen and (max-width: 500px) {
+    .calc-tabs label {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    .result-card p.result-value {
+        font-size: 22px;
+    }
+}
+
+/* Calculator pages (Cell Suspension, Lab Dilution) end */
