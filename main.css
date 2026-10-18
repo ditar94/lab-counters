@@ -453,6 +453,7 @@ input[type=text] {
   }
 
 footer {
+    position: relative;
     text-align: center;
     padding: 20px 0; /* Optional: adds some breathing room */
 }
@@ -770,69 +771,33 @@ details.calc-details code {
 
 /* Tip jar widget (sitewide) start */
 
-/* Default: a small badge fixed to the bottom-left corner of the
-   viewport (every page except the homepage, which pairs it with the
-   comment form instead — see .support-row below). Kept deliberately
-   small: a full-size card here collided with real counter
-   buttons/inputs and the footer's links on most pages at common sizes
-   (these pages center their content and don't reserve a margin wide
-   enough for a persistent corner card) — a compact badge keeps that
-   footprint, and the risk, as small as possible. An earlier
-   floating-under-header version was dropped for the same kind of
-   reason: it overlapped page H1/H2 text on every counter page. */
+/* A plain static card sitting at the bottom-left of each page's own
+   content (not position:fixed/absolute) — it scrolls away with the
+   page like any other element, so it never slides over content as you
+   scroll, and never needs to dodge anything since nothing else renders
+   after it. Square-ish: image on top, short caption below. On the
+   homepage it instead sits next to the comment form (.support-row). */
 #tip-bar {
-    position: fixed;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    z-index: 500;
-    width: 4.2rem;
+    align-self: flex-start;
+    width: 9rem;
     flex-shrink: 0;
 }
 
-/* On the homepage the card instead sits in normal flow next to the
-   comment form, full-size, not floating. */
 .support-row #tip-bar {
-    position: static;
-    bottom: auto;
-    left: auto;
-    width: 11rem;
-}
-
-/* The Cell Suspension Calculator's own Reset button is left-aligned
-   and, on narrow/short viewports, its single-column input grid pushes
-   it down far enough that there is no vertical offset where a fixed
-   corner badge doesn't sit on top of it (confirmed: the safe margin is
-   negative at several common viewport sizes). Falls back to the same
-   in-flow placement as the homepage uses, scoped to this page only. */
-.tip-bar-inline #tip-bar {
-    position: static;
-    bottom: auto;
-    left: auto;
-    align-self: flex-start;
-    width: 11rem;
-}
-
-.tip-bar-inline #tip-widget img {
-    width: 80px;
-    height: 80px;
-}
-
-.tip-bar-inline #tip-widget .tip-widget-text {
-    font-size: 11px;
-    line-height: 1.35;
+    width: 9rem;
 }
 
 #tip-widget {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.4rem;
     text-decoration: none;
     color: black;
     background-color: white;
     border: 0.1rem solid #1d70b8;
     border-radius: 8px;
-    padding: 0.35rem;
+    padding: 0.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
     text-align: center;
 }
@@ -842,27 +807,31 @@ details.calc-details code {
 }
 
 #tip-widget img {
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
+    width: 70px;
+    height: 70px;
+    border-radius: 6px;
     border: 0.05rem solid black;
 }
 
-.support-row #tip-widget img {
-    width: 80px;
-    height: 80px;
-    border-radius: 6px;
-}
-
 #tip-widget .tip-widget-text {
-    font-size: 9px;
-    line-height: 1.2;
+    font-size: 11px;
+    line-height: 1.3;
     color: black;
 }
 
-.support-row #tip-widget .tip-widget-text {
-    font-size: 11px;
-    line-height: 1.35;
+/* In the footer (every page except the homepage), the badge sits
+   independently at the far left, out of the normal flow via
+   position:absolute — so the copyright/Terms of Use text next to it
+   stays centered on the page exactly as it always has, unaffected by
+   the badge's presence. This still scrolls away with the page like a
+   normal element (footer is the positioned ancestor, not the
+   viewport) — it does not stay pinned on screen while scrolling,
+   unlike position:fixed. */
+footer #tip-bar {
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* Pairs the comment/suggestions form with the tip-jar card on the
@@ -878,39 +847,27 @@ details.calc-details code {
 }
 
 @media screen and (max-width: 500px) {
-    /* Homepage card (in-flow, next to the form) and the calculator
-       page's in-flow card both shrink a bit on narrow screens, same as
-       before. */
-    .support-row #tip-bar,
-    .tip-bar-inline #tip-bar {
-        width: 9rem;
-    }
-
-    .support-row #tip-widget img,
-    .tip-bar-inline #tip-widget img {
-        width: 64px;
-        height: 64px;
-    }
-
-    .support-row #tip-widget .tip-widget-text,
-    .tip-bar-inline #tip-widget .tip-widget-text {
-        font-size: 10px;
-    }
-
-    /* The fixed corner badge (every other page) shrinks further still
-       on narrow screens, where centered page content has the least
-       room to avoid the edges. */
     #tip-bar {
-        width: 3.4rem;
+        width: 8rem;
     }
 
     #tip-widget img {
-        width: 32px;
-        height: 32px;
+        width: 56px;
+        height: 56px;
     }
 
     #tip-widget .tip-widget-text {
-        font-size: 8px;
+        font-size: 10px;
+    }
+
+    /* The far-left badge is absolutely positioned (out of flow), so
+       the footer's centered text doesn't know to avoid it — reserve
+       that space on narrow screens only, where the text's own width
+       is close enough to the footer's to otherwise run under it.
+       Desktop/tablet is unaffected: text centers on the full page as
+       requested, with the badge independently off to the side. */
+    footer:has(#tip-bar) {
+        padding-left: 9rem;
     }
 }
 
