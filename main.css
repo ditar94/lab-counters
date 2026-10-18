@@ -770,57 +770,59 @@ details.calc-details code {
 
 /* Tip jar widget (sitewide) start */
 
-/* Floats in the left margin reserved by #main-body's own
-   margin-left: 4rem — that strip is always empty of real content at
-   every breakpoint, so an overlay confined to it can never cover page
-   content. position:absolute (not fixed) means it scrolls away with
-   the page instead of staying pinned over content further down, and it
-   takes no space in the flex layout, so nothing else shifts. Its `top`
-   is set by tip-widget.js to sit just below the actual rendered header
-   (height varies by breakpoint/nav wrapping), not a guessed value. */
+/* A normal-flow bar below the header — a full paragraph plus a larger
+   QR image doesn't fit a floating corner widget without either getting
+   cramped or risking overlap, and this also avoids the JS-driven
+   reposition-after-load that caused a visible jump. Left-aligned per
+   request; this does add its own height below the nav. */
 #tip-bar {
-    position: absolute;
-    left: 0.4rem;
-    z-index: 500;
+    display: flex;
+    justify-content: flex-start;
+    background-color: #f3f2f1;
+    border-bottom: 0.1rem solid #1d70b8;
+    padding: 0.75rem 1.5rem;
 }
 
 #tip-widget {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 0.2rem;
+    gap: 1rem;
     text-decoration: none;
-    color: #1d70b8;
-    width: 3.2rem;
-    text-align: center;
+    color: black;
+    max-width: 44rem;
 }
 
-#tip-widget:hover .tip-widget-text {
+#tip-widget:hover {
     text-decoration: underline;
 }
 
 #tip-widget img {
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    border-radius: 6px;
     border: 0.05rem solid black;
     background-color: white;
 }
 
 #tip-widget .tip-widget-text {
-    font-size: 10px;
-    line-height: 1.15;
-    font-weight: bold;
+    font-size: 14px;
+    line-height: 1.4;
+    color: black;
 }
 
-@media screen and (max-width: 420px) {
+@media screen and (max-width: 600px) {
+    #tip-bar {
+        padding: 0.5rem 0.75rem;
+    }
+
     #tip-widget img {
-        width: 32px;
-        height: 32px;
+        width: 64px;
+        height: 64px;
     }
 
     #tip-widget .tip-widget-text {
-        display: none;
+        font-size: 12px;
     }
 }
 
